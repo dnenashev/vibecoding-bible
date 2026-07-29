@@ -19,14 +19,14 @@
 Попросите Codex установить skill из GitHub:
 
 ```text
-Установи skill из https://github.com/dmitryintoxic/vibecoding-bible/tree/main/skills/vibecoding-bible
+Установи skill из https://github.com/dnenashev/vibecoding-bible/tree/main/skills/vibecoding-bible
 ```
 
 Или используйте системный skill installer:
 
 ```bash
 python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
-  --repo dmitryintoxic/vibecoding-bible \
+  --repo dnenashev/vibecoding-bible \
   --path skills/vibecoding-bible
 ```
 
