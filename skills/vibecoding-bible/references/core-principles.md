@@ -63,7 +63,7 @@ Oper8 превращает AI-функцию в управляемую опер�
 
 1. `ContextPack` — versioned вход, provenance, freshness, разрешённые данные и missing facts.
 2. `Rulebook` — deterministic rules, owners, effective dates, exceptions и change process.
-3. `EvalSuite` — representative cases, primary/counter-metrics, red lines и expected evidence.
+3. `EvalSuite` — versioned cases с provenance, slices, thresholds, judge calibration, run config, fallback и expected evidence. Полный lifecycle описан в [`evals.md`](evals.md).
 4. `AutonomyPolicy` — уровни самостоятельности, permissions, approvals, stop rules и maximum level.
 5. `DecisionRecord` — выбранная альтернатива, alternatives considered, context/model/rules/tools versions, confidence и human intervention.
 6. `OutcomeRecord` — фактический результат после observation window, source refs, attribution confidence и win/loss/inconclusive.

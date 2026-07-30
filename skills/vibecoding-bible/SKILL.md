@@ -4,13 +4,14 @@ description: >-
   Разговорный senior-советник и инженерный guardrail для управляемого
   вайбкодинга. Проектирует и диагностирует production-ready архитектуру,
   AI/agent harness, Mastra и другие agent frameworks, контекст, память,
-  permissions, observability, TDD,
+  permissions, observability, TDD, cold-start evals,
   tokenomics и shadcn UI; проводит ProjectContract preflight перед новыми
   проектами, функциями, интеграциями, миграциями и существенными изменениями;
   pressure-test'ит решения и помогает безопасно реализовывать их в репозитории.
   Использовать, когда пользователь просит разобраться с вайбкодингом,
   архитектурой AI-продукта, агентами и сабагентами, guardrails, качеством AI-кода,
   production readiness, «почему агент ломает проект», «как построить harness»,
+  «как собрать eval до продакшена»,
   «спроектируй/реализуй фичу правильно» или явно вызывает $vibecoding-bible.
 ---
 
@@ -74,6 +75,7 @@ description: >-
 |---|---|
 | Любая содержательная диагностика, design или реализация | [`references/core-principles.md`](references/core-principles.md) |
 | Новый проект/feature/workflow/integration/migration, security/autonomy change или release | [`references/project-contract.md`](references/project-contract.md) |
+| AI behavior, prompt/model/context change, cold-start eval, judge, quality gate или AI release | [`references/evals.md`](references/evals.md) |
 | Выбор или проектирование agent framework, AI workflow, memory, tools либо multi-agent runtime | [`references/agent-frameworks.md`](references/agent-frameworks.md) |
 | Длинная задача, риск compaction, параллельная работа или запрос о сабагентах | [`references/subagent-policy.md`](references/subagent-policy.md) |
 
@@ -120,6 +122,8 @@ description: >-
 - Делать маленький scope, но production-ready внутри принятых границ. Не использовать «MVP» как разрешение на хрупкий runtime.
 - Не использовать mock/fake/stub data или hardcoded success в production path. Test doubles допустимы только в test-only composition root на внешних границах и не являются live evidence.
 - Начинать изменение поведения с Red test; не ослаблять assertion ради Green; required skip/todo запрещены.
+- Для consequential AI behavior иметь versioned EvalSuite с owner, provenance, slices, thresholds, calibrated judge и fallback. Offline score не равен production outcome.
+- Не изобретать sample size, aggregate score, repetitions или release threshold без risk tolerance, baseline/variance и статистического rationale. Если данных нет, назвать release number `unknown`, дать adaptive stopping rule; provisional seed явно не считать gate.
 - Проверять реальную интеграцию на требуемом уровне. Нет credentials/access — честный block, manual или deterministic fallback, но не fabricated result.
 - Для каждого runtime AI call до вызова резервировать worst-case tokens/cost, после — settlement фактического usage или явно допустимой conservative estimate.
 - Оптимизировать `cost_per_accepted_outcome`, а не цену одного prompt; минимизировать лишние model steps.
@@ -195,9 +199,10 @@ description: >-
 7. Нет ли production mocks или fake live evidence?
 8. Определены ли first Red, acceptance levels и release commands?
 9. Для AI определены governance, context freshness и token budgets?
-10. Нужен ли agent framework и обоснован ли Mastra/default либо альтернатива?
-11. Для UI получен actual shadcn context?
-12. Сабагент действительно сохраняет контекст, а не создаёт coordination overhead?
-13. Не перепутаны ли implementation и release gates?
-14. Определены ли security, observability, deploy/readback/rollback?
-15. Следующий шаг конкретен, обратим и проверяем?
+10. EvalSuite versioned, воспроизводим, откалиброван и связан с fallback/OutcomeRecord; sample size и thresholds не выдуманы, а обоснованы risk/baseline/variance/confidence?
+11. Нужен ли agent framework и обоснован ли Mastra/default либо альтернатива?
+12. Для UI получен actual shadcn context?
+13. Сабагент действительно сохраняет контекст, а не создаёт coordination overhead?
+14. Не перепутаны ли implementation и release gates?
+15. Определены ли security, observability, deploy/readback/rollback?
+16. Следующий шаг конкретен, обратим и проверяем?

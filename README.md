@@ -106,6 +106,7 @@ $vibecoding-bible реализуй оплату подписки
 - **Production-ready внутри выбранного scope.** Маленький vertical slice допустим; хрупкий runtime — нет.
 - **Никаких mocks в production path.** Test doubles разрешены только в test-only composition root и не заменяют live evidence.
 - **TDD.** Изменение поведения начинается с Red test; assertions не ослабляются ради Green.
+- **EvalSuite lifecycle.** Cold-start cases проходят expert labeling, judge calibration, per-slice gates, CI regressions и пополняются production outcomes.
 - **Tokenomics.** Каждый runtime AI call получает pre-call budget и post-call settlement; оптимизируется `cost_per_accepted_outcome`.
 - **Lean AI и Oper8.** Ценность идёт раньше технологии; контекст, память, автономность и outcomes имеют явные контракты.
 - **Agent frameworks по необходимости.** Для TypeScript/Node.js Mastra рассматривается первой, но обычный код, provider SDK или durable orchestration могут быть правильнее.
@@ -123,6 +124,7 @@ skills/vibecoding-bible/
 └── references/
     ├── core-principles.md
     ├── project-contract.md
+    ├── evals.md
     ├── agent-frameworks.md
     └── subagent-policy.md
 ```
@@ -131,6 +133,7 @@ skills/vibecoding-bible/
 
 - [`core-principles.md`](skills/vibecoding-bible/references/core-principles.md) — production readiness, Lean AI, Oper8, mocks, TDD, tokenomics, shadcn и evidence;
 - [`project-contract.md`](skills/vibecoding-bible/references/project-contract.md) — `VibecodingProjectContract`, gates и red lines;
+- [`evals.md`](skills/vibecoding-bible/references/evals.md) — cold-start eval, judge calibration, slices, guardrails и production regression lifecycle;
 - [`agent-frameworks.md`](skills/vibecoding-bible/references/agent-frameworks.md) — Mastra, alternatives, memory, tools и orchestration;
 - [`subagent-policy.md`](skills/vibecoding-bible/references/subagent-policy.md) — compaction risk, delegation verdicts и `SubagentTaskContract`.
 
@@ -168,6 +171,7 @@ python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-githu
 
 - Раздел Lean AI вдохновлён принципами Lean thinking: ценность до технологии, устранение waste и уважение роли человека. См. материалы [Lean Enterprise Institute](https://tech.lean.org/journal/lean-ai-navigating-hype).
 - Раздел Oper8 вдохновлён публичным [справочником методики Oper8 от Кактус.AI](https://kkts.ai/methodology).
+- Cold-start часть EvalSuite адаптирует идеи раздатки Михаила Карпова / AI Product Club [«Cold-start eval»](https://drive.google.com/file/d/1RfWeSkRn5MgI8QVNc5ZAriymZsnlI31K/view); её численные ориентиры используются как эвристики, а не универсальные нормы.
 - Mastra, Temporal, LangGraph, CrewAI, Agno, OpenAI и shadcn упоминаются как инструменты или варианты архитектуры. Все названия и товарные знаки принадлежат соответствующим владельцам.
 
 ## Лицензия

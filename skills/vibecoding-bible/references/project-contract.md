@@ -139,6 +139,7 @@ Artifact («создать экран/файл/AI-текст») не являе�
 - runtime/version, deployment model и production storage;
 - critical decisions и autonomy levels;
 - ContextPack/Rulebook/EvalSuite/AutonomyPolicy;
+- EvalSuite owner/status/version/provenance, floor/ceiling, slices, per-slice thresholds, ambiguity/fallback, judge calibration, exact run config и OutcomeRecord link;
 - DecisionRecord/OutcomeRecord;
 - memory/freshness/stale;
 - workflow durability, retries, suspend/resume и human checkpoints;
@@ -251,20 +252,22 @@ Frozen contract не редактировать молча. Создать но�
 8. Не определены first Red и acceptance criteria.
 9. Не определены security, permissions, observability и rollback для scope.
 10. Runtime AI не имеет model/context/rule/eval/autonomy/token budget policy.
-11. Web UI не имеет actual shadcn context/conformance plan.
-12. Не выбраны delivery strategy и write scopes.
+11. Consequential AI behavior не имеет EvalSuite owner, version, provenance, slices, acceptance/fallback policy или reproducible run plan.
+12. Web UI не имеет actual shadcn context/conformance plan.
+13. Не выбраны delivery strategy и write scopes.
 
 ### Release
 
-13. Mandatory integration не прошла required sandbox/live evidence.
-14. Required test/build/lint/security/conformance содержит fail/skip/todo/warning по принятой policy.
-15. External mutation не имеет idempotency/readback/rollback.
-16. AI calls не имеют работающего token/cost accounting и enforcement.
-17. AI decision не связан с actual context/rules/model/tool versions.
-18. Autonomy превышает доказанный и утверждённый уровень.
-19. Web UI не прошло required shadcn/browser conformance.
-20. Production readiness основана только на source/unit/mock/replay.
-21. Deploy/readback/rollback не воспроизводимы.
+14. Mandatory integration не прошла required sandbox/live evidence.
+15. Required test/build/lint/security/conformance содержит fail/skip/todo/warning по принятой policy.
+16. External mutation не имеет idempotency/readback/rollback.
+17. AI calls не имеют работающего token/cost accounting и enforcement.
+18. AI decision не связан с actual context/rules/model/tool versions.
+19. Required EvalSuite не прошёл blocking per-slice thresholds на exact model/context/rules/tools/judge versions либо judge не откалиброван по принятой risk policy.
+20. Autonomy превышает доказанный и утверждённый уровень.
+21. Web UI не прошло required shadcn/browser conformance.
+22. Production readiness основана только на source/unit/mock/replay/offline score.
+23. Deploy/readback/rollback не воспроизводимы.
 
 ## 7. Evidence levels
 
@@ -325,6 +328,9 @@ Deploy/readback/rollback/blast radius:
 Framework/runtime decision and rationale:
 Orchestration layers and ownership:
 Model/context/rules/evals/autonomy:
+EvalSuite lifecycle/status/version/owner/provenance:
+Floor/ceiling/slices/thresholds/ambiguity/fallback:
+Judge calibration/run config/regression/OutcomeRecord link:
 Memory/storage/durability/tool permissions:
 Budgets/reservation/settlement:
 Fallback:
@@ -359,8 +365,9 @@ Constraints:
 8. Security/observability/deploy/rollback определены?
 9. Потребность в agent framework и выбор Mastra/альтернативы обоснованы?
 10. AI governance и token budgets есть?
-11. Actual shadcn context получен?
-12. Delivery strategy рациональна?
-13. Implementation readiness не выдана за release?
-14. Constraint не скрывает red-line failure?
-15. Следующий шаг конкретен и проверяем?
+11. EvalSuite имеет owner/version/provenance/slices/thresholds/calibration/fallback и online outcome link?
+12. Actual shadcn context получен?
+13. Delivery strategy рациональна?
+14. Implementation readiness не выдана за release?
+15. Constraint не скрывает red-line failure?
+16. Следующий шаг конкретен и проверяем?
