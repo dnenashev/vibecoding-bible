@@ -146,6 +146,20 @@ Artifact («создать экран/файл/AI-текст») не являе�
 - tool schemas, permissions и mutation controls;
 - manual/deterministic fallback.
 
+### Testing harness
+
+- применимость: workflow, multi-agent system, agent role, skill либо `not_applicable` с rationale;
+- `TestSubjectManifest` и `ScenarioContract` versions/hashes из actual sources;
+- execution modes и scenario/risk slices;
+- authenticated actor/recorder/collector/supervisor/repairer/verifier/approver;
+- trusted evidence collectors и resolvable receipt formats;
+- append-only journal, trace completeness и drift policy;
+- atomic idempotency/outbox protocol для run changes и external mutations;
+- issue classification, approved BugSpec и Red→Green repair proof;
+- clean replay procedure, isolated namespace и side-effect policy;
+- acceptance/promotion/rollback policy;
+- harness qualification: seeded defects, trace loss, spoofing и false-green checks.
+
 ### Delivery harness
 
 - `KEEP_LOCAL`, `DELEGATE`, `PARALLELIZE` или `DECOMPOSE_FIRST`;
@@ -163,6 +177,7 @@ Artifact («создать экран/файл/AI-текст») не являе�
 - regressions, security, performance и accessibility;
 - zero required skip/todo;
 - mock policy reference.
+- TestingHarness reference и required qualification/evidence status для consequential composite behavior.
 
 ### UI
 
@@ -255,19 +270,22 @@ Frozen contract не редактировать молча. Создать но�
 11. Consequential AI behavior не имеет EvalSuite owner, version, provenance, slices, acceptance/fallback policy или reproducible run plan.
 12. Web UI не имеет actual shadcn context/conformance plan.
 13. Не выбраны delivery strategy и write scopes.
+14. Consequential workflow, multi-agent system, agent role или skill не имеет TestingHarness plan с actual subject/contract versions, trusted evidence collector, authenticated roles и clean replay strategy.
 
 ### Release
 
-14. Mandatory integration не прошла required sandbox/live evidence.
-15. Required test/build/lint/security/conformance содержит fail/skip/todo/warning по принятой policy.
-16. External mutation не имеет idempotency/readback/rollback.
-17. AI calls не имеют работающего token/cost accounting и enforcement.
-18. AI decision не связан с actual context/rules/model/tool versions.
-19. Required EvalSuite не прошёл blocking per-slice thresholds на exact model/context/rules/tools/judge versions либо judge не откалиброван по принятой risk policy.
-20. Autonomy превышает доказанный и утверждённый уровень.
-21. Web UI не прошло required shadcn/browser conformance.
-22. Production readiness основана только на source/unit/mock/replay/offline score.
-23. Deploy/readback/rollback не воспроизводимы.
+15. Mandatory integration не прошла required sandbox/live evidence.
+16. Required test/build/lint/security/conformance содержит fail/skip/todo/warning по принятой policy.
+17. External mutation не имеет idempotency/readback/rollback.
+18. AI calls не имеют работающего token/cost accounting и enforcement.
+19. AI decision не связан с actual context/rules/model/tool versions.
+20. Required EvalSuite не прошёл blocking per-slice thresholds на exact model/context/rules/tools/judge versions либо judge не откалиброван по принятой risk policy.
+21. Required TestingHarness acceptance основан на caller/subject self-attestation, spoofable identity, unresolved evidence refs или неисполненном replay; либо сам harness не прошёл требуемую qualification.
+22. Autonomy превышает доказанный и утверждённый уровень.
+23. Web UI не прошло required shadcn/browser conformance.
+24. Production readiness основана только на source/unit/mock/replay/offline score.
+25. Deploy/readback/rollback не воспроизводимы.
+26. Release decision выдан за реальный OutcomeRecord до observation window либо idempotency допускает duplicate/orphan consequential mutation после crash.
 
 ## 7. Evidence levels
 
@@ -339,6 +357,15 @@ Fallback:
 KEEP_LOCAL | DELEGATE | PARALLELIZE | DECOMPOSE_FIRST
 Task contracts/write scopes/integration owner:
 
+## Testing harness
+Subject type/id/version/hash and actual contract ref:
+Modes/scenarios/risk slices:
+Authenticated roles and separation of duties:
+Trusted collectors/evidence receipts/journal:
+Issue → BugSpec → Red/Green → clean replay:
+Acceptance/promotion/rollback policy:
+Harness qualification/seeded faults/known gaps:
+
 ## TDD and evidence
 First Red:
 Acceptance criteria:
@@ -366,8 +393,9 @@ Constraints:
 9. Потребность в agent framework и выбор Mastra/альтернативы обоснованы?
 10. AI governance и token budgets есть?
 11. EvalSuite имеет owner/version/provenance/slices/thresholds/calibration/fallback и online outcome link?
-12. Actual shadcn context получен?
-13. Delivery strategy рациональна?
-14. Implementation readiness не выдана за release?
-15. Constraint не скрывает red-line failure?
-16. Следующий шаг конкретен и проверяем?
+12. Consequential workflow/agent/role/skill имеет TestingHarness с actual hashes, authenticated roles, trusted receipts, clean replay и qualification?
+13. Actual shadcn context получен?
+14. Delivery strategy рациональна?
+15. Implementation readiness не выдана за release?
+16. Constraint не скрывает red-line failure?
+17. Следующий шаг конкретен и проверяем?

@@ -1,4 +1,4 @@
 interface:
   display_name: "Вайбкодинг Библия"
-  short_description: "Архитектура, evals и guardrails для AI-разработки"
+  short_description: "Архитектура, testing harness, evals и guardrails"
   default_prompt: "Используй $vibecoding-bible, чтобы разобрать мой проект и предложить один безопасный следующий шаг."
