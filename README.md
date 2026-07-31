@@ -75,7 +75,7 @@ Implementation readiness не считается release readiness.
 | «Почему агент постоянно ломает проект?» | Находит системную причину и самый опасный failure mode |
 | «Спроектируй архитектуру AI-функции» | Фиксирует границы, контракты, инварианты, integrations и rollback |
 | «Построй agent harness» | Проектирует context, memory, tools, permissions, evals и observability |
-| «Как тестировать workflow или multi-agent system?» | Проектирует trusted evidence, checkpoints, repair, clean replay и acceptance |
+| «Как впервые протестировать workflow?» | Совместно формирует TestCase/checkpoints, затем автономно диагностирует, исправляет и replay'ит failures |
 | «Как проверить agent role или skill?» | Создаёт fresh-agent cases, routing/permission probes и fault-injection qualification |
 | «Разнеси мой подход» | Проводит pressure-test по наиболее дорогому сценарию провала |
 | «Реализуй фичу правильно» | Выполняет Contract → Red → Green → Refactor и собирает release evidence |
@@ -109,7 +109,7 @@ $vibecoding-bible реализуй оплату подписки
 - **Никаких mocks в production path.** Test doubles разрешены только в test-only composition root и не заменяют live evidence.
 - **TDD.** Изменение поведения начинается с Red test; assertions не ослабляются ради Green.
 - **EvalSuite lifecycle.** Cold-start cases проходят expert labeling, judge calibration, per-slice gates, CI regressions и пополняются production outcomes.
-- **Evidence-backed TestingHarness.** Workflow, multi-agent system, agent role и skill проходят versioned scenarios, independent evidence collection, Red→Green repair и clean replay; self-attested pass запрещён.
+- **Interactive Calibration + Autonomous Repair.** Первый run совместно определяет качество на critical checkpoints; harness сам классифицирует failures, выполняет bounded Red→Green repair и replay, а пользователь принимает компактный CheckpointReview.
 - **Tokenomics.** Каждый runtime AI call получает pre-call budget и post-call settlement; оптимизируется `cost_per_accepted_outcome`.
 - **Lean AI и Oper8.** Ценность идёт раньше технологии; контекст, память, автономность и outcomes имеют явные контракты.
 - **Agent frameworks по необходимости.** Для TypeScript/Node.js Mastra рассматривается первой, но обычный код, provider SDK или durable orchestration могут быть правильнее.
@@ -138,7 +138,7 @@ skills/vibecoding-bible/
 - [`core-principles.md`](skills/vibecoding-bible/references/core-principles.md) — production readiness, Lean AI, Oper8, mocks, TDD, tokenomics, shadcn и evidence;
 - [`project-contract.md`](skills/vibecoding-bible/references/project-contract.md) — `VibecodingProjectContract`, gates и red lines;
 - [`evals.md`](skills/vibecoding-bible/references/evals.md) — cold-start eval, judge calibration, slices, guardrails и production regression lifecycle;
-- [`testing-harness.md`](skills/vibecoding-bible/references/testing-harness.md) — универсальный harness для workflows, multi-agent systems, agent roles и skills: trusted evidence, repair, replay и acceptance;
+- [`testing-harness.md`](skills/vibecoding-bible/references/testing-harness.md) — calibration-first harness для workflows, multi-agent systems, agent roles и skills: TestCase, checkpoints, autonomous repair, replay и progressive autonomy;
 - [`agent-frameworks.md`](skills/vibecoding-bible/references/agent-frameworks.md) — Mastra, alternatives, memory, tools и orchestration;
 - [`subagent-policy.md`](skills/vibecoding-bible/references/subagent-policy.md) — compaction risk, delegation verdicts и `SubagentTaskContract`.
 

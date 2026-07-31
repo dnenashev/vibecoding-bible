@@ -1,522 +1,765 @@
-# TestingHarness: доказательное тестирование AI-систем
+# TestingHarness v2: Interactive Calibration + Autonomous Repair
 
 ## Содержание
 
-1. Назначение и граница с EvalSuite
-2. Объекты тестирования
-3. Непереговорная модель доверия
-4. Роли и separation of duties
-5. Версионируемые артефакты
-6. Жизненный цикл прогона
-7. Режимы исполнения
-8. Универсальная матрица сценариев
-9. Специализация по объекту тестирования
-10. Evidence, checkpoints и semantic verdicts
-11. Issue, repair и TDD
-12. Clean replay и внешние мутации
-13. Acceptance, promotion и rollback
-14. Проверка самого harness
-15. Observability и tokenomics
-16. Mastra и другие реализации
-17. Минимальный production-ready slice
-18. Red lines
-19. Шаблон TestingHarnessContract
-20. Self-check
+1. Назначение
+2. Главный принцип
+3. Граница с EvalSuite
+4. Объекты тестирования
+5. Роли
+6. TestCase
+7. Проектирование checkpoints
+8. Критерии качества
+9. Жизненный цикл первого прогона
+10. CheckpointReview
+11. Классификация расхождений
+12. Автономный repair loop
+13. Replay protocol
+14. Progressive autonomy
+15. Evidence и trust boundaries
+16. Ограничители автономности
+17. Специализация по объектам
+18. Scenario matrix
+19. Проверка самого harness
+20. Observability и tokenomics
+21. Реализация и Mastra
+22. Минимальный production-ready slice
+23. Red lines
+24. Шаблон TestingHarnessContract
+25. Self-check
 
-## 1. Назначение и граница с EvalSuite
+## 1. Назначение
 
-`TestingHarness` — отдельный служебный контур, который исполняет сценарии, собирает доказательства, останавливает прогон при отклонении, воспроизводит исправление и выдаёт проверяемый acceptance verdict.
+`TestingHarness` нужен прежде всего для первого контролируемого испытания нового или существенно изменённого workflow, когда команда ещё не знает:
 
-Он отвечает на вопрос:
+- работает ли workflow от входа до конечного результата;
+- соответствует ли промежуточное поведение реальному намерению пользователя;
+- правильно ли выбраны архитектура и границы;
+- где возникают потери контекста, качества или state;
+- можно ли позже безопасно повысить автономность тестирования.
 
-> Можно ли доверять этому прогону, его доказательствам и решению о выпуске?
+Harness не должен превращать пользователя в ручного debugger. Пользователь совместно с агентом определяет, что считать хорошим результатом, и принимает смысловые checkpoints. Технический цикл исполнения, диагностики, исправления и перепроверки выполняет harness.
 
-`EvalSuite` отвечает на другой вопрос:
+## 2. Главный принцип
 
-> Насколько хорошо вероятностный AI-компонент ведёт себя на выбранном наборе случаев?
+> Сначала человек и агент калибруют качество на одном наблюдаемом прогоне. Затем подтверждённые критерии превращаются в regression cases, а harness постепенно становится автономным.
 
-Эти контуры дополняют друг друга, но не взаимозаменяемы:
-
-- EvalSuite содержит cases, slices, labels, judges, metrics и thresholds;
-- TestingHarness управляет execution, identities, trace, checkpoints, repair, replay и acceptance;
-- высокий offline eval score не доказывает реальную интеграцию, side effects или recovery;
-- зелёный deterministic test не доказывает качество открытого AI-решения;
-- release consequential AI behavior обычно требует обоих контуров.
-
-## 2. Объекты тестирования
-
-Один универсальный протокол применяется к четырём основным типам `TestSubject`:
-
-1. `workflow` — последовательность deterministic и AI-шагов, state transitions, approvals и side effects;
-2. `multi_agent_system` — topology, роли, handoffs, shared memory, coordination и partial failures;
-3. `agent_role` — контракт одной роли: входы, решения, инструменты, permissions, abstention и handoff;
-4. `skill` — trigger/routing, инструкции, lazy references, task outcome, permissions и fresh-agent поведение.
-
-При необходимости тип расширяется до `single_agent`, `tool` или `memory_pipeline`, но не ценой потери конкретных инвариантов.
-
-Harness тестирует наблюдаемое поведение и system boundaries, а не скрытую chain-of-thought. Рассуждение агента не является доказательством корректного результата.
-
-## 3. Непереговорная модель доверия
-
-Главное правило:
-
-> Test subject, test actor или semantic supervisor не могут доказать hard fact собственным утверждением.
-
-Недостаточные доказательства:
-
-- boolean `passed: true` от вызывающего клиента;
-- текст «проверено» без resolvable evidence reference;
-- screenshot без identity, timestamp, target и связанного state receipt;
-- supervisor confidence или explanation без наблюдаемого trace;
-- hardcoded copy контракта, выданная за hash реального source;
-- два approval с разными строками actor, если identity не аутентифицирована;
-- replay, который создал запись `queued`, но не исполнил действия;
-- отсутствие ошибки, выданное за доказательство outcome.
-
-Hard evidence создаёт `TrustedEvidenceCollector`, находящийся вне control plane субъекта тестирования. Collector проверяет источник и сохраняет immutable или tamper-evident receipt.
-
-Подходящие источники:
-
-- ответ реальной state query с server-side identity и version;
-- database/event-store receipt с correlation ID;
-- результат test runner на exact commit/config;
-- tool receipt с target, arguments hash, result hash и timestamp;
-- artifact hash и независимый parser/validator;
-- browser/network trace, связанный с run и authenticated session;
-- readback внешней системы после mutation.
-
-Если collector недоступен, состояние называется `BLOCKED: evidence collector unavailable`, а не `pending success` и не `passed with confidence`.
-
-## 4. Роли и separation of duties
-
-Минимальная ролевая модель:
-
-- `contract_owner` определяет expected behavior, invariants и risk policy;
-- `test_actor` выполняет пользовательские действия: человек, persona agent или deterministic runner;
-- `recorder` пишет append-only journal наблюдаемых действий и событий;
-- `evidence_collector` независимо подтверждает hard facts;
-- `semantic_supervisor` сравнивает наблюдения с контрактом и классифицирует неоднозначности;
-- `repairer` реализует approved BugSpec;
-- `verifier` повторяет тесты и clean replay;
-- `release_approver` принимает promotion/rollback decision.
-
-В маленькой команде один человек может выполнять несколько ролей, но для consequential decision обязательны логическое разделение и durable audit. Запрещено:
-
-- subject-under-test подтверждает собственный pass;
-- repairer единолично принимает собственный fix;
-- semantic supervisor превращает interpretation в hard evidence;
-- caller выбирает произвольную identity через недоверенный header;
-- одна identity выдаёт два независимых approval под разными labels;
-- ожидаемый ответ скрыто передаётся persona agent.
-
-Identity должна приходить из server-authenticated session/service principal. Проверять нужно capability и роль, а не только строковое имя.
-
-## 5. Версионируемые артефакты
-
-### `TestSubjectManifest`
-
-- `subjectId`, `subjectType`, owner;
-- code/skill/workflow/model version и content hash;
-- entrypoint и environment;
-- topology, roles, tools и permissions;
-- ContextPack/Rulebook/EvalSuite/AutonomyPolicy refs;
-- state stores и external side effects;
-- source refs, вычисленные из фактических файлов/artifacts;
-- known limitations и required evidence level.
-
-### `ScenarioContract`
-
-- user/persona goal;
-- preconditions и fixture provenance;
-- action semantics, но не скрытые UI selectors как единственный контракт;
-- expected checkpoints и allowed branches;
-- hard invariants и semantic criteria;
-- forbidden actions;
-- stop conditions, time/token/cost budget;
-- required evidence и acceptance policy.
-
-### `RunSnapshot`
-
-- run/attempt IDs и parent lineage;
-- exact subject, scenario, environment и dependency versions;
-- authenticated actor/role assignments;
-- code dirty state и diff hash;
-- model/provider/tool/judge versions;
-- seed, clock, locale и relevant feature flags;
-- started/ended timestamps и terminal status.
-
-### Runtime artifacts
-
-- `JournalEvent` — append-only action/runtime event;
-- `EvidenceReceipt` — independently verified fact: content hash, collector/source, authenticated producer, environment/mode, timestamp, correlation, verifier, immutable payload ref и limitations;
-- `CheckpointProof` — contract clause + receipts + verdict;
-- `Observation` — замеченное отклонение или ambiguity;
-- `IssueRecord` — classification, severity, reproduction и evidence bundle;
-- `BugSpec` — минимальный approved change contract;
-- `RepairRecord` — exact diff/commit, changed-files ledger, scope check, rollback recipe и Red→Green evidence;
-- `ReplayRecord` — source/target lineage и action outcomes;
-- `AcceptanceReport` — evidence matrix, limits и unresolved areas;
-- `PromotionRecord` — decision, approvers, autonomy effect и rollback trigger.
-
-Frozen artifact не редактировать. Создавать новую version и помечать downstream run/replay/report `stale`.
-
-`DecisionRecord` и `OutcomeRecord` не объединять. Release/promotion decision фиксирует ожидание и observation window; реальный outcome создаётся позже из downstream evidence. Нельзя в момент acceptance записать его же status как «наблюдаемый бизнес-результат» с высокой attribution confidence.
-
-## 6. Жизненный цикл прогона
+Архитектура называется `Interactive Calibration + Autonomous Repair`:
 
 ```text
-actual contract snapshot
-  → preflight
-  → clean isolated run
-  → append-only journal
-  → trusted evidence receipts
-  → checkpoint proof
-  → deviation? pause and reproduce
-  → approved BugSpec
-  → Red → Green → Refactor
-  → clean replay in a new run
-  → independent verification
-  → acceptance / limited acceptance / rejection
-  → production observation and promotion / rollback
+analyze subject
+  → co-design TestCase
+  → propose critical checkpoints
+  → agree quality rubrics
+  → freeze TestCase
+  → execute to checkpoint
+  → independent agent evaluation
+  → user calibration/approval
+  → autonomous diagnosis and repair when needed
+  → clean replay
+  → final acceptance
+  → promote approved checkpoints into regressions
 ```
 
-### Preflight
+Ручное изучение логов и пошаговый технический debugging — fallback, а не основной user journey.
 
-До запуска проверить:
+## 3. Граница с EvalSuite
 
-1. hashes и versions реального subject/contract;
-2. environment, fixtures и data provenance;
-3. authenticated identities и permissions;
-4. recorder/collector availability и trace completeness probe;
-5. side-effect policy, idempotency и rollback capability;
-6. budgets, stop conditions и emergency stop;
-7. отсутствие скрытого доступа actor к expected answer;
-8. пригодность harness к выбранному evidence level.
+`EvalSuite` и `TestingHarness` решают разные задачи.
 
-Manual check может быть явно approved человеком, но не должен автоматически становиться machine-verified fact.
+`EvalSuite` отвечает:
 
-### Во время прогона
+> Насколько хорошо вероятностный AI-компонент ведёт себя на наборе cases и risk slices?
 
-- каждое действие получает monotonically increasing sequence и correlation IDs;
-- critical event немедленно переводит run в `paused_at_issue`;
-- sequence gap, contract drift или потеря collector блокируют продолжение;
-- supervisor review привязан к persisted event IDs;
-- unknown остаётся unknown; нельзя достраивать trace догадкой;
-- retries bounded и различимы с новыми attempts.
+Он содержит:
 
-Append-only должен обеспечиваться storage policy/constraint, а не только соглашением API. Idempotency receipt сохранять атомарно с mutation или через durable transactional/outbox protocol: сбой между side effect и записью ответа не должен создавать duplicate run, orphan replay или повторную внешнюю mutation.
+- cases и label provenance;
+- acceptable outcomes;
+- deterministic graders и semantic judges;
+- slices, metrics и thresholds;
+- judge calibration;
+- regression history.
 
-## 7. Режимы исполнения
+`TestingHarness` отвечает:
 
-1. `deterministic_runner` — machine-executable tests для правил, schemas, state transitions и invariants;
-2. `human_supervised` — реальный пользователь действует, supervisor наблюдает каждый checkpoint;
-3. `persona_supervised` — изолированный agent-user следует versioned persona contract только через разрешённый интерфейс;
-4. `clean_replay` — новый run повторяет action semantics до defect/final checkpoint;
-5. `shadow_or_dual_run` — candidate сравнивается с baseline без production authority;
-6. `fault_injection` — seeded defects проверяют сам harness и false-green resistance;
-7. `production_observation` — ограниченный canary с readback, counter-metrics и rollback trigger.
+> Можно ли доверять конкретному исполнению workflow, промежуточному state, исправлению и итоговому acceptance?
 
-Mode является свойством evidence. `mock`, `recorded_replay`, `sandbox_live`, `shadow`, `canary` и `production_observation` нельзя повышать простым переименованием записи; новая evidence level требует нового исполнения в соответствующей среде.
+Он управляет:
 
-Persona agent не получает code, database, internal APIs, supervisor notes или expected answer, если этого не имеет моделируемая роль. Любой такой доступ фиксируется как contamination.
+- согласованием TestCase;
+- запуском subject;
+- checkpoints и human calibration;
+- evidence collection;
+- diagnosis, BugSpec и repair;
+- targeted и clean replay;
+- release decision и последующим OutcomeRecord.
 
-## 8. Универсальная матрица сценариев
+EvalSuite может использоваться внутри checkpoint evaluator. Но высокий eval score не доказывает handoff, persistence, external mutation, recovery или полный user journey.
 
-Для каждого subject выбирать релевантные slices, а не механически запускать всё:
+## 4. Объекты тестирования
 
-- happy path и alternate valid branch;
-- boundary/empty/unknown/ambiguous input;
-- invalid input и forbidden action;
-- stale context, stale memory или incompatible version;
-- tool/provider timeout, malformed response и partial outage;
-- retry exhaustion, token/cost/deadline exhaustion;
-- interruption, resume и duplicate delivery;
-- concurrency, ordering race и conflicting updates;
-- permission escalation и cross-tenant access;
-- prompt injection/data exfiltration attempt;
-- partial side effect, readback failure и compensation;
-- semantic ambiguity, abstention и human handoff;
-- regression на ранее найденный production failure.
+Базовый протокол применим к:
 
-Sample size, repetitions и thresholds выводить из severity, baseline, variance и допустимой false-pass probability. Не переносить числа из одного проекта как универсальный стандарт.
+1. `workflow` — state transitions, AI decisions, approvals, artifacts и side effects;
+2. `multi_agent_system` — topology, roles, handoffs, shared memory и coordination;
+3. `agent_role` — входы, decisions, tools, permissions, abstention и escalation;
+4. `skill` — trigger/routing, instructions, references, permissions и task outcome.
 
-## 9. Специализация по объекту тестирования
+При необходимости разрешены `single_agent`, `tool` и `memory_pipeline`. Специализация не должна устранять общий calibration/repair/replay protocol.
+
+## 5. Роли
+
+Harness разделяет логические роли, даже если несколько ролей используют один model family:
+
+- `HarnessDesigner` анализирует subject и проектирует TestCase вместе с пользователем;
+- `Runner` запускает workflow и действует через разрешённый interface;
+- `Recorder` автоматически пишет append-only execution journal;
+- `EvidenceCollector` подтверждает hard facts из systems of record;
+- `CheckpointEvaluator` оценивает результат по frozen rubric;
+- `Investigator` классифицирует расхождение и локализует причину;
+- `Repairer` исправляет только approved `workflow_defect` в bounded scope;
+- `Verifier` независимо запускает tests и replay;
+- `HumanApprover` калибрует смысловое качество на первом прогоне;
+- `ReleaseApprover` принимает final promotion/rollback decision.
+
+Обязательная независимость:
+
+- Runner не подтверждает собственный hard pass;
+- Repairer не верифицирует и не выпускает свой fix;
+- CheckpointEvaluator не редактирует subject;
+- semantic verdict не заменяет hard evidence;
+- один caller не изображает несколько approvers произвольными labels.
+
+Независимость может обеспечиваться отдельными агентными сессиями с минимальным контекстом, а не обязательно разными моделями.
+
+## 6. TestCase
+
+Первый этап всегда диалоговый. Агент изучает реальный subject, затем вместе с пользователем формирует `TestCase`.
+
+### Обязательные поля
+
+- `testCaseId`, version, owner и risk class;
+- `TestSubjectManifest` с actual source/build/model/tool hashes;
+- цель пользователя и ожидаемый terminal outcome;
+- входные данные с provenance и privacy class;
+- preconditions, environment и fixtures;
+- допустимые варианты выходного результата;
+- критерии качества результата;
+- недопустимые результаты и forbidden actions;
+- критические инварианты;
+- checkpoints и их rubrics;
+- required hard/semantic/human/live evidence;
+- budgets: attempts, deadline, tokens и cost;
+- external mutation policy;
+- final acceptance и rollback policy.
+
+### Входные данные
+
+Использовать реальные или синтетически созданные test fixtures только внутри test environment. Fixture должен быть versioned и маркирован как test data. Он не выдаётся за live evidence и не попадает в production path.
+
+Если workflow зависит от реальной integration, заранее определить sandbox/live-like boundary. Недоступность обязательной integration означает `BLOCKED`, manual verification или честное ограничение, но не mock success.
+
+### Ожидаемый результат
+
+Для deterministic output можно задать точное expected value/schema/state.
+
+Для вероятностного output задавать:
+
+- acceptable outcome set;
+- quality dimensions;
+- minimum blocking criteria;
+- examples только как anchors, а не единственный допустимый текст;
+- counter-examples и forbidden claims;
+- ambiguity/fallback policy.
+
+Нельзя превращать один эталонный output в требование дословного совпадения, если задача допускает несколько качественных решений.
+
+## 7. Проектирование checkpoints
+
+После первичного анализа workflow агент предлагает минимальный набор критических checkpoints. Пользователь утверждает или меняет их до запуска.
+
+Checkpoint нужен, когда происходит хотя бы одно:
+
+- существенное преобразование или потеря контекста;
+- критическое AI-решение;
+- handoff между workflows, roles или agents;
+- запись durable state;
+- freeze/versioning важного artifact;
+- внешний side effect;
+- human approval;
+- переход, после которого исправление становится дорогим;
+- security/permission boundary;
+- irreversible или high-blast-radius action.
+
+Checkpoint не нужен после каждого технического шага. Избыточные остановки повышают стоимость, создают approval fatigue и мешают увидеть целостный workflow.
+
+Каждый checkpoint содержит:
+
+- `checkpointId` и contract clause;
+- expected observable state;
+- blocking hard invariants;
+- semantic quality rubric;
+- evidence sources;
+- allowed branches;
+- resume compatibility rule;
+- user review requirement;
+- rollback/compensation boundary;
+- downstream dependents.
+
+## 8. Критерии качества
+
+Критерий должен быть проверяемым и помогать принять решение. Формулировка «результат хороший» недостаточна.
+
+Для каждого критерия указать:
+
+- quality dimension;
+- observable condition;
+- blocking или advisory;
+- evaluator: deterministic, semantic judge или human;
+- evidence source;
+- acceptable alternatives;
+- failure severity;
+- ambiguity handling;
+- owner изменений критерия.
+
+Пример:
+
+```yaml
+criterion: facts_have_provenance
+dimension: trustworthiness
+blocking: true
+condition: every factual claim has a resolvable source reference
+evaluator: deterministic_validator
+evidence: artifact_claim_ledger
+on_failure: pause_and_classify
+```
+
+Численные thresholds, repetitions и sample size нельзя изобретать. Они выводятся из risk tolerance, baseline, variance и цены false pass/false fail.
+
+## 9. Жизненный цикл первого прогона
+
+### Phase A — Design
+
+1. Изучить actual workflow/source/config.
+2. Зафиксировать facts, assumptions и unknowns.
+3. Сформировать draft TestCase.
+4. Предложить critical checkpoints.
+5. Совместно определить quality rubrics.
+6. Утвердить mutation, privacy и budget policies.
+7. Freeze `TestCase v1` и hashes subject/config.
+
+### Phase B — Guided execution
+
+1. Runner запускает workflow с утверждённым input.
+2. Recorder и Collector автоматически собирают trace/evidence.
+3. На checkpoint выполнение останавливается.
+4. CheckpointEvaluator применяет frozen rubric.
+5. При agent `PASS` пользователь получает компактный `CheckpointReview`.
+6. При user `APPROVE` checkpoint замораживается и workflow продолжается.
+7. При agent `FAIL` либо user `REJECT` запускается classification.
+8. Confirmed workflow defect уходит в autonomous repair loop.
+9. После repair и replay checkpoint снова проходит agent evaluation и user review.
+10. Цикл повторяется до terminal outcome.
+
+### Phase C — Final verification
+
+1. Выполнить полный clean replay от первоначального input.
+2. Проверить все frozen checkpoints без наследования старых pass flags.
+3. Собрать final output quality review.
+4. Получить final human acceptance.
+5. Превратить approved checkpoints и defects в regression cases.
+
+## 10. CheckpointReview
+
+Пользователь не должен разбирать raw logs. Harness формирует компактный review packet:
+
+```text
+Checkpoint: research_ready
+Verdict: PASS | FAIL | INSUFFICIENT_EVIDENCE
+
+Criteria:
+✓ Coverage соответствует rubric
+✓ Все факты имеют источники
+✱ Один источник недоступен; limitation видима
+
+Evidence:
+- artifact hash
+- state receipt
+- validator output
+- relevant trace refs
+
+Uncertainties:
+- что не удалось доказать
+
+Recommendation:
+APPROVE | REJECT | CHANGE_CRITERION | ESCALATE
+```
+
+Пользователь выбирает:
+
+- `APPROVE` — качество устраивает, checkpoint frozen;
+- `REJECT + reason` — результат не соответствует ожиданию;
+- `CHANGE_CRITERION` — первоначальная rubric была неполной/ошибочной;
+- `ESCALATE` — требуется отдельное продуктовое решение.
+
+Raw trace доступен по ссылкам, но не является основным интерфейсом приёмки.
+
+## 11. Классификация расхождений
+
+Любой agent `FAIL` или user `REJECT` сначала классифицируется. Нельзя автоматически менять workflow до определения типа проблемы.
+
+### `workflow_defect`
+
+Реализация нарушает frozen TestCase, invariant или rubric. Разрешён bounded autonomous repair.
+
+### `test_case_defect`
+
+Вход, expected outcome, checkpoint или criterion сформулированы неверно/неполно. Изменить TestCase новой version, пометить зависимые результаты stale и повторить затронутый путь.
+
+### `judge_miscalibration`
+
+CheckpointEvaluator неправильно оценил приемлемый результат. Добавить calibration example, обновить judge/rubric version и повторно проверить прежние verdicts.
+
+### `input_or_data_defect`
+
+Fixture повреждён, неполон, устарел либо не соответствует preconditions. Исправить/заменить fixture, не маскировать проблему кодовым patch.
+
+### `environment_or_integration_defect`
+
+Причина находится в deployment, credentials, provider, network, storage или test environment. Repair subject запрещён без доказанной причинности.
+
+### `ambiguous_product_decision`
+
+Нет утверждённого ответа, какое поведение правильно. Остановиться и запросить решение пользователя/contract owner.
+
+### `harness_defect`
+
+Recorder, collector, executor, replay или acceptance logic дали неполное/ложное evidence. Результат run инвалидируется; сначала исправляется и повторно квалифицируется harness.
+
+Classification сохраняет evidence, alternatives, confidence и owner. Низкая уверенность либо конфликт evaluator/user автоматически эскалируется, а не превращается в workflow patch.
+
+## 12. Автономный repair loop
+
+Автономный repair разрешён только для подтверждённого `workflow_defect`.
+
+```text
+failure evidence
+  → reproduce
+  → localize probable cause
+  → bounded BugSpec
+  → first Red
+  → approved write scope
+  → minimal Green
+  → Refactor inside scope
+  → deterministic verification
+  → targeted replay
+  → independent checkpoint evaluation
+  → user review
+```
+
+`BugSpec` содержит:
+
+- failed criterion и evidence bundle;
+- minimal reproduction;
+- probable cause и alternatives considered;
+- included/excluded scope;
+- invariants и permissions;
+- first Red и required regressions;
+- allowed files/components;
+- rollback recipe;
+- attempt/token/cost budget;
+- exit/escalation conditions.
+
+Repairer работает в изолированном worktree/namespace. Он не видит hidden expected answer сверх TestCase и не получает production mutation permissions.
+
+Verifier проверяет:
+
+- что first Red действительно падал до исправления;
+- что Green вызван изменением behavior, а не ослаблением assertion;
+- что diff ограничен BugSpec;
+- что required regressions проходят;
+- что новый output не hardcoded под единственный fixture;
+- что targeted replay достиг исправленного checkpoint.
+
+## 13. Replay protocol
+
+Один тип replay не решает одновременно задачу скорости и доказательности. Использовать три уровня.
+
+### 1. `Targeted replay`
+
+Быстрая итерация от последнего проверенного совместимого checkpoint до исправленной точки.
+
+Разрешён, если:
+
+- checkpoint snapshot имеет hash и provenance;
+- schemas/state совместимы с новым code/config;
+- изменённый код не влияет на upstream state;
+- external mutations безопасно изолированы;
+- resume capability реально проверена.
+
+Targeted replay ускоряет debugging, но не является final acceptance evidence.
+
+### 2. `Clean checkpoint replay`
+
+Новый run от исходного input до исправленного checkpoint. Он проверяет, что fix работает вместе с upstream path и не зависит от старого snapshot.
+
+Обязателен после успешного targeted replay перед окончательным user approval исправленного checkpoint, если patch затрагивает upstream behavior либо совместимость state не доказана.
+
+### 3. `Full clean replay`
+
+Новый end-to-end run от initial input до terminal outcome на exact candidate version. Обязателен перед final acceptance/release.
+
+Правила всех replay:
+
+- повторять action semantics, а не копировать конечный state;
+- target run не наследует pass flags и receipts;
+- заново выполнять preflight;
+- drift ведёт к stop/new baseline, а не silent adaptation;
+- запрещены closest-match action substitution и пропуск шагов;
+- provider-output pinning маркируется offline и не заменяет live revalidation;
+- внешние mutations требуют idempotency, readback и compensation;
+- запись `queued` не считается исполненным replay.
+
+## 14. Progressive autonomy
+
+Первый unknown workflow запускается в `calibration` mode: пользователь утверждает каждый критический semantic checkpoint.
+
+После approval:
+
+- frozen input/output/evidence становятся regression case;
+- user rejection становится calibration case;
+- confirmed defect становится failure regression;
+- rubric и judge получают новую version;
+- replay history сохраняет model/context/tool versions.
+
+Следующие runs могут переходить по уровням:
+
+- `L0 manual calibration` — human approval на каждом checkpoint;
+- `L1 assisted` — agent evaluates, human подтверждает blocking checkpoints;
+- `L2 supervised autonomy` — agent auto-passes calibrated checkpoints, human видит exceptions и final review;
+- `L3 qualified autonomy` — routine regressions проходят автоматически, human нужен только для drift/high-risk/ambiguity;
+- `L4 release gate` — разрешён только после qualification harness, production observation и отдельного approval.
+
+Autonomy повышается по checkpoint/risk slice, а не для workflow целиком. Новый criterion, subject drift, model/tool change или repeated disagreement понижает соответствующий checkpoint до calibration mode.
+
+## 15. Evidence и trust boundaries
+
+Hard fact нельзя подтвердить boolean `passed: true` от Runner, subject, caller или semantic evaluator.
+
+`EvidenceCollector` независимо получает:
+
+- database/event-store receipts;
+- state/API readback;
+- test runner output на exact commit;
+- artifact hashes и validator results;
+- tool call/side-effect receipts;
+- browser/network trace;
+- authenticated approval event.
+
+Каждый `EvidenceReceipt` содержит:
+
+- run/attempt/checkpoint IDs;
+- subject/config versions;
+- collector/source и authenticated producer;
+- environment/evidence mode;
+- timestamp/correlation;
+- content/payload hash;
+- verification result;
+- limitations и expiry.
+
+Evidence levels различать:
+
+- `hard_verified`;
+- `semantic_reviewed`;
+- `human_calibrated`;
+- `offline_simulated`;
+- `live_verified`;
+- `unverified`.
+
+Journal защищается storage constraints, а не только API convention. Idempotency receipt сохраняется атомарно с mutation либо через durable outbox/transactional protocol.
+
+Если collector недоступен, checkpoint получает `INSUFFICIENT_EVIDENCE`/`BLOCKED`, а не pass.
+
+## 16. Ограничители автономности
+
+Autonomous loop обязан остановиться, когда:
+
+- исчерпан maximum attempts/deadline/token/cost budget;
+- дважды повторяется та же probable cause без нового evidence;
+- classification неоднозначна;
+- пользовательское ожидание конфликтует с frozen contract;
+- repair требует расширить BugSpec/write scope;
+- нужны новые credentials/permissions;
+- затрагивается irreversible/high-blast-radius mutation;
+- невозможно получить trusted evidence;
+- обнаружен harness defect или trace gap;
+- clean replay расходится с targeted replay;
+- patch начинает оптимизироваться под один fixture.
+
+При stop пользователь получает не dump логов, а escalation packet:
+
+- что ожидалось;
+- что наблюдается;
+- что уже проверено/исправлено;
+- почему автономный цикл остановлен;
+- одно конкретное решение, которое требуется от человека.
+
+## 17. Специализация по объектам
 
 ### Workflow
 
-Проверять state machine, обязательный порядок, allowed branches, resume, duplicate events, approvals, artifact lineage, side effects и terminal outcome. Replay повторяет действия, а не копирует конечное состояние.
+Checkpoint candidates: major state transitions, handoffs, durable writes, approvals, external mutations и terminal artifact. Проверять resume, duplicates, stale inputs и end-to-end outcome.
 
 ### Multi-agent system
 
-Проверять:
+Дополнительно проверять:
 
-- topology и разрешённые communication edges;
-- role identity и запрет подмены роли;
-- handoff payload schema, provenance и acknowledgement;
-- ownership shared memory, freshness и conflict resolution;
-- attribution decisions/actions конкретному агенту и version;
-- bounded loops, deadlock/livelock и duplicate work;
-- partial agent/tool failure, restart и recovery;
-- separation planner/executor/verifier;
-- aggregate token/cost/deadline budget;
-- отсутствие privilege amplification через delegation.
+- topology и communication edges;
+- typed handoff и acknowledgement;
+- role identity и privilege boundaries;
+- shared memory ownership/provenance/freshness;
+- conflict resolution, loops и deadlocks;
+- partial agent failure и restart;
+- aggregate token/cost budget;
+- attribution decisions/actions конкретной role/version.
+
+Checkpoints ставить на critical handoffs и ownership changes, а не после каждого agent message.
 
 ### Agent role
 
-Проверять входной контракт, domain boundaries, known/unknown, tool allowlist, permission denials, abstention, escalation, handoff completeness, forbidden mutations, model/context versions и response schema. Роль должна корректно отказать там, где outcome недоказуем или полномочий недостаточно.
+Проверять входной контракт, allowed knowledge/tools/actions, typed output, abstention, escalation и forbidden mutation. Human calibration особенно важна для semantic quality и границы «достаточно данных».
 
 ### Skill
 
-Проверять на fresh agents без скрытого контекста:
+Запускать fresh-agent cases без скрытой истории:
 
-- true-positive trigger и естественные переформулировки;
-- true-negative routing, когда skill не нужен;
-- полный task outcome, а не упоминание инструкций;
-- lazy loading только требуемых references;
-- соблюдение read/write/approval boundaries;
-- отсутствие fabricated repository/runtime claims;
-- обработку missing file/tool/credential;
-- instruction conflicts и prompt injection;
-- forward-test после каждого существенного изменения;
-- regression cases из реальных сбоев.
+- positive/negative trigger;
+- естественные paraphrases;
+- lazy reference loading;
+- task outcome;
+- permission/approval boundaries;
+- missing file/tool/credential;
+- dirty worktree preservation;
+- prompt injection;
+- clean replay на новой session/environment.
 
-Skill нельзя валидировать только чтением `SKILL.md` тем же агентом, который его редактировал. Нужен fresh-agent behavior.
+Checkpoint для skill обычно ставится на routing, перед consequential write и на terminal task outcome.
 
-## 10. Evidence, checkpoints и semantic verdicts
+## 18. Scenario matrix
 
-`CheckpointProof` считается valid только если:
+Для первого TestCase выбрать один high-value path. Затем расширять regressions по риску:
 
-1. ссылается на clause pinned `ScenarioContract`;
-2. все hard invariants имеют independently resolvable receipts;
-3. receipts принадлежат этому run/attempt и exact subject version;
-4. semantic criterion имеет calibrated supervisor/judge либо explicit human review;
-5. waiver содержит owner, rationale, expiry и compensating control;
-6. known evidence gaps видимы в report.
+- happy path;
+- alternate valid branch;
+- empty/unknown/ambiguous input;
+- invalid input и forbidden action;
+- stale context/memory/version;
+- provider/tool timeout и malformed response;
+- retry/budget exhaustion;
+- interruption/resume;
+- duplicate delivery;
+- concurrency/conflict;
+- permission escalation;
+- cross-tenant access;
+- prompt injection/exfiltration;
+- partial side effect/readback failure;
+- human rejection и rubric change;
+- previously observed production failure.
 
-Evidence делить минимум на:
+Не пытаться покрыть всю matrix до первого полезного прогона. Первый slice должен быть узким, но пройти полный calibration/repair/replay lifecycle.
 
-- `hard_verified` — collector подтвердил observable fact;
-- `semantic_reviewed` — meaning оценён calibrated judge/supervisor;
-- `human_attested` — человек подтвердил manual observation;
-- `offline_simulated` — test double/replay/fixture;
-- `live_verified` — реальная integration или live-like path;
-- `unverified` — claim ещё не подтверждён.
+## 19. Проверка самого harness
 
-Semantic supervisor может сказать `pass`, `pause` или `insufficient_evidence`. Его explanation остаётся interpretation, пока hard facts не подтверждены collector.
+До использования как release gate harness проходит `HarnessQualification`:
 
-## 11. Issue, repair и TDD
+1. Runner сообщает false `passed: true` без receipt.
+2. Collector теряет или получает подменённый evidence ref.
+3. Один principal пытается дать два approval.
+4. Subject/source меняется после snapshot.
+5. Replay остаётся только `queued`.
+6. External mutation доставляется дважды.
+7. Targeted replay проходит, а full clean replay ломается.
+8. В workflow внесён seeded defect, неизвестный Evaluator/Runner.
+9. User rejection противоречит judge pass для проверки calibration flow.
+10. TestCase defect пытаются ошибочно исправить patch workflow.
 
-При отклонении:
+Измерять false green, false red, inconclusive, trace completeness и seeded-defect detection. Thresholds выводятся из risk policy и qualification data.
 
-1. остановить run на безопасной границе;
-2. сохранить evidence bundle и минимальное reproduction;
-3. классифицировать: product defect, contract defect, test defect, environment defect, data defect, flaky/unknown;
-4. проверить, воспроизводится ли проблема без подсказки ожидаемого ответа;
-5. создать bounded `BugSpec` с included/excluded scope, invariants и first Red;
-6. получить approval на repair, если write/blast radius этого требует;
-7. repairer выполняет Red → Green → Refactor;
-8. независимый verifier запускает targeted regression и clean replay;
-9. ambiguous contract не «чинить» автоматически — вернуть contract owner.
+Пока qualification не пройден, harness даёт `diagnostic evidence`, но не является единственным release gate.
 
-Нельзя расширять repair до соседнего refactor без нового delta-contract. Passing test, созданный после fix и никогда не видевший Red, не считается достаточным regression evidence.
-
-## 12. Clean replay и внешние мутации
-
-Replay всегда создаёт новый target run с pinned lineage. Он повторяет user-visible action semantics через тот же разрешённый interface.
-
-Правила replay:
-
-- deterministic-first: точное действие либо явный stop;
-- запрещены closest-match selector, silent action substitution и пропуск шага;
-- фиксированные provider outputs допустимы для path replay, но маркируются offline;
-- отдельно выполняется live revalidation probabilistic/provider behavior;
-- replay проходит все checkpoints до defect point и затем обязательный downstream path;
-- drift source/contract/environment блокирует сравнение либо создаёт новую baseline;
-- target run не наследует pass flags и receipts source run.
-- target run заново проходит preflight против фактической post-fix build/config и не наследует старый preflight как доказательство;
-
-Для внешней mutation требуются idempotency key, exact target, pre-state, execution receipt, post-action readback и rollback/compensation. Replay не имеет production mutation authority по умолчанию.
-
-## 13. Acceptance, promotion и rollback
-
-Acceptance report отдельно показывает hard, semantic, human, offline, live и unverified evidence. Допустимые terminal verdicts:
-
-- `accepted` — все blocking criteria доказаны на требуемом уровне;
-- `accepted_with_limits` — только non-critical limitation с owner/expiry/control;
-- `rejected` — defect, red line или недостаточное evidence;
-- `blocked` — prerequisite или trusted collector недоступен;
-- `invalidated` — contamination, drift или corruption лишили прогон доказательной силы.
-
-Обязательные release условия:
-
-- exact subject/contract/config versions;
-- trace completeness и no unresolved sequence gaps;
-- no unresolved critical/high issue;
-- blocking checkpoints имеют trusted receipts;
-- required EvalSuite slices прошли calibrated gates;
-- required clean replay/live path выполнены;
-- approvals принадлежат authenticated distinct identities;
-- production observation, counter-metrics и rollback trigger определены.
-
-Acceptance фиксирует release decision, а не симулирует будущий outcome. `OutcomeRecord` появляется после заявленного observation window и ссылается на независимый source of truth; attribution остаётся `unknown/low`, если причинность не доказана.
-
-Promotion autonomy выполняется на уровне конкретного decision/action. Один успешный run не повышает весь агент или систему автоматически.
-
-## 14. Проверка самого harness
-
-Harness нельзя считать trusted только потому, что он запустился. До использования как release gate провести `HarnessQualification`:
-
-1. внедрить versioned seeded defects, неизвестные supervisor/test actor;
-2. проверить detection rate по risk slices;
-3. измерить false green, false red и inconclusive;
-4. проверить trace completeness и deliberate event loss;
-5. подменить/оборвать evidence reference и ожидать fail-closed;
-6. попытаться spoof identity и выдать два approval;
-7. изменить source после snapshot и ожидать contract drift;
-8. повторить side effect и ожидать idempotent result;
-9. проверить clean replay на UI/route drift;
-10. откалибровать semantic judge на expert-labeled disagreements.
-
-Seeded defects не должны становиться частью production path. Их manifest, owner и cleanup proof сохраняются отдельно.
-
-Пока qualification не пройден, результаты harness называются `diagnostic evidence`, но не единственным release gate. Численные release thresholds определяются risk policy и данными qualification, а не придумываются заранее.
-
-## 15. Observability и tokenomics
+## 20. Observability и tokenomics
 
 Сохранять:
 
-- run/attempt/subject/scenario/actor IDs;
-- versions/hashes/context/rules/models/tools/judges;
-- state transitions, retries, deadlines и stop reason;
-- evidence receipt provenance и verification result;
-- agent handoffs, memory reads/writes и stale decisions;
-- token reservation, actual usage, cost и latency по role/step;
-- human intervention, repair, approval и rollback;
-- outcome/counter-metrics после observation window.
+- TestCase/subject/config/model/tool/judge versions;
+- run/attempt/checkpoint/actor IDs;
+- state transitions и evidence receipts;
+- agent/user verdict disagreements;
+- classification и confidence;
+- BugSpec, diff, Red/Green и replay lineage;
+- tokens/cost/latency по role и attempt;
+- human interventions и причины escalation;
+- production OutcomeRecord после observation window.
 
 Не сохранять secrets, лишние PII и chain-of-thought.
 
-Оптимизировать не число тестовых model calls изолированно, а `cost_per_detected_material_defect` и `cost_per_trusted_accepted_outcome`. Сначала deterministic assertions, затем semantic judge только для действительно неоднозначных критериев. Не экономить токены ценой потери blocking evidence.
+Оптимизировать:
 
-## 16. Mastra и другие реализации
+- `cost_per_calibrated_checkpoint` на первом прогоне;
+- `cost_per_detected_material_defect`;
+- `cost_per_trusted_accepted_outcome`;
+- долю checkpoints, перешедших от manual calibration к supervised autonomy;
+- human minutes per accepted run.
 
-Для TypeScript/Node.js Mastra — рекомендуемый первый кандидат, если harness требует durable workflows, agents, tools, memory, suspend/resume и observability. Но framework не является trust boundary сам по себе.
+Сначала использовать deterministic validators. Semantic judge вызывать только для действительно смысловых критериев. Экономия не должна удалять blocking evidence.
 
-Возможная декомпозиция:
+## 21. Реализация и Mastra
 
-- deterministic workflow/state machine управляет lifecycle и gates;
-- Mastra agent выполняет persona или semantic supervisor role;
-- durable storage хранит journal, receipts и artifacts;
-- отдельный collector адаптер читает реальные systems of record;
-- test runner выполняет deterministic assertions;
-- browser runner исполняет user-visible path;
-- approval service проверяет authenticated capabilities.
+Для TypeScript/Node.js Mastra — рекомендуемый первый кандидат, если нужны agents, tools, workflows, memory, suspend/resume и observability.
 
-Для простого skill или agent role может хватить test runner + fresh-agent invocations + append-only artifacts. Для долгоживущего процесса с сильными recovery guarantees оценивать Temporal или другой durable engine отдельно от AI runtime.
+Возможная архитектура:
 
-## 17. Минимальный production-ready slice
+- deterministic state machine управляет lifecycle и gates;
+- Mastra workflow координирует Runner/Evaluator/Investigator/Repairer/Verifier;
+- separate agent sessions обеспечивают role isolation;
+- durable store хранит TestCases, checkpoints, journals и receipts;
+- collector adapters читают реальные systems of record;
+- test runner исполняет deterministic Red/Green;
+- browser/API runner исполняет user-visible workflow;
+- human approval реализован через suspend/resume;
+- budget policy ограничивает repair loops.
 
-Первый полный slice harness включает:
+Framework не создаёт trust boundary автоматически. Для простого skill достаточно fresh-agent runner, isolated fixtures, test runner и content-addressed artifacts. Для долгоживущих business processes отдельно оценивать Temporal/другой durable engine.
 
-1. один versioned subject manifest;
-2. один high-value scenario и один negative/failure scenario;
-3. реальный contract snapshot и drift detection;
-4. authenticated actor и append-only journal;
-5. минимум один trusted evidence collector;
-6. hard checkpoint и semantic criterion, если он действительно нужен;
-7. issue pause и BugSpec;
-8. first Red, Green и targeted regression;
-9. новый clean replay;
-10. acceptance report с explicit unverified areas;
-11. fault-injection check самого harness;
-12. rollback/cleanup proof.
+## 22. Минимальный production-ready slice
 
-Уменьшать scope можно количеством subjects/scenarios, но не самодекларацией evidence или удалением trust boundaries.
+Первый slice включает:
 
-## 18. Red lines
+1. один actual subject manifest;
+2. один совместно утверждённый TestCase;
+3. один terminal outcome;
+4. один-два действительно critical checkpoints;
+5. один automatic recorder и trusted collector;
+6. agent evaluation + human CheckpointReview;
+7. classification хотя бы одного intentional failure;
+8. bounded BugSpec и first Red;
+9. isolated repair + independent verification;
+10. targeted replay;
+11. full clean replay;
+12. final acceptance и regression artifact;
+13. один seeded harness fault;
+14. budgets и stop conditions.
+
+Уменьшать scope количеством scenarios/checkpoints. Нельзя уменьшать его self-attested evidence, отсутствием replay или бесконтрольным repair.
+
+## 23. Red lines
 
 Implementation gate блокирован, если:
 
-- consequential subject не имеет manifest, invariants и required evidence plan;
-- hard facts планируется принимать от subject/caller без collector;
-- identity/permissions/separation of duties не определены;
-- contract snapshot не связан с actual source/version;
-- external mutation не имеет idempotency/readback/rollback;
-- repair/replay могут молча изменить contract или production state;
-- harness планируется как release gate без qualification strategy.
+- TestCase не определяет input, outcome и quality criteria;
+- checkpoints выбраны без анализа критических transitions/risk boundaries;
+- user не может утвердить rubrics первого calibration run;
+- hard evidence планируется принимать от subject/caller;
+- Evaluator и Repairer не разделены;
+- reject автоматически считается workflow bug без classification;
+- repair loop не имеет BugSpec, budgets и stop conditions;
+- replay/side-effect policy не определены;
+- actual subject/contract versions не закреплены.
 
 Release gate блокирован, если:
 
-- acceptance основан на caller-supplied booleans или unresolved refs;
-- actor identity spoofable либо approvals не независимы;
-- exact versions, lineage или trace неполны;
-- append-only/idempotency держатся только на API convention и допускают duplicate/orphan state после crash;
-- required clean replay только queued/declared, но не executed;
-- required live evidence заменено mock/offline replay;
-- semantic self-verdict выдан за hard evidence;
-- unresolved critical/high issue или required evidence gap скрыт limitation;
-- harness провалил seeded fault, trace-loss или identity-spoof test;
-- repairer единолично подтвердил и выпустил собственный fix.
+- acceptance основан на agent self-verdict;
+- user approval или hard receipt отсутствуют для blocking checkpoint первого run;
+- `test_case_defect`, `judge_miscalibration` или environment defect замаскированы patch workflow;
+- replay только queued/declared;
+- выполнен только targeted replay без required clean replay;
+- target replay наследует pass flags/evidence;
+- repairer подтвердил собственный fix;
+- required live integration заменена mock/offline result;
+- attempts/budget exceeded, а run продолжен молча;
+- harness не ловит seeded false green/trace loss/identity spoofing;
+- unresolved critical/high issue или evidence gap спрятан limitation;
+- OutcomeRecord создан одновременно с release decision без observation window.
 
-## 19. Шаблон TestingHarnessContract
+## 24. Шаблон TestingHarnessContract
 
 ```markdown
 # TestingHarnessContract: <name> v<version>
 
-Subject type/id/version/hash:
-Contract source/version/hash:
-Owner and risk class:
+## Subject
+Type/id/version/hash:
+Actual contract/config/model/tool refs:
+Owner/risk class:
 
-Outcome and blocking invariants:
-Scenarios/slices:
-Required evidence levels:
+## TestCase
+User goal:
+Input/provenance/preconditions:
+Expected terminal outcome:
+Acceptable alternatives:
+Quality criteria:
+Forbidden outcomes/invariants:
 
-Actor/recorder/collector/supervisor/repairer/verifier/approver:
-Authentication and capabilities:
-Forbidden role combinations:
+## Checkpoints
+Checkpoint IDs and rationale:
+Hard invariants:
+Semantic rubrics:
+Evidence sources:
+Human calibration requirements:
+Resume compatibility:
 
-Environment/fixtures/provenance:
-Journal and evidence stores:
-Collector adapters and trust boundaries:
-Model/context/rules/tools/judge versions:
+## Roles
+Designer/Runner/Recorder/Collector/Evaluator:
+Investigator/Repairer/Verifier/Approvers:
+Authentication/separation of duties:
 
-Modes and budgets:
-Checkpoints and receipts:
-Semantic criteria/calibration:
-Stop conditions:
+## Execution
+Environment/fixtures:
+Attempts/deadline/token/cost budgets:
+Stop/escalation conditions:
+External mutation policy:
 
-Issue classification:
-BugSpec approval:
-First Red:
-Clean replay procedure:
+## Classification and repair
+Defect taxonomy:
+BugSpec/write-scope approval:
+First Red/regressions:
 
-External mutations/idempotency/readback/rollback:
-Acceptance and promotion policy:
-Production observation/counter-metrics/rollback trigger:
+## Replay
+Targeted replay:
+Clean checkpoint replay:
+Full clean replay:
 
-Harness qualification/seeded faults:
+## Acceptance and autonomy
+Checkpoint review protocol:
+Final acceptance:
+Regression promotion:
+Autonomy level/promotion/rollback:
+
+## Harness qualification
+Seeded faults:
 Known evidence gaps:
 Implementation verdict:
 Release verdict:
 ```
 
-## 20. Self-check
+## 25. Self-check
 
-1. EvalSuite и TestingHarness не перепутаны?
-2. Subject и actual contract version/hash закреплены?
-3. Actor не знает скрытый expected answer?
-4. Hard facts создаёт независимый collector, а не caller boolean?
-5. Identities аутентифицированы, capabilities проверены?
-6. Semantic supervisor не выдан за oracle?
-7. Journal append-only, sequence gaps и drift fail-closed?
-8. Modes и target-specific probes выбраны по риску?
-9. Issue отделяет product, contract, test, environment и data defects?
-10. Repair имеет approved BugSpec и доказанный Red→Green?
-11. Replay создаёт новый run и действительно исполняет actions?
-12. Offline, live, human и unverified evidence разделены?
-13. External mutations имеют idempotency/readback/rollback?
-14. Release approvals независимы от repair и subject?
-15. Harness прошёл seeded faults, trace loss и identity spoofing?
-16. Thresholds обоснованы risk/baseline/variance, а не скопированы?
-17. Token/cost измеряется на trusted accepted outcome?
-18. Следующий шаг — маленький полный slice, а не декоративная панель?
+1. Harness тестирует новый workflow, а не требует заранее знать всё его внутреннее поведение?
+2. TestCase совместно определяет input, output и качество?
+3. Checkpoints минимальны и находятся на критических границах?
+4. Каждый criterion наблюдаем и имеет evaluator/evidence?
+5. Первый run действительно калибруется пользователем?
+6. Пользователь получает CheckpointReview, а не raw-log debugging?
+7. Agent FAIL/user REJECT сначала классифицируются?
+8. Workflow patch разрешён только для confirmed workflow_defect?
+9. TestCase/judge/data/environment defects исправляются в правильном слое?
+10. Runner/Evaluator/Repairer/Verifier логически разделены?
+11. Repair имеет bounded BugSpec, Red/Green и budgets?
+12. Targeted replay используется для скорости, но не выдаётся за final proof?
+13. Full clean replay выполнен от initial input?
+14. Hard evidence независимо собрано?
+15. User approvals и identities аутентифицированы?
+16. Autonomy повышается по checkpoint/risk slice после calibration evidence?
+17. Loop останавливается при ambiguity, repeated failure или scope expansion?
+18. Harness ловит seeded false green и собственные defects?
+19. OutcomeRecord отделён от release decision?
+20. Первый следующий шаг — один полный calibration/repair/replay slice?

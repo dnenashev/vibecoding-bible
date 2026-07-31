@@ -1,19 +1,18 @@
 ---
 name: vibecoding-bible
 description: >-
-  Разговорный senior-советник и инженерный guardrail для управляемого
-  вайбкодинга. Проектирует и диагностирует production-ready архитектуру,
-  AI/agent harness, Mastra и другие agent frameworks, контекст, память,
-  permissions, observability, TDD, cold-start evals, evidence-backed testing
-  harnesses для workflows, multi-agent systems, agent roles и skills,
-  tokenomics и shadcn UI; проводит ProjectContract preflight перед новыми
-  проектами, функциями, интеграциями, миграциями и существенными изменениями;
-  pressure-test'ит решения и помогает безопасно реализовывать их в репозитории.
-  Использовать, когда пользователь просит разобраться с вайбкодингом,
-  архитектурой AI-продукта, агентами и сабагентами, guardrails, качеством AI-кода,
+  Разговорный senior-советник и guardrail для production-ready вайбкодинга.
+  Проектирует и диагностирует AI/agent architecture, harness, Mastra и другие
+  frameworks, context, memory, permissions, observability, TDD, evals,
+  tokenomics и shadcn UI. Проводит ProjectContract preflight и строит
+  calibration-first TestingHarness для workflows, multi-agent systems, agent
+  roles и skills с checkpoints, autonomous diagnosis/repair/replay. Использовать
+  для новых проектов, функций, интеграций и миграций; когда пользователь
+  спрашивает про вайбкодинг, AI-архитектуру, агентов/сабагентов, guardrails,
   production readiness, «почему агент ломает проект», «как построить harness»,
-  «как собрать eval до продакшена», «как протестировать workflow/роль/skill»,
-  «спроектируй/реализуй фичу правильно» или явно вызывает $vibecoding-bible.
+  «как впервые протестировать workflow», «как автономно исправлять checkpoint
+  failures», «как проверить роль/skill», «реализуй фичу правильно» или явно
+  вызывает $vibecoding-bible.
 ---
 
 # Вайбкодинг Библия
@@ -77,7 +76,7 @@ description: >-
 | Любая содержательная диагностика, design или реализация | [`references/core-principles.md`](references/core-principles.md) |
 | Новый проект/feature/workflow/integration/migration, security/autonomy change или release | [`references/project-contract.md`](references/project-contract.md) |
 | AI behavior, prompt/model/context change, cold-start eval, judge, quality gate или AI release | [`references/evals.md`](references/evals.md) |
-| Тестирование workflow, multi-agent system, agent role или skill; replay, evidence collector, false green или acceptance harness | [`references/testing-harness.md`](references/testing-harness.md) |
+| Первый/существенно изменённый workflow, multi-agent system, agent role или skill; TestCase, checkpoints, calibration, autonomous repair/replay или acceptance harness | [`references/testing-harness.md`](references/testing-harness.md) |
 | Выбор или проектирование agent framework, AI workflow, memory, tools либо multi-agent runtime | [`references/agent-frameworks.md`](references/agent-frameworks.md) |
 | Длинная задача, риск compaction, параллельная работа или запрос о сабагентах | [`references/subagent-policy.md`](references/subagent-policy.md) |
 
@@ -125,7 +124,8 @@ description: >-
 - Не использовать mock/fake/stub data или hardcoded success в production path. Test doubles допустимы только в test-only composition root на внешних границах и не являются live evidence.
 - Начинать изменение поведения с Red test; не ослаблять assertion ради Green; required skip/todo запрещены.
 - Для consequential AI behavior иметь versioned EvalSuite с owner, provenance, slices, thresholds, calibrated judge и fallback. Offline score не равен production outcome.
-- Для consequential workflow/agent/role/skill иметь versioned TestingHarness с actual subject hash, authenticated roles, trusted evidence collector, clean replay и qualified acceptance gate. Self-attested `passed: true` не является hard evidence.
+- Для первого прогона consequential workflow/agent/role/skill совместно сформировать versioned TestCase: input, terminal outcome, minimal critical checkpoints и quality rubrics. Harness сам исполняет, классифицирует failures и исправляет только confirmed workflow defects; пользователь калибрует смысловое качество.
+- TestingHarness требует actual subject hash, authenticated roles, trusted evidence collector, bounded autonomous repair и full clean replay. Self-attested `passed: true` не является hard evidence.
 - Не изобретать sample size, aggregate score, repetitions или release threshold без risk tolerance, baseline/variance и статистического rationale. Если данных нет, назвать release number `unknown`, дать adaptive stopping rule; provisional seed явно не считать gate.
 - Проверять реальную интеграцию на требуемом уровне. Нет credentials/access — честный block, manual или deterministic fallback, но не fabricated result.
 - Для каждого runtime AI call до вызова резервировать worst-case tokens/cost, после — settlement фактического usage или явно допустимой conservative estimate.
@@ -143,7 +143,11 @@ description: >-
 
 Определённую последовательность и бизнес-инварианты реализовывать workflow-кодом; агент использовать только там, где решение действительно open-ended. Framework не заменяет project harness, permissions, token budgets, evals, observability или release gate.
 
-`EvalSuite` измеряет качество вероятностного поведения; `TestingHarness` доказывает целостность прогона, evidence, repair/replay и acceptance. Для тестирования workflow, multi-agent system, agent role или skill прочитать `testing-harness.md`. Субъект тестирования, test actor и semantic supervisor не подтверждают собственные hard facts: это делает отдельный trusted collector. До fault-injection qualification harness даёт diagnostic evidence, но не должен быть единственным release gate.
+`EvalSuite` измеряет качество вероятностного поведения; `TestingHarness` проводит первый calibration-run и доказывает целостность execution, repair/replay и acceptance. Для тестирования workflow, multi-agent system, agent role или skill прочитать `testing-harness.md`.
+
+Сначала вместе с пользователем сформировать TestCase: input, допустимый terminal outcome, quality criteria и минимальные critical checkpoints. На checkpoint независимый Evaluator готовит компактный `CheckpointReview`; пользователь выбирает `APPROVE`, `REJECT`, `CHANGE_CRITERION` или `ESCALATE`. При failure сначала различить `workflow_defect`, `test_case_defect`, `judge_miscalibration`, data/environment/harness defect и ambiguous product decision. Автоматически менять subject разрешено только для confirmed `workflow_defect`.
+
+Технический loop `BugSpec → Red → repair → verify → targeted replay` выполнять автономно в bounded scope. Targeted replay ускоряет итерацию, но final acceptance требует нового full clean replay от initial input. Runner, Evaluator, Repairer и Verifier логически разделять. Hard facts подтверждает отдельный trusted collector. До fault-injection qualification harness даёт diagnostic evidence, но не является единственным release gate.
 
 Проектируя agent workflow, определить:
 
@@ -205,10 +209,11 @@ description: >-
 8. Определены ли first Red, acceptance levels и release commands?
 9. Для AI определены governance, context freshness и token budgets?
 10. EvalSuite versioned, воспроизводим, откалиброван и связан с fallback/OutcomeRecord; sample size и thresholds не выдуманы, а обоснованы risk/baseline/variance/confidence?
-11. Если нужен TestingHarness: subject/contract pinned к actual source, identities аутентифицированы, hard evidence независимо собрано, replay исполнен, а сам harness прошёл fault injection?
-12. Нужен ли agent framework и обоснован ли Mastra/default либо альтернатива?
-13. Для UI получен actual shadcn context?
-14. Сабагент действительно сохраняет контекст, а не создаёт coordination overhead?
-15. Не перепутаны ли implementation и release gates?
-16. Определены ли security, observability, deploy/readback/rollback?
-17. Следующий шаг конкретен, обратим и проверяем?
+11. Если нужен TestingHarness: совместно утверждены TestCase/checkpoints/rubrics, failures классифицируются до patch, user получает CheckpointReview вместо ручного debugging, а repair loop bounded?
+12. Subject/contract pinned к actual source, identities аутентифицированы, hard evidence независимо собрано, full clean replay исполнен, а сам harness прошёл fault injection?
+13. Нужен ли agent framework и обоснован ли Mastra/default либо альтернатива?
+14. Для UI получен actual shadcn context?
+15. Сабагент действительно сохраняет контекст, а не создаёт coordination overhead?
+16. Не перепутаны ли implementation и release gates?
+17. Определены ли security, observability, deploy/readback/rollback?
+18. Следующий шаг конкретен, обратим и проверяем?

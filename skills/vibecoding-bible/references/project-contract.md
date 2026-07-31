@@ -149,14 +149,18 @@ Artifact («создать экран/файл/AI-текст») не являе�
 ### Testing harness
 
 - применимость: workflow, multi-agent system, agent role, skill либо `not_applicable` с rationale;
-- `TestSubjectManifest` и `ScenarioContract` versions/hashes из actual sources;
-- execution modes и scenario/risk slices;
-- authenticated actor/recorder/collector/supervisor/repairer/verifier/approver;
+- `TestSubjectManifest` и совместно утверждённый TestCase: input, acceptable terminal outcome, quality criteria и forbidden outcomes;
+- minimal critical checkpoints, quality rubrics, evidence sources и human calibration policy;
+- `CheckpointReview` protocol: `APPROVE`, `REJECT`, `CHANGE_CRITERION`, `ESCALATE`;
+- actual subject/TestCase/config/model/tool versions/hashes;
+- authenticated Designer/Runner/Recorder/Collector/Evaluator/Investigator/Repairer/Verifier/Approver;
 - trusted evidence collectors и resolvable receipt formats;
 - append-only journal, trace completeness и drift policy;
 - atomic idempotency/outbox protocol для run changes и external mutations;
-- issue classification, approved BugSpec и Red→Green repair proof;
-- clean replay procedure, isolated namespace и side-effect policy;
+- classification: workflow/test-case/judge/data/environment/harness defect или ambiguous product decision;
+- bounded autonomous repair: approved BugSpec, Red→Green proof, attempts/deadline/token/cost budgets и stop rules;
+- targeted, clean-checkpoint и full-clean replay procedures, isolated namespace и side-effect policy;
+- regression promotion и progressive autonomy по checkpoint/risk slice;
 - acceptance/promotion/rollback policy;
 - harness qualification: seeded defects, trace loss, spoofing и false-green checks.
 
@@ -270,7 +274,7 @@ Frozen contract не редактировать молча. Создать но�
 11. Consequential AI behavior не имеет EvalSuite owner, version, provenance, slices, acceptance/fallback policy или reproducible run plan.
 12. Web UI не имеет actual shadcn context/conformance plan.
 13. Не выбраны delivery strategy и write scopes.
-14. Consequential workflow, multi-agent system, agent role или skill не имеет TestingHarness plan с actual subject/contract versions, trusted evidence collector, authenticated roles и clean replay strategy.
+14. Consequential workflow, multi-agent system, agent role или skill не имеет совместно утверждённого TestCase с input/outcome/quality criteria, critical checkpoints, human calibration, failure classification, bounded repair и full-clean replay strategy.
 
 ### Release
 
@@ -280,7 +284,7 @@ Frozen contract не редактировать молча. Создать но�
 18. AI calls не имеют работающего token/cost accounting и enforcement.
 19. AI decision не связан с actual context/rules/model/tool versions.
 20. Required EvalSuite не прошёл blocking per-slice thresholds на exact model/context/rules/tools/judge versions либо judge не откалиброван по принятой risk policy.
-21. Required TestingHarness acceptance основан на caller/subject self-attestation, spoofable identity, unresolved evidence refs или неисполненном replay; либо сам harness не прошёл требуемую qualification.
+21. Required TestingHarness acceptance основан на caller/subject self-attestation, spoofable identity, unresolved evidence refs, неисполненном replay или только targeted replay; failure был исправлен без classification либо сам harness не прошёл qualification.
 22. Autonomy превышает доказанный и утверждённый уровень.
 23. Web UI не прошло required shadcn/browser conformance.
 24. Production readiness основана только на source/unit/mock/replay/offline score.
@@ -359,10 +363,15 @@ Task contracts/write scopes/integration owner:
 
 ## Testing harness
 Subject type/id/version/hash and actual contract ref:
-Modes/scenarios/risk slices:
+TestCase input/terminal outcome/quality criteria/forbidden outcomes:
+Critical checkpoints/rubrics/evidence/human calibration:
+CheckpointReview protocol:
 Authenticated roles and separation of duties:
 Trusted collectors/evidence receipts/journal:
-Issue → BugSpec → Red/Green → clean replay:
+Failure classification:
+Bounded BugSpec → Red/Green → targeted replay:
+Clean checkpoint/full clean replay:
+Regression promotion/progressive autonomy:
 Acceptance/promotion/rollback policy:
 Harness qualification/seeded faults/known gaps:
 
@@ -393,9 +402,10 @@ Constraints:
 9. Потребность в agent framework и выбор Mastra/альтернативы обоснованы?
 10. AI governance и token budgets есть?
 11. EvalSuite имеет owner/version/provenance/slices/thresholds/calibration/fallback и online outcome link?
-12. Consequential workflow/agent/role/skill имеет TestingHarness с actual hashes, authenticated roles, trusted receipts, clean replay и qualification?
-13. Actual shadcn context получен?
-14. Delivery strategy рациональна?
-15. Implementation readiness не выдана за release?
-16. Constraint не скрывает red-line failure?
-17. Следующий шаг конкретен и проверяем?
+12. Consequential workflow/agent/role/skill имеет совместно утверждённый TestCase, critical checkpoints, CheckpointReview, classification и bounded autonomous repair?
+13. Actual hashes/roles/receipts закреплены, а full clean replay и harness qualification выполнены?
+14. Actual shadcn context получен?
+15. Delivery strategy рациональна?
+16. Implementation readiness не выдана за release?
+17. Constraint не скрывает red-line failure?
+18. Следующий шаг конкретен и проверяем?

@@ -263,16 +263,21 @@ cost_per_accepted_outcome = total_workflow_cost / accepted_outcomes
 
 ## 10. TestingHarness
 
-Для consequential workflow, multi-agent system, agent role или skill одного EvalSuite недостаточно. Требуется `TestingHarness`, который закрепляет actual subject/contract versions, исполняет сценарий, собирает независимые receipts, управляет issue → repair → clean replay и выдаёт acceptance report. Полный протокол описан в [`testing-harness.md`](testing-harness.md).
+Для первого испытания consequential workflow, multi-agent system, agent role или skill одного EvalSuite недостаточно. Требуется `TestingHarness`: пользователь и агент совместно определяют TestCase/checkpoints/rubrics, после чего harness автономно исполняет, классифицирует failure, исправляет confirmed workflow defect и выполняет replay. Полный протокол описан в [`testing-harness.md`](testing-harness.md).
 
 Инварианты:
 
 - `EvalSuite` измеряет качество вероятностного поведения; `TestingHarness` доказывает целостность execution и evidence;
+- первый run калибрует semantic quality с пользователем; approved checkpoints становятся regressions и постепенно повышают автономность;
+- пользователь получает компактный CheckpointReview, а не выполняет ручной debugging по raw logs;
+- user REJECT/agent FAIL сначала классифицируется; test-case, judge, data, environment и harness defects нельзя маскировать patch workflow;
 - subject-under-test, test actor и semantic supervisor не создают hard evidence собственным `passed: true`;
 - hard facts подтверждает trusted collector из system of record;
 - actor/approver identities server-authenticated, а repairer не принимает собственный fix;
 - contract hash вычисляется из реального versioned source/artifact;
+- targeted replay используется для скорости; release требует full clean replay от initial input;
 - replay означает новый исполненный run, а не запись `queued` или копирование состояния;
+- autonomous repair имеет bounded BugSpec, attempts/deadline/token/cost budget и stop/escalation rules;
 - offline/mock, human-attested, semantic, live и unverified evidence различимы;
 - до seeded fault/trace-loss/identity-spoof qualification harness не является единственным release gate.
 
@@ -299,6 +304,7 @@ Exception не отменяет red line. Допустимо только для
 | AI output нестабилен | schema, evidence, eval cases, deterministic boundaries | увеличивать retries без cap |
 | Unit tests зелёные, prod ломается | evidence gap, real integration, E2E/live path | добавлять ещё mocks |
 | Harness зелёный, но evidence прислал сам caller | collector trust boundary, authenticated identity, resolvable receipts | добавлять ещё approval booleans |
+| Первый тест workflow требует много ручного дебага | TestCase, critical checkpoints, CheckpointReview, classification и autonomous repair loop | заставлять пользователя читать весь trace |
 | Стоимость растёт | calls/outcome, context, retries, model routing | оптимизировать цену одного prompt изолированно |
 | UI выглядит несистемно | actual shadcn context и conformance | писать новый component с нуля |
 | Agent workflow нельзя отладить | DecisionRecord, versions, events, readback | логировать chain-of-thought |
