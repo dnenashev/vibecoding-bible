@@ -118,11 +118,12 @@ cases:
       - Предлагает минимальные critical checkpoints и компактный CheckpointReview.
       - Различает deterministic evidence, semantic evaluation и human calibration.
       - Перед repair классифицирует workflow, test-case, judge, data, environment или harness defect.
-      - Требует bounded repair, независимую verification и full clean replay перед acceptance.
+      - Требует bounded repair, независимую verification и replay всего затронутого downstream-пути перед acceptance.
     must_not_include:
       - Заставляет пользователя вручную читать полный trace после каждого шага.
       - Принимает passed true самого workflow как hard evidence.
       - Придумывает универсальный pass rate, sample size или число повторов.
+      - Требует полный прогон от initial input, хотя upstream не менялся и его trusted evidence остаётся совместимым.
 
   - id: skill_agent_regression
     prompt: >-

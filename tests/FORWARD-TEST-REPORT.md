@@ -49,4 +49,8 @@ Coverage: 11 distinct requests, all lifecycle phases, and all three risk modes.
 
 ## Release verdict
 
-`READY_WITH_CONSTRAINTS` until structural validation, publication, and installed-source parity are complete. After those checks, this report can support `READY` for the skill release itself.
+`READY`. Structural validation, publication, and installed-source parity were completed for the lifecycle release.
+
+## Replay-policy regression — 2026-08-04
+
+A fresh agent received a five-stage expensive workflow with a repaired fourth checkpoint. It correctly reused version-matched upstream evidence, replayed from checkpoint 3 through the terminal outcome, required readback for side effects, and reserved full clean replay only for explicit stale-state or cross-stage risk. Verdict: passed.

@@ -190,7 +190,7 @@ Artifact вроде «создать экран» или «написать AI-�
 - role separation;
 - failure classification;
 - bounded BugSpec/repair budgets;
-- targeted/full clean replay;
+- replay scope, affected downstream path и правила переиспользования trusted upstream evidence;
 - qualification/promotion policy.
 
 ### Delivery harness

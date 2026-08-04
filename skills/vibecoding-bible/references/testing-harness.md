@@ -1,4 +1,4 @@
-# TestingHarness v2: калибровка и автономное исправление
+# TestingHarness v2.1: калибровка и экономный replay
 
 ## Содержание
 
@@ -171,7 +171,7 @@ Recommendation: APPROVE | REJECT | CHANGE_CRITERION | ESCALATE
 - `CHANGE_CRITERION` — rubric была неполной или ошибочной;
 - `ESCALATE` — требуется продуктовое, risk или permission решение.
 
-После terminal outcome выполнить full clean replay, заново проверить blocking checkpoints, получить final human acceptance и превратить approvals/rejections/defects в regression cases.
+После terminal outcome проверить exact candidate по выбранному replay scope, получить final human acceptance и превратить approvals/rejections/defects в regression cases. Не перезапускать неизменённый upstream только ради формальной «чистоты».
 
 ## 7. Классифицировать расхождение
 
@@ -219,15 +219,25 @@ Verifier независимо подтверждает:
 
 Возобновить run от последнего совместимого checkpoint до исправленной точки. Разрешать только при hashed/provenanced snapshot, совместимых state/schema, неизменном upstream, изолированных/idempotent side effects и доказанном resume.
 
-Targeted replay ускоряет repair, но не является final evidence.
+Targeted replay подтверждает исправленный checkpoint. Для final evidence дополнить его проверкой затронутого downstream-пути и terminal invariants.
 
 ### Clean checkpoint replay — при затронутом upstream
 
 Запустить новый run от initial input до исправленного checkpoint, если patch затронул upstream behavior или совместимость snapshot не доказана.
 
-### Full clean replay — для acceptance
+### Финальная проверка — по затронутому пути
 
-Перед final acceptance всегда запускать новый end-to-end run от initial input до terminal outcome на exact candidate.
+По умолчанию не запускать workflow заново от initial input. Перед acceptance:
+
+1. подтвердить неизменность upstream source/config/input и совместимость checkpoint snapshot;
+2. выполнить targeted replay исправленной точки;
+3. пройти от неё весь затронутый downstream-путь до terminal outcome;
+4. заново проверить terminal invariants и external side effects через readback/reconciliation;
+5. собрать coverage map: какие checkpoints подтверждены свежим replay, а какие — trusted receipts неизменённого upstream.
+
+Full clean replay — опциональная эскалация, а не стандартный gate. Рассматривать его только когда impact analysis не может доказать границу изменения: менялся upstream contract, snapshot несовместим или недостоверен, обнаружен cross-stage state leak, затронута orchestration topology либо targeted/downstream evidence противоречат друг другу. Даже тогда сначала оценить token/time/cost и выбрать более узкий clean segment, если он даёт достаточное evidence.
+
+Для дорогих или необратимых external side effects не повторять весь workflow ради проверки. Использовать idempotency, sandbox, recorded fixtures с provenance, state readback, reconciliation или compensation drill — в зависимости от claim.
 
 Для любого replay:
 
@@ -279,7 +289,8 @@ Targeted replay ускоряет repair, но не является final eviden
 - subject изменился после snapshot;
 - replay остался `queued`;
 - duplicate external mutation;
-- targeted replay прошёл, full clean replay упал;
+- targeted replay прошёл, но затронутый downstream-путь или terminal invariant упал;
+- harness принял stale upstream receipt после изменения source/config/input;
 - seeded workflow defect;
 - user reject против agent pass;
 - TestCase defect направлен в workflow repair.
@@ -316,11 +327,12 @@ Targeted replay ускоряет repair, но не является final eviden
 - classification intentional failure;
 - bounded BugSpec, Red/Green и independent verification;
 - targeted replay для repair;
-- full clean replay для acceptance;
+- targeted replay и проверка всего затронутого downstream-пути;
+- coverage map для fresh и повторно используемого evidence;
 - regression artifact и seeded harness fault;
 - budgets и stop conditions.
 
-Уменьшать scope числом scenarios/checkpoints. Не убирать trust boundary, classification, bounded repair или full clean replay.
+Уменьшать scope числом scenarios/checkpoints и replay только затронутого пути. Не убирать trust boundary, classification, bounded repair, terminal verification или evidence coverage.
 
 ## 15. Red lines
 
@@ -341,7 +353,8 @@ Targeted replay ускоряет repair, но не является final eviden
 - Blocking checkpoint не имеет receipt/human calibration.
 - Не-workflow defect замаскирован patch subject.
 - Replay объявлен/queued или наследует старые pass/evidence.
-- Выполнен только targeted replay без full clean replay.
+- Не проверен затронутый downstream-путь или terminal invariants.
+- Старый upstream receipt переиспользован без проверки version/hash и snapshot compatibility.
 - Repairer подтвердил собственный fix.
 - Required live integration заменена offline/mock result.
 - Budget превышен, но loop продолжен молча.
@@ -376,7 +389,8 @@ Stop conditions; external mutation policy:
 Defect/evidence; BugSpec/write scope; first Red/regressions:
 
 ## Replay
-Targeted; clean checkpoint; full clean:
+Targeted checkpoint; affected downstream path; terminal verification:
+Reused upstream receipts and compatibility proof; optional clean-segment trigger:
 
 ## Acceptance and autonomy
 CheckpointReview; final acceptance; regressions; autonomy promotion/rollback:
@@ -397,11 +411,13 @@ Seeded faults/results; known gaps; implementation/release verdicts:
 6. `FAIL`/`REJECT` сначала классифицируется?
 7. Patch разрешён только для `workflow_defect`?
 8. Repair имеет bounded BugSpec, Red/Green и independent verifier?
-9. Targeted replay используется только для скорости?
-10. Full clean replay выполнен от initial input без старых pass/receipts?
-11. Autonomy повышается по checkpoint/risk slice после calibration?
-12. Loop останавливается при ambiguity, budget или scope expansion?
-13. Harness проверен seeded faults и false-green cases?
-14. Required live evidence не заменено offline result?
-15. Final acceptance и OutcomeRecord не перепутаны?
-16. Следующий шаг — один полный calibration/repair/replay slice?
+9. Targeted replay подтверждает исправленную точку?
+10. Затронутый downstream-путь и terminal invariants проверены на exact candidate?
+11. Переиспользованный upstream evidence привязан к неизменным versions/hashes и совместимому snapshot?
+12. Full clean не запускается без конкретного risk trigger и оценки стоимости?
+13. Autonomy повышается по checkpoint/risk slice после calibration?
+14. Loop останавливается при ambiguity, budget или scope expansion?
+15. Harness проверен seeded faults и false-green cases?
+16. Required live evidence не заменено offline result?
+17. Final acceptance и OutcomeRecord не перепутаны?
+18. Следующий шаг — один calibration/repair/replay slice с минимальным достаточным scope?
