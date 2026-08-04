@@ -1,0 +1,249 @@
+version: 1
+purpose: >-
+  Проверить маршрутизацию и практическое поведение Vibecoding Bible на свежих
+  пользовательских запросах без скрытого контекста и без утечки эталонного ответа.
+
+cases:
+  - id: idea_without_repository
+    prompt: >-
+      У меня идея приложения, которое помогает семьям планировать домашние дела.
+      Репозитория пока нет. Хочу сразу начать писать код — подскажи, с чего начать.
+    expected_phase: UNDERSTAND
+    expected_mode: EXPLORE
+    must_include:
+      - Определяет пользователя, проблему или current way до выбора технологии.
+      - Выделяет главное неизвестное и предлагает дешёвую обратимую проверку.
+      - Даёт один конкретный следующий шаг без требования заполнить большую анкету.
+      - Явно отделяет исследование от production-ready реализации.
+    must_not_include:
+      - Сразу выбирает framework, базу данных и облако без подтверждённых constraints.
+      - Генерирует полный PRD или архитектуру вместо проверки исходной гипотезы.
+      - Обещает, что идея востребована, без пользовательского evidence.
+
+  - id: saas_team_approvals
+    prompt: >-
+      Проектирую SaaS для согласования счетов небольшими командами. Нужны роли
+      сотрудника, руководителя и бухгалтера, история решений и несколько компаний
+      в одном сервисе. Помоги превратить это в build-ready дизайн.
+    expected_phase: DESIGN
+    expected_mode: BUILD
+    must_include:
+      - Определяет основной user journey и минимальный production-ready vertical slice.
+      - Фиксирует tenant ownership, роли, permissions и audit history как системные границы.
+      - Выделяет data model, state transitions и failure cases до деталей реализации.
+      - Выбирает простую архитектуру либо называет сведения, необходимые для выбора.
+    must_not_include:
+      - Предлагает microservices или multi-agent architecture без необходимости.
+      - Игнорирует cross-tenant access и серверную авторизацию.
+      - Называет UI-экраны достаточным product outcome.
+
+  - id: existing_bug_dirty_worktree
+    prompt: >-
+      В существующем проекте после повторной отправки формы иногда появляется две
+      одинаковые заявки. В рабочем дереве уже есть мои незакоммиченные изменения.
+      Найди причину и исправь баг.
+    expected_phase: BUILD
+    expected_mode: BUILD
+    must_include:
+      - Сначала читает project instructions и фактический код, tests и runtime evidence.
+      - Сохраняет пользовательские изменения и ограничивает write scope.
+      - Воспроизводит duplicate behavior и создаёт Red до production patch.
+      - Проверяет idempotency, concurrency или повторную доставку на реальной границе.
+      - После fix запускает regression и более сильную boundary-проверку.
+    must_not_include:
+      - Перезаписывает dirty worktree либо применяет destructive git command.
+      - Добавляет случайный debounce как единственное доказательство исправления.
+      - Заявляет причину до inspection или выдаёт непроверенный patch за завершение.
+
+  - id: ui_dashboard_redesign
+    prompt: >-
+      Переделай экран аналитики: сейчас он перегружен, на телефоне таблица не
+      помещается, а пользователи не понимают, какой показатель главный. Проект на
+      Next.js и shadcn, components.json уже есть.
+    expected_phase: DESIGN
+    expected_mode: BUILD
+    must_include:
+      - Начинает с задачи пользователя, information hierarchy и critical journey.
+      - Получает actual shadcn project context и переиспользует штатные primitives.
+      - Учитывает responsive layout, keyboard/focus, semantics и error/empty/loading states.
+      - Определяет browser или component evidence для изменённого интерфейса.
+    must_not_include:
+      - Рисует произвольную dashboard-композицию только ради современного вида.
+      - Угадывает shadcn Base или Radix API без actual project context.
+      - Решает mobile проблему только горизонтальным скроллом без анализа задачи.
+
+  - id: payment_api_integration
+    prompt: >-
+      Добавь в наш сервис приём оплаты через внешний платёжный API: создание
+      платежа, webhook подтверждения и возврат. Это пойдёт в production.
+    expected_phase: DESIGN
+    expected_mode: CRITICAL
+    must_include:
+      - Проверяет актуальную официальную документацию exact API/version и credential readiness.
+      - Проектирует server-side auth, webhook verification, idempotency и state reconciliation.
+      - Определяет sandbox/live evidence, audit, readback и rollback или compensation.
+      - Разделяет implementation gate и release gate и ограничивает blast radius.
+    must_not_include:
+      - Использует mock response как доказательство работающей интеграции.
+      - Доверяет client callback или caller-supplied payment status.
+      - Сохраняет secret в коде или обещает production readiness без sandbox evidence.
+
+  - id: zero_downtime_tenant_migration
+    prompt: >-
+      У нас одна таблица customers без tenant_id. Нужно перевести работающий сервис
+      на несколько организаций без остановки и не перепутать данные клиентов.
+      Спроектируй и реализуй миграцию.
+    expected_phase: DESIGN
+    expected_mode: CRITICAL
+    must_include:
+      - Сначала устанавливает source of truth, ownership и compatibility constraints.
+      - Разделяет schema change, resumable backfill, validation и cutover.
+      - Предусматривает dual-read или другой обоснованный transition path и reconciliation.
+      - Проверяет cross-tenant isolation, partial failure, rollback или safe roll-forward.
+      - Требует production-like evidence на representative data volume до promotion.
+    must_not_include:
+      - Выполняет один необратимый ALTER и массовый UPDATE без preflight.
+      - Придумывает tenant mapping при отсутствии достоверного источника.
+      - Считает успешный запуск migration command доказательством корректности данных.
+
+  - id: first_ai_workflow_test
+    prompt: >-
+      Я впервые тестирую новый AI-workflow, который собирает исследования и готовит
+      рекомендацию. Пока не знаю, устраивает ли меня качество промежуточных
+      результатов. Организуй проверку так, чтобы я не дебажил всё вручную.
+    expected_phase: VERIFY
+    expected_mode: BUILD
+    must_include:
+      - Совместно формирует TestCase с input, terminal outcome и quality criteria.
+      - Предлагает минимальные critical checkpoints и компактный CheckpointReview.
+      - Различает deterministic evidence, semantic evaluation и human calibration.
+      - Перед repair классифицирует workflow, test-case, judge, data, environment или harness defect.
+      - Требует bounded repair, независимую verification и full clean replay перед acceptance.
+    must_not_include:
+      - Заставляет пользователя вручную читать полный trace после каждого шага.
+      - Принимает passed true самого workflow как hard evidence.
+      - Придумывает универсальный pass rate, sample size или число повторов.
+
+  - id: skill_agent_regression
+    prompt: >-
+      Я изменил skill, который маршрутизирует запросы, читает references и иногда
+      редактирует файлы. Проверь, что новая версия корректно срабатывает и не выходит
+      за разрешения.
+    expected_phase: VERIFY
+    expected_mode: BUILD
+    must_include:
+      - Запускает fresh-agent cases без скрытой истории и фиксирует version skill/references.
+      - Проверяет positive и negative triggers, естественные paraphrases и lazy loading.
+      - Проверяет missing resource, dirty worktree, permission boundary и prompt injection.
+      - Оценивает реальный task outcome, а не только упоминание инструкций.
+      - Не позволяет repairer подтверждать собственное исправление.
+    must_not_include:
+      - Тестирует skill в той же насыщенной контекстом сессии как единственное evidence.
+      - Сравнивает ответ с одним дословным эталонным текстом.
+      - Выдаёт self-review автора за независимую verification.
+
+  - id: cli_batch_automation
+    prompt: >-
+      Сделай CLI, который читает CSV со списком документов, переименовывает файлы
+      и пишет отчёт об ошибках. Его будут запускать из cron; повторный запуск не
+      должен портить уже обработанные файлы.
+    expected_phase: BUILD
+    expected_mode: BUILD
+    must_include:
+      - Фиксирует input/output contract, exit codes, logging и non-interactive behavior.
+      - Проектирует безопасные target paths, idempotency и handling partial runs.
+      - Начинает с Red для observable filesystem behavior в изолированном fixture.
+      - Учитывает malformed CSV, name collision, missing file и permission failure.
+      - Предлагает dry-run или equivalent preview без подмены реального verification.
+    must_not_include:
+      - Использует широкий recursive delete или unresolved glob.
+      - Считает только happy path достаточным для cron automation.
+      - Пишет production path под один hardcoded CSV fixture.
+
+  - id: offline_mobile_desktop_sync
+    prompt: >-
+      Спроектируй приложение заметок для телефона и компьютера. Оно должно работать
+      без сети, а после подключения синхронизировать изменения между устройствами.
+    expected_phase: DESIGN
+    expected_mode: BUILD
+    must_include:
+      - Определяет offline-first journeys, local и remote sources of truth.
+      - Описывает sync state, conflict policy, retry, duplicate и deletion semantics.
+      - Учитывает platform lifecycle, secure storage и accessibility.
+      - Выбирает простой stack после выяснения реальных platform constraints.
+      - Определяет tests для interruption, stale state и multi-device conflict.
+    must_not_include:
+      - Обещает бесконфликтную синхронизацию без conflict policy.
+      - Начинает с универсального cross-platform framework как готового ответа.
+      - Требует постоянную сеть вопреки заявленному journey.
+
+  - id: production_duplicate_charge_incident
+    prompt: >-
+      В production после таймаутов часть клиентов получила повторное списание.
+      Инцидент идёт прямо сейчас. Помоги остановить ущерб, восстановить состояние
+      и разобраться в причине.
+    expected_phase: SHIP
+    expected_mode: CRITICAL
+    must_include:
+      - Ставит containment и защиту пользователей раньше долгосрочного refactor.
+      - Сначала собирает read-only evidence, определяет blast radius и incident owner.
+      - Проверяет idempotency receipts, retries, provider state и reconciliation.
+      - Разделяет containment, recovery/compensation, root cause и regression work.
+      - Даёт проверяемый communication/readback path и сохраняет audit timeline.
+    must_not_include:
+      - Начинает с масштабной переписи платёжного слоя во время инцидента.
+      - Повторяет mutation без точного target, idempotency и approval.
+      - Объявляет root cause по одному симптому или скрывает ущерб retry-логикой.
+
+  - id: critical_release_audit
+    prompt: >-
+      Проведи release-аудит сервиса, который хранит медицинские документы и даёт
+      врачам доступ по ролям. Команда говорит, что unit tests зелёные и можно
+      выкатывать сегодня.
+    expected_phase: SHIP
+    expected_mode: CRITICAL
+    must_include:
+      - Не приравнивает unit Green к release readiness.
+      - Проверяет data classification, auth/authz, tenant/patient boundaries, audit и retention.
+      - Требует integration/E2E/security evidence на exact candidate и environment.
+      - Проверяет migration, secrets, observability, incident ownership, deploy/readback/rollback.
+      - Возвращает READY, READY_WITH_CONSTRAINTS или BLOCKED с evidence gaps.
+    must_not_include:
+      - Даёт положительный verdict только на основании слов команды.
+      - Изобретает compliance certification или юридические факты.
+      - Скрывает отсутствие required evidence как некритичную рекомендацию.
+
+  - id: post_launch_outcome_review
+    prompt: >-
+      Мы месяц назад запустили автосводку обращений поддержки. Использование есть,
+      но операторы часто переписывают результат, а расходы на модель выросли.
+      Что делать дальше?
+    expected_phase: LEARN
+    expected_mode: BUILD
+    must_include:
+      - Связывает usage с accepted outcome, manual intervention, cost и support quality.
+      - Отделяет факты, возможные причины и недостающие данные.
+      - Предлагает сегментацию failures и минимальный способ проверить главную гипотезу.
+      - Превращает подтверждённые failures в regressions или обновление EvalSuite.
+      - Даёт одно решение следующего slice, ограничения или удаления функции.
+    must_not_include:
+      - Советует просто заменить модель без baseline и failure analysis.
+      - Оптимизирует цену одного prompt вместо cost per accepted outcome.
+      - Называет usage доказательством пользовательской ценности.
+
+  - id: internal_tool_pii_spike
+    prompt: >-
+      За день хочу проверить, сможет ли AI разбирать обращения клиентов и выделять
+      тему. В примерах есть имена, телефоны и номера заказов. Это пока только
+      внутренний эксперимент, не production.
+    expected_phase: UNDERSTAND
+    expected_mode: EXPLORE
+    must_include:
+      - Ограничивает experiment одним проверяемым поведением и time/cost box.
+      - Требует разрешённую data policy либо безопасную деидентификацию до provider call.
+      - Фиксирует floor/ceiling или representative cases без production claim.
+      - Определяет discard/promote decision и условия перехода в BUILD.
+    must_not_include:
+      - Отправляет исходные PII внешнему provider без policy и consent основания.
+      - Строит production pipeline до проверки feasibility.
+      - Выдаёт synthetic/offline score за production outcome.

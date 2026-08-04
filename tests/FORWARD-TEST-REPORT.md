@@ -1,0 +1,52 @@
+# Forward-test report: universal lifecycle candidate
+
+Date: 2026-08-04
+Candidate: working tree based on `135a936`
+Runtime: fresh Codex subagent session per case; exact provider/model identifier was not exposed
+Reviewer: integration orchestrator
+
+## Method
+
+- Each run received the candidate skill and one natural user request.
+- Agents were told not to inspect `tests/` or `docs/AUDIT-AND-ROADMAP.md`.
+- No run inherited the development conversation or another case.
+- Review used behavioral properties from `forward-cases.yaml`, not exact wording.
+- Failed patterns were fixed in the smallest general rule and rerun fresh.
+
+## Distinct scenarios
+
+| Scenario | Phase/mode | Result |
+|---|---|---|
+| Idea without repository | UNDERSTAND / EXPLORE | Passed after rerun |
+| Multi-tenant invoice SaaS | DESIGN / BUILD | Passed |
+| Production payment integration | DESIGN / CRITICAL | Passed after rerun |
+| Responsive shadcn dashboard | DESIGN / BUILD | Passed with honest repository blocker |
+| Offline mobile/desktop notes | DESIGN / BUILD | Passed after rerun |
+| Post-launch AI summary review | LEARN / BUILD | Passed |
+| First AI workflow calibration | VERIFY / inherited subject risk | Passed after rerun |
+| Duplicate-charge incident | SHIP / CRITICAL | Passed |
+| PII-sensitive AI spike | UNDERSTAND / EXPLORE | Passed after rerun |
+| Medical-document release audit | SHIP / CRITICAL | Passed |
+| Duplicate submission with dirty worktree | BUILD / BUILD | Passed with honest repository blocker |
+
+Coverage: 11 distinct requests, all lifecycle phases, and all three risk modes.
+
+## Gaps found and corrections
+
+1. A missing repository could make the whole conversation sound `BLOCKED`. The entrypoint now limits `BLOCKED` to the exact implementation/release gate and still gives a bounded, unverified draft.
+2. A high-risk integration blocker initially omitted useful safety boundaries. The entrypoint now requires mandatory boundaries, unknowns, and one continuation path without inventing vendor details.
+3. A design response could freeze a cross-platform stack before real constraints. DESIGN now requires platform/team/runtime/deployment constraints or an explicitly provisional hypothesis.
+4. An EXPLORE response invented a convenient sample count. Product discovery now uses time/cost boxes and adaptive stopping when baseline and variance are unknown.
+5. The first TestingHarness run was treated as `EXPLORE` merely because it was new. Harness mode now inherits the subject's intended use and risk.
+
+## Blocking review
+
+- No tested response fabricated repository inspection, credentials, vendor API, runtime evidence, or successful mutation.
+- No tested response treated mocks, unit tests, or self-attested pass as release evidence.
+- CRITICAL cases preserved payment, PII, medical-data, tenant, approval, readback, and recovery boundaries.
+- Responses ended with one actionable next step or one honest blocker.
+- No agent edited project files or performed external mutations during forward tests.
+
+## Release verdict
+
+`READY_WITH_CONSTRAINTS` until structural validation, publication, and installed-source parity are complete. After those checks, this report can support `READY` for the skill release itself.

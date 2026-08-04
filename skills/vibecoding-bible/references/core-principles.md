@@ -1,312 +1,201 @@
-# Канон: production-ready вайбкодинг
+# Канон: простое production-ready вайбкодинг-проектирование
 
 ## Содержание
 
 1. Назначение
-2. Lean AI
-3. Oper8
-4. Production-ready scope
-5. Политика mocks
-6. TDD
-7. Tokenomics
-8. shadcn
-9. Evidence и operations
-10. TestingHarness
-11. Исключения
-12. Диагностическая матрица
+2. Приоритеты
+3. Простота и scope
+4. Truth и evidence
+5. Изменения и TDD
+6. Реальные boundaries
+7. Human и AI autonomy
+8. Production minimum
+9. Исключения
+10. Диагностическая матрица
 
 ## 1. Назначение
 
-Этот канон определяет, как проектировать и реализовывать AI-продукты, функции и agent workflows. Его цель — не максимальная скорость генерации кода, а минимальный путь к принятому outcome с контролируемым риском, стоимостью и проверяемым поведением.
+Канон применяется к любому цифровому продукту, создаваемому с помощью AI: conventional software и AI systems. Цель — минимальный путь к принятому outcome без скрытого долга, fabricated evidence и неконтролируемого риска.
 
-Порядок приоритетов:
+AI помогает проектировать и реализовывать. Он не отменяет product reasoning, инженерные границы, permissions и проверку фактического результата.
 
-1. Реальный outcome пользователя или бизнеса.
-2. Безопасность и корректность принятого scope.
-3. Проверяемость и управляемость системы.
-4. Скорость и стоимость достижения outcome.
-5. Удобство реализации.
+## 2. Приоритеты
 
-## 2. Lean AI
+При конфликте выбирать в таком порядке:
 
-### Главный тезис
+1. Реальный outcome пользователя.
+2. Безопасность и корректность выбранного scope.
+3. Простота понимания, изменения и эксплуатации.
+4. Проверяемость и обратимость.
+5. Скорость и стоимость достижения результата.
+6. Удобство конкретной технологии/framework.
 
-Не автоматизировать waste. Сначала определить решение или outcome, которое должно измениться; затем убрать лишние шаги; только после этого добавлять AI.
+Не автоматизировать waste. Сначала понять решение или действие, которое должно измениться; затем убрать лишние шаги; только после этого добавлять software/AI.
 
-Для каждого workflow зафиксировать:
+## 3. Простота и scope
 
-- consumer;
-- Core Job/current way и наблюдаемую потерю;
-- expected outcome и downstream decision;
-- primary metric и counter-metrics;
-- гипотезу, почему AI улучшит outcome;
-- минимальный набор AI decisions;
-- стоимость одного принятого outcome.
+### Принцип
 
-### Инварианты Lean AI
+Выбирать самую простую архитектуру, которая честно выдерживает requirements и risk. Не выбирать самый короткий код ценой потери данных, безопасности или поддержки.
 
-- Value before AI.
-- Один artifact имеет одну ясную ответственность.
-- Observation, fact, inference, hypothesis и unknown различимы.
-- Сначала standard stream, отдельно risky/exception stream.
-- AI decision не равен внешнему action.
-- Human correction не становится production truth автоматически.
-- Eval score не подменяет business outcome.
-- Fine-tuning не является обязательным default.
-- Повторный ручной перенос и лишние model hops считаются waste.
-- Scope уменьшается удалением функциональности, а не качества.
+### Режимы
 
-## 3. Oper8
+- `EXPLORE` — reversible experiment без production claim;
+- `BUILD` — default: маленький production-ready vertical slice;
+- `CRITICAL` — усиленный контур для high-impact риска.
 
-Oper8 превращает AI-функцию в управляемую операционную систему.
+Scope уменьшать удалением функциональности, а не качества внутри принятой границы.
 
-### Шесть обязательных контрактов
+### Production-ready slice
 
-1. `ContextPack` — versioned вход, provenance, freshness, разрешённые данные и missing facts.
-2. `Rulebook` — deterministic rules, owners, effective dates, exceptions и change process.
-3. `EvalSuite` — versioned cases с provenance, slices, thresholds, judge calibration, run config, fallback и expected evidence. Полный lifecycle описан в [`evals.md`](evals.md).
-4. `AutonomyPolicy` — уровни самостоятельности, permissions, approvals, stop rules и maximum level.
-5. `DecisionRecord` — выбранная альтернатива, alternatives considered, context/model/rules/tools versions, confidence и human intervention.
-6. `OutcomeRecord` — фактический результат после observation window, source refs, attribution confidence и win/loss/inconclusive.
+Минимум по применимости:
 
-### Уровни автономности
-
-- `A1` — AI только предлагает; человек принимает решение и действует.
-- `A2` — AI готовит bounded artifact; человек проверяет/утверждает.
-- `A3` — AI выполняет reversible low-risk action под policy и audit.
-- `A4` — AI выполняет более широкие действия с canary/readback/rollback.
-- `A5` — высокая автономность; допустима только после сильного production evidence и отдельного approval.
-
-Autonomy определяется на уровне конкретного decision/action, а не «агента в целом». Повышать её только по evidence; red-line failure блокирует promotion и может требовать rollback.
-
-### Memory и freshness
-
-- Назвать владельца каждого memory store.
-- Хранить provenance и captured/effective timestamps.
-- Не смешивать working memory, durable facts, rules и outcomes.
-- Upstream change создаёт новую версию и помечает dependents `stale`.
-- Retrieval не делает информацию истинной; retrieved item проходит relevance/freshness/authorization checks.
-- Не хранить скрытую chain-of-thought; хранить проверяемые decisions и evidence.
-
-## 4. Production-ready scope
-
-### Правило
-
-По умолчанию строить production-ready product/function, а не throwaway MVP. Допустим маленький vertical slice, но внутри него обязательны:
-
-- полный обязательный user journey;
+- законченный user journey;
 - реальные data/integration boundaries;
-- error/empty/loading/retry states;
-- persistence и migrations;
-- security и permissions;
+- loading/empty/error/retry/cancel states;
+- persistence/migration/compatibility;
+- permissions и privacy;
+- tests нужного уровня;
 - observability;
 - deploy/readback/rollback;
-- tests нужных уровней;
-- documented limitations без ложных claims.
+- explicit limitations.
 
-### Что можно отложить
+### Не усложнять заранее
 
-- дополнительные сегменты и роли;
-- второстепенные workflows;
-- необязательные integrations;
-- optimization после подтверждённого bottleneck;
-- масштабирование, не требуемое утверждённой нагрузкой.
+Не добавлять без доказанной необходимости:
 
-### Что нельзя называть MVP-исключением
+- microservices;
+- multi-agent topology;
+- event bus;
+- distributed cache;
+- custom framework;
+- premature abstraction;
+- новый database/provider;
+- generalized plugin system.
 
-- публичную утечку данных;
-- эфемерное required state;
-- отсутствие rollback для материальной мутации;
-- fake integration;
-- hardcoded success;
-- отсутствие cost limits для paid AI;
-- unit-only доказательство live path;
-- обязательный путь, работающий только вручную вопреки заявлению.
+## 4. Truth и evidence
 
-## 5. Политика mocks
+Различать:
 
-### Production-strict policy
+- `fact` — подтверждён source/runtime evidence;
+- `assumption` — рабочая гипотеза с validation;
+- `unknown` — неизвестное с owner/next probe;
+- `not_applicable` — неприменимо с причиной.
 
-Запрещены в production/runtime/integration/live evidence:
-
-- mock/fake data, выдаваемые пользователю как реальные;
-- hardcoded provider response или happy path;
-- placeholder implementation обязательной функции;
-- env/header/query branch, включающий QA behavior в production service;
-- fallback credential или secret в коде;
-- catch-all, превращающий failure в fabricated success;
-- demo brands/payloads в accepted production artifact.
-
-### Допустимые test doubles
-
-Разрешены только когда одновременно выполнено:
-
-1. Double находится в test-only composition root и отсутствует в production bundle.
-2. Он заменяет внешнюю границу, а не tested domain logic.
-3. Он нужен для deterministic unit/component/replay case.
-4. Test явно маркирован как non-live evidence.
-5. Обязательная integration отдельно проверяется sandbox/live evidence.
-
-Нет ключа или provider access — это `blocked`, configuration error либо честный manual/deterministic fallback. Не повод мокать runtime.
-
-## 6. TDD
-
-### Цикл
-
-1. Зафиксировать behavior и evidence level.
-2. Написать минимальный поведенческий test.
-3. Запустить и убедиться, что он падает по ожидаемой причине — Red.
-4. Реализовать минимальный production path — Green.
-5. Refactor без расширения контракта.
-6. Запустить regression и более высокие evidence levels.
-7. Связать найденный production defect с новым regression case.
-
-### Запреты
-
-- Не писать production code до подтверждённого Red для нового behavior.
-- Не ослаблять assertion ради Green.
-- Не менять expected output на фактический только потому, что test упал.
-- Не принимать required skip/todo/warning как release success.
-- Не делать production branch специально под fixture.
-- Не считать snapshot/source-string test достаточным для behavior, требующего runtime/E2E.
-
-## 7. Tokenomics
-
-### Pre-call
-
-Каждый runtime AI request должен иметь:
-
-- exact model и versioned billing policy;
-- input upper bound;
-- max output tokens;
-- worst-case cost;
-- per-call, per-run, daily и monthly caps;
-- atomic reservation до network fetch;
-- attempt budget и общий deadline.
-
-Если policy отсутствует, model mismatch или cap превышен — request блокируется до fetch.
-
-### Post-call
-
-Settlement сохраняет:
-
-- provider-reported input/output/cached tokens;
-- actual либо явно estimated/conservative cost;
-- model/billing/policy attribution;
-- success/failure/timeout status;
-- workflow/run/request/attempt identifiers.
-
-Неизвестная стоимость не равна нулю. Paid response без valid usage fail closed, кроме заранее описанного conservative accounting для provider surface без token usage.
-
-### Optimization target
-
-Оптимизировать:
+Иерархия evidence:
 
 ```text
-cost_per_accepted_outcome = total_workflow_cost / accepted_outcomes
+source/static → unit → component/contract → integration → E2E → live observation
 ```
 
-Сокращать лишние context, retries и model hops, но не ценой correctness, evidence или downstream rework.
+Более слабый уровень не заменяет требуемый сильный. README, self-report агента, screenshot или `passed: true` без resolvable evidence не доказывают production behavior.
 
-## 8. shadcn
+Не сохранять hidden chain-of-thought. Сохранять observable inputs, decisions, versions, actions, evidence и outcomes.
 
-Для web UI:
+## 5. Изменения и TDD
 
-1. Обнаружить `components.json`.
-2. Использовать доступный `shadcn` skill.
-3. Получить actual project context через project package runner.
-4. Проверить `base`, framework, RSC, Tailwind version, aliases, icon library и installed components.
-5. Получить актуальную документацию затрагиваемых primitives.
-6. Использовать existing components и built-in variants до custom markup/styles.
-7. Добавить automated source/component/browser conformance.
+Каждое изменение behavior выполнять так:
 
-Обязательные общие правила:
+1. Зафиксировать current и expected behavior.
+2. Ограничить write scope и invariants.
+3. Создать минимальный failing behavioral test — Red.
+4. Убедиться, что он падает по ожидаемой причине.
+5. Реализовать минимальный Green.
+6. Refactor только внутри согласованного scope.
+7. Запустить regressions и required higher-level evidence.
+8. Синхронизировать docs/decisions.
 
-- semantic tokens вместо raw palette;
-- `FieldGroup`/`Field` для forms;
-- correct Base/Radix APIs;
-- full component composition;
-- Spinner/Skeleton/Empty/Alert/Separator вместо hand-built replacements;
-- configured icon library и icon contract;
-- штатные chat primitives для conversation UI;
-- keyboard, focus, accessibility, responsive и console-warning evidence.
+Запрещено:
 
-## 9. Evidence и operations
+- писать feature code до проверяемого behavior contract;
+- ослаблять assertion ради Green;
+- менять expected output на фактический только из-за fail;
+- оставлять required skip/todo;
+- делать branch под конкретный fixture;
+- превращать соседний redesign в «небольшой fix».
 
-### Уровни evidence
+## 6. Реальные boundaries
 
-1. `source_inspection` — наличие и структура кода.
-2. `unit` — локальная логика.
-3. `component` — component behavior на контролируемых границах.
-4. `contract` — schema/interface compatibility.
-5. `integration_sandbox` — реальная тестовая интеграция.
-6. `e2e_live` — обязательный live-like путь.
-7. `production_observation` — outcome, нагрузка и downstream effects.
+### Mocks
 
-Более слабый уровень не подменяет требуемый сильный.
+Mock/fake/stub разрешён только в test-only composition root и не считается live evidence. Production path не содержит hardcoded success, placeholder core behavior или fabricated provider result.
 
-### Observability minimum
+Нет credential/provider access — это `BLOCKED`, configuration error либо explicit manual/deterministic fallback.
 
-Сохранять identifiers/versions, state transitions, model/tools, token usage/cost, attempts/deadline, approvals, mutations, readback, stale/rollback и pending outcome. Маскировать secrets/PII; не сохранять chain-of-thought.
+### Integrations
+
+Для каждой mandatory integration определить:
+
+- exact provider/environment/version;
+- typed contract;
+- auth/permission boundary;
+- timeout/retry/rate limit;
+- failure/fallback behavior;
+- sandbox/live verification.
+
+### Data
+
+Назвать owner и source of truth. Определить schema/version, provenance, privacy, retention, migration, backup/recovery и stale propagation по риску.
 
 ### External mutations
 
-Требовать:
+Требовать exact target, least privilege, idempotency, bounded diff, risk-based approval, post-action readback, rollback/compensation и audit event.
 
-- exact target и permission;
-- idempotency key;
-- bounded diff;
-- approval по risk class;
-- post-action readback;
-- rollback/compensation;
-- audit event и outcome window.
+## 7. Human и AI autonomy
 
-## 10. TestingHarness
+Deterministic order, invariants и side-effect control реализовывать кодом/workflow. AI использовать для open-ended decisions, где допустимые действия ограничены policy, tools и evidence.
 
-Для первого испытания consequential workflow, multi-agent system, agent role или skill одного EvalSuite недостаточно. Требуется `TestingHarness`: пользователь и агент совместно определяют TestCase/checkpoints/rubrics, после чего harness автономно исполняет, классифицирует failure, исправляет confirmed workflow defect и выполняет replay. Полный протокол описан в [`testing-harness.md`](testing-harness.md).
+Autonomy задавать на уровне конкретного decision/action:
 
-Инварианты:
+- proposal;
+- bounded artifact;
+- reversible action;
+- broader action with canary/readback/rollback;
+- high autonomy только после production evidence и approval.
 
-- `EvalSuite` измеряет качество вероятностного поведения; `TestingHarness` доказывает целостность execution и evidence;
-- первый run калибрует semantic quality с пользователем; approved checkpoints становятся regressions и постепенно повышают автономность;
-- пользователь получает компактный CheckpointReview, а не выполняет ручной debugging по raw logs;
-- user REJECT/agent FAIL сначала классифицируется; test-case, judge, data, environment и harness defects нельзя маскировать patch workflow;
-- subject-under-test, test actor и semantic supervisor не создают hard evidence собственным `passed: true`;
-- hard facts подтверждает trusted collector из system of record;
-- actor/approver identities server-authenticated, а repairer не принимает собственный fix;
-- contract hash вычисляется из реального versioned source/artifact;
-- targeted replay используется для скорости; release требует full clean replay от initial input;
-- replay означает новый исполненный run, а не запись `queued` или копирование состояния;
-- autonomous repair имеет bounded BugSpec, attempts/deadline/token/cost budget и stop/escalation rules;
-- offline/mock, human-attested, semantic, live и unverified evidence различимы;
-- до seeded fault/trace-loss/identity-spoof qualification harness не является единственным release gate.
+Human correction не становится truth автоматически. Проверить её против правил и outcome. AI/judge/repairer не подтверждает собственный consequential pass.
 
-## 11. Исключения
+Для AI systems применять versioned context/rules/models/tools, fallback, token/cost budgets и EvalSuite. Для первого сложного workflow — calibration-first TestingHarness.
 
-Exception не отменяет red line. Допустимо только для некритического constraint и содержит:
+## 8. Production minimum
 
-- reason и exact scope;
-- owner и approvedBy;
-- effectiveFrom/expiresAt;
+По риску определить:
+
+- authentication/authorization/tenancy;
+- secrets/privacy/data handling;
+- performance/capacity/reliability;
+- logs/metrics/traces и SLO;
+- environments/config/CI-CD;
+- migration/deploy/readback/rollback;
+- backup/recovery/incident owner;
+- analytics/feedback/outcome window.
+
+Не объявлять production-ready по одному локальному happy path. Не требовать enterprise controls для reversible EXPLORE spike.
+
+## 9. Исключения
+
+Exception не отменяет red line. Допустимое исключение содержит:
+
+- exact scope и reason;
+- owner/approvedBy;
 - risk и compensating control;
-- machine check и regression test;
-- closure criterion.
+- expiry;
+- validation и closure criterion.
 
-Постоянное, бесхозное или недокументированное exception запрещено.
+Постоянное, бесхозное или недокументированное исключение запрещено.
 
-## 12. Диагностическая матрица
+## 10. Диагностическая матрица
 
 | Симптом | Сначала проверить | Не делать первым |
 |---|---|---|
-| Агент пишет много, результата нет | outcome, step count, context waste | добавлять ещё prompt-инструкции |
-| Агент ломает соседний код | scope, write permissions, tests, ownership | просить «быть осторожнее» |
-| После compaction теряются решения | ContextPack, decision log, делегирование bounded task | бесконечно расширять system prompt |
-| AI output нестабилен | schema, evidence, eval cases, deterministic boundaries | увеличивать retries без cap |
-| Unit tests зелёные, prod ломается | evidence gap, real integration, E2E/live path | добавлять ещё mocks |
-| Harness зелёный, но evidence прислал сам caller | collector trust boundary, authenticated identity, resolvable receipts | добавлять ещё approval booleans |
-| Первый тест workflow требует много ручного дебага | TestCase, critical checkpoints, CheckpointReview, classification и autonomous repair loop | заставлять пользователя читать весь trace |
-| Стоимость растёт | calls/outcome, context, retries, model routing | оптимизировать цену одного prompt изолированно |
-| UI выглядит несистемно | actual shadcn context и conformance | писать новый component с нуля |
-| Agent workflow нельзя отладить | DecisionRecord, versions, events, readback | логировать chain-of-thought |
-| Agent orchestration собирается вручную | нужен ли framework; для TypeScript сначала оценить Mastra | добавлять framework без use-case и contract |
-| «MVP» накопил долги | production-ready slice boundary | переписывать всё без contract |
+| Непонятно, что строить | user/problem/current way/outcome | выбирать framework |
+| Scope разрастается | mode, slice, non-goals, critical unknown | добавлять ещё backlog |
+| Агент ломает соседний код | write scope, tests, ownership, dirty state | просить «быть осторожнее» |
+| После compaction теряются решения | project context, decision log, bounded delegation | расширять prompt бесконечно |
+| Баг чинится случайными patches | reproduction, hypothesis, localization, first Red | переписывать модуль целиком |
+| Unit зелёный, prod ломается | evidence gap, integration/E2E/live path | добавлять mocks |
+| AI output нестабилен | context/rules/schema/evals/fallback | бесконечные retries |
+| UI неудобен | journey, IA, states, accessibility, user validation | косметический polish |
+| Стоимость растёт | calls/outcome, context, retries, architecture waste | менять модель без baseline |
+| Release страшно делать | migrations, flags, canary, readback, rollback | ручной deploy без evidence |
+| Процесс слишком тяжёл | risk mode и применимость artifacts | удалять safety red lines |

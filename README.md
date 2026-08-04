@@ -1,148 +1,149 @@
 # Вайбкодинг Библия
 
-**Код генерируется быстро. Система должна оставаться управляемой.**
+**Одна точка входа: от идеи до работающего и управляемого цифрового продукта.**
 
-`vibecoding-bible` — открытый Codex skill для разработки production-ready AI-продуктов. Он превращает вайбкодинг из серии импровизированных промптов в проверяемый инженерный цикл: цель → контракт → Red → Green → integration evidence → release gate.
+`vibecoding-bible` — открытый Codex skill для создания software с помощью AI. Он помогает сделать сайт, SaaS, API, mobile/desktop app, CLI, automation, data product или AI/agent system — и не спутать быстро написанный код с готовым продуктом.
 
-Скилл работает как разговорный senior-инженер: находит самое опасное неизвестное, ограничивает scope, проектирует архитектуру и harness, а затем требует доказательства, что результат действительно готов к эксплуатации.
+Skill работает как senior product-and-engineering partner: определяет текущую фазу, выбирает уровень строгости, подключает только нужные правила и заканчивает одним проверяемым следующим шагом.
 
 ## Быстрый старт
 
-Попросите Codex установить skill из GitHub:
+Попросите Codex установить skill:
 
 ```text
 Установи skill из https://github.com/dnenashev/vibecoding-bible/tree/main/skills/vibecoding-bible
 ```
 
-Начните новую задачу и вызовите skill явно:
+Начните новую задачу:
 
 ```text
-$vibecoding-bible разбери мой проект и предложи один безопасный следующий шаг
+$vibecoding-bible хочу создать сервис для подготовки коммерческих предложений
 ```
 
-Или сразу дайте конкретную задачу:
+Или принесите существующий проект:
 
 ```text
-$vibecoding-bible спроектируй и реализуй production-ready оплату подписки
+$vibecoding-bible разберись, почему checkout ломается, и исправь production-ready
 ```
 
-## Зачем он нужен
-
-AI-агент может быстро написать локально работающий код и одновременно увеличить системный риск:
-
-- заменить недоступную интеграцию mock-данными и назвать функцию готовой;
-- доказать unit-тестом то, что должно быть проверено на integration, E2E или live-уровне;
-- потерять важные решения после сжатия контекста, сломать соседний код или выполнить внешнюю мутацию без readback и rollback;
-- раздувать число model calls и стоимость workflow без измеримого роста полезного результата.
-
-`vibecoding-bible` добавляет между намерением и кодом явные контракты, границы автономности, TDD, evidence levels, token budgets и отдельную проверку готовности к релизу.
-
-## Для кого
-
-- Для founders и solo builders, которые вайбкодят реальные сервисы, а не одноразовые демо.
-- Для инженеров и tech leads, внедряющих AI coding в существующий продукт.
-- Для команд, которые строят agents, workflows, multi-agent systems, память и tool use.
-- Для тех, кому нужно диагностировать, почему агент зацикливается, теряет контекст или ломает проект.
-
-Для disposable-прототипа без пользователей, данных и последствий полный production-контур может быть избыточен. Скилл умеет уменьшать scope, но не называет хрупкий runtime «достаточно хорошим MVP».
-
-## Как это работает
+## Как работает Библия
 
 ```text
-Реальный outcome
-  → VibecodingProjectContract
-  → самый дорогой failure mode
-  → минимальный production-ready vertical slice
-  → implementation gate
-  → первый поведенческий Red test
-  → Green и Refactor
-  → integration / E2E / live evidence
-  → release gate, readback и rollback
+UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 ```
 
-Перед существенным изменением скилл создаёт полный или delta-контракт и выносит отдельные verdicts:
+- `UNDERSTAND` — пользователь, проблема, outcome и главное неизвестное.
+- `DESIGN` — requirements, journeys, architecture, data, integrations и interface.
+- `BUILD` — repository reality, маленькие slices, Red → Green → Refactor.
+- `VERIFY` — risk-based tests, AI evals, workflow TestingHarness и evidence.
+- `SHIP` — security, migrations, CI/CD, deploy, readback и rollback.
+- `LEARN` — analytics, feedback, incidents, cost и реальный OutcomeRecord.
 
-- `READY`, `READY_WITH_CONSTRAINTS` или `BLOCKED` — можно ли начинать реализацию;
-- `KEEP_LOCAL`, `DELEGATE`, `PARALLELIZE` или `DECOMPOSE_FIRST` — как организовать работу и сохранить контекст;
-- отдельный release verdict — достаточно ли evidence для выпуска.
+Skill не заставляет каждый запрос начинать с нуля. Он находит текущую фазу и проверяет только нужные prerequisites.
 
-Implementation readiness не считается release readiness.
+## Три режима строгости
+
+| Режим | Для чего |
+|---|---|
+| `EXPLORE` | Reversible spike без production claim, ограниченный временем и стоимостью |
+| `BUILD` | Маленький production-ready vertical slice; режим по умолчанию |
+| `CRITICAL` | Payments, PII, regulated data, high autonomy и необратимые действия |
+
+Эксперимент не становится production автоматически. При этом изменение текста кнопки не требует процесса уровня платёжной системы.
 
 ## Что можно попросить
 
-| Запрос | Что делает скилл |
+| Запрос | Что сделает skill |
 |---|---|
-| «Почему агент постоянно ломает проект?» | Находит системную причину и самый опасный failure mode |
-| «Спроектируй архитектуру AI-функции» | Фиксирует границы, контракты, инварианты, integrations и rollback |
-| «Построй agent harness» | Проектирует context, memory, tools, permissions, evals и observability |
-| «Как впервые протестировать workflow?» | Совместно формирует TestCase/checkpoints, затем автономно диагностирует, исправляет и replay'ит failures |
-| «Как проверить agent role или skill?» | Создаёт fresh-agent cases, routing/permission probes и fault-injection qualification |
-| «Разнеси мой подход» | Проводит pressure-test по наиболее дорогому сценарию провала |
-| «Реализуй фичу правильно» | Выполняет Contract → Red → Green → Refactor и собирает release evidence |
-| «Когда вызывать сабагента?» | Оценивает риск compaction и формирует `SubagentTaskContract` |
+| «У меня есть идея, но я не понимаю, с чего начать» | Найдёт пользователя, проблему, outcome и самый дешёвый validation step |
+| «Сделай приложение» | Сформирует requirements, выберет простой stack и проведёт через полный lifecycle |
+| «Спроектируй API или архитектуру» | Определит boundaries, data ownership, contracts, failure и migration paths |
+| «Реализуй функцию правильно» | Создаст risk-scaled contract и выполнит Red → Green → Refactor |
+| «Почему всё ломается?» | Построит reproduction, локализует boundary и исправит root cause |
+| «Сделай удобный интерфейс» | Проработает journey, IA, states, accessibility и подходящую design system |
+| «Как проверить AI-функцию?» | Спроектирует EvalSuite с risk-based slices и calibrated judge |
+| «Как впервые протестировать workflow?» | Совместно задаст checkpoints и автономно выполнит diagnosis/repair/replay |
+| «Можно выпускать?» | Проверит exact evidence, integrations, security, deploy/readback/rollback |
+| «Что улучшать после запуска?» | Свяжет usage, feedback, cost и downstream outcome |
 
-По умолчанию ответ остаётся разговорным и заканчивается одним конкретным следующим шагом. Код и артефакты создаются тогда, когда пользователь просит реализацию или задача действительно этого требует.
+## Основные правила
 
-## Пример поведения
+- Маленький scope, но production-ready внутри принятой границы.
+- Никаких production mocks, hardcoded success и fabricated evidence.
+- Изменение behavior начинается с подтверждённого Red.
+- Самая простая архитектура, достаточная для реальных constraints.
+- Deterministic rules остаются в коде; AI получает bounded decisions.
+- Permissions, idempotency, readback и rollback для внешних mutations.
+- Security, data, accessibility и operations усиливаются по риску.
+- AI calls имеют token/cost budgets и измеримый accepted outcome.
+- Implementation readiness и release readiness — разные verdicts.
+- Пользователь получает один следующий шаг, а не весь канон сразу.
 
-Запрос:
+## Opinionated defaults без lock-in
 
-```text
-$vibecoding-bible реализуй оплату подписки
-```
+- Для TypeScript/Node agent runtime первой оценивается Mastra, если действительно нужны agents, workflows, tools и memory.
+- Для web UI с `components.json` используется actual shadcn project context.
+- Для bounded AI calls может быть правильнее обычный provider SDK.
+- Для long-running business process может потребоваться отдельный durable engine.
 
-Скилл не начинает с генерации checkout-компонента. Сначала он:
+Framework и design system — conditional defaults, а не универсальные зависимости.
 
-1. Осматривает фактическое состояние репозитория и действующие project instructions.
-2. Отделяет известные факты от assumptions и unknowns.
-3. Фиксирует payment invariants, permissions, idempotency и границы внешних мутаций.
-4. Создаёт delta `VibecodingProjectContract` и называет первый failing behavioral test.
-5. Реализует минимальный Green без production mocks и hardcoded success.
-6. Проверяет реальную интеграцию на требуемом уровне, usage/cost, observability, readback и rollback.
-7. До изменения кода сообщает, можно ли начинать реализацию; после evidence — готов ли результат к релизу.
-
-Если credentials или live access отсутствуют, результат будет честно помечен как blocked или потребует manual verification — fabricated evidence не используется.
-
-## Инженерный канон
-
-- **Production-ready внутри выбранного scope.** Маленький vertical slice допустим; хрупкий runtime — нет.
-- **Никаких mocks в production path.** Test doubles разрешены только в test-only composition root и не заменяют live evidence.
-- **TDD.** Изменение поведения начинается с Red test; assertions не ослабляются ради Green.
-- **EvalSuite lifecycle.** Cold-start cases проходят expert labeling, judge calibration, per-slice gates, CI regressions и пополняются production outcomes.
-- **Interactive Calibration + Autonomous Repair.** Первый run совместно определяет качество на critical checkpoints; harness сам классифицирует failures, выполняет bounded Red→Green repair и replay, а пользователь принимает компактный CheckpointReview.
-- **Tokenomics.** Каждый runtime AI call получает pre-call budget и post-call settlement; оптимизируется `cost_per_accepted_outcome`.
-- **Lean AI и Oper8.** Ценность идёт раньше технологии; контекст, память, автономность и outcomes имеют явные контракты.
-- **Agent frameworks по необходимости.** Для TypeScript/Node.js Mastra рассматривается первой, но обычный код, provider SDK или durable orchestration могут быть правильнее.
-- **Контекст оркестратора защищён.** Сабагент вызывается для длинной bounded-задачи, когда compaction угрожает исходному диалогу и решениям, а не просто потому, что задача большая.
-- **UI следует actual shadcn context.** Компоненты, semantic tokens и composition проверяются по реальному проекту, а не угадываются.
-- **Внешние мутации управляемы.** Требуются permissions, idempotency, approval, readback и rollback.
-
-## Архитектура скилла
+## Архитектура skill
 
 ```text
 skills/vibecoding-bible/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
+├── assets/templates/
+│   ├── product-brief.md
+│   ├── project-contract.md
+│   ├── adr.md
+│   ├── bug-spec.md
+│   ├── release-checklist.md
+│   └── operations-runbook.md
 └── references/
     ├── core-principles.md
+    ├── product.md
+    ├── architecture.md
+    ├── build.md
+    ├── experience.md
+    ├── quality.md
+    ├── ai-systems.md
+    ├── production.md
     ├── project-contract.md
     ├── evals.md
-    ├── testing-harness.md
-    ├── agent-frameworks.md
-    └── subagent-policy.md
+    └── testing-harness.md
 ```
 
-`SKILL.md` содержит routing, режимы и основной рабочий протокол. Детальные правила загружаются лениво:
+`SKILL.md` содержит lifecycle и routing. References загружаются лениво, поэтому запрос про обычный UI не тратит контекст на multi-agent orchestration, а AI eval не загружает deployment runbook без необходимости.
 
-- [`core-principles.md`](skills/vibecoding-bible/references/core-principles.md) — production readiness, Lean AI, Oper8, mocks, TDD, tokenomics, shadcn и evidence;
-- [`project-contract.md`](skills/vibecoding-bible/references/project-contract.md) — `VibecodingProjectContract`, gates и red lines;
-- [`evals.md`](skills/vibecoding-bible/references/evals.md) — cold-start eval, judge calibration, slices, guardrails и production regression lifecycle;
-- [`testing-harness.md`](skills/vibecoding-bible/references/testing-harness.md) — calibration-first harness для workflows, multi-agent systems, agent roles и skills: TestCase, checkpoints, autonomous repair, replay и progressive autonomy;
-- [`agent-frameworks.md`](skills/vibecoding-bible/references/agent-frameworks.md) — Mastra, alternatives, memory, tools и orchestration;
-- [`subagent-policy.md`](skills/vibecoding-bible/references/subagent-policy.md) — compaction risk, delegation verdicts и `SubagentTaskContract`.
+## Практические artifacts
 
-Так канон остаётся подробным, но не расходует контекст на правила, которые не относятся к текущей задаче.
+Skill включает короткие шаблоны:
+
+- Product Brief;
+- risk-scaled ProjectContract;
+- Architecture Decision Record;
+- BugSpec;
+- Release Checklist;
+- Operations Runbook.
+
+Агент заполняет только применимые поля. Пользователь не обязан проходить анкету вручную.
+
+## Границы доверия
+
+Библия задаёт operating system, но не заменяет фактический source и актуальную документацию:
+
+- README не доказывает runtime behavior;
+- unit test не доказывает live integration;
+- `passed: true` не является hard evidence;
+- отсутствие credentials не разрешает выдумать результат;
+- offline eval не равен production outcome;
+- advice/diagnosis не разрешает внешние mutations;
+- быстро меняющийся API проверяется по installed version и official docs.
+
+Пользователю достаточно обратиться к `$vibecoding-bible`: skill сам применит доступные специализированные skills, connectors и официальные источники, если они нужны задаче.
 
 ## Установка через системный installer
 
@@ -154,31 +155,20 @@ python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-githu
 
 После установки начните новую задачу, чтобы Codex обнаружил skill.
 
-## Границы доверия
+## Развитие и качество
 
-Скилл задаёт инженерный процесс и guardrails, но не гарантирует production readiness сам по себе. Verdict зависит от доступного repository и runtime evidence.
+Skill проходит `quick_validate.py` и fresh-agent forward-tests на разных типах проектов и фазах lifecycle. Аудит и phased roadmap находятся в [`docs/AUDIT-AND-ROADMAP.md`](docs/AUDIT-AND-ROADMAP.md).
 
-- Исходный код и README не заменяют runtime-проверку.
-- Unit tests не доказывают работу внешней интеграции.
-- Отсутствие credentials не разрешает подменить live result.
-- Framework не заменяет permissions, evals, observability и release gate.
-- Самодекларация `passed: true`, supervisor confidence или запись `replay queued` не являются hard evidence; required facts подтверждает независимый collector.
-- Advice или diagnosis не дают разрешения изменять проект или внешние системы.
-
-## Статус и развитие
-
-Текущий канал разработки — `main`. Пакет проходит стандартный `quick_validate.py` из системного `skill-creator` Codex. Методология развивается через применение на реальных проектах, regression cases и evidence-backed обновления.
-
-Ошибки и предложения можно оставить в [GitHub Issues](https://github.com/dnenashev/vibecoding-bible/issues).
+Ошибки и предложения: [GitHub Issues](https://github.com/dnenashev/vibecoding-bible/issues).
 
 ## Методологическая оговорка
 
-Это независимая практическая интерпретация, а не официальный материал и не сертифицированная реализация упомянутых методологий или продуктов.
+Это независимая инженерная интерпретация, а не официальная или сертифицированная реализация упомянутых подходов.
 
-- Раздел Lean AI вдохновлён принципами Lean thinking: ценность до технологии, устранение waste и уважение роли человека. См. материалы [Lean Enterprise Institute](https://tech.lean.org/journal/lean-ai-navigating-hype).
-- Раздел Oper8 вдохновлён публичным [справочником методики Oper8 от Кактус.AI](https://kkts.ai/methodology).
-- Cold-start часть EvalSuite адаптирует идеи раздатки Михаила Карпова / AI Product Club [«Cold-start eval»](https://drive.google.com/file/d/1RfWeSkRn5MgI8QVNc5ZAriymZsnlI31K/view); её численные ориентиры используются как эвристики, а не универсальные нормы.
-- Mastra, Temporal, LangGraph, CrewAI, Agno, OpenAI и shadcn упоминаются как инструменты или варианты архитектуры. Все названия и товарные знаки принадлежат соответствующим владельцам.
+- Lean AI: value before technology, устранение waste и короткие feedback loops.
+- Oper8: versioned context, rules, evals, autonomy, decisions и outcomes.
+- Cold-start eval: практическая адаптация идей Михаила Карпова / AI Product Club.
+- Mastra, Temporal, LangGraph, CrewAI, Agno, OpenAI и shadcn рассматриваются как инструменты, а не обязательные части канона.
 
 ## Лицензия
 
