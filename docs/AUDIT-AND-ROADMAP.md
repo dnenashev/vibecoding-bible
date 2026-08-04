@@ -2,7 +2,7 @@
 
 Дата аудита: 2026-08-04
 Baseline: `135a936`
-Статус: implementation complete; publication pending
+Статус: complete
 
 ## 1. Цель
 
@@ -206,7 +206,7 @@ Acceptance: skill создаёт консистентные artifacts и про�
 - [x] Проверить все links/routes/metadata.
 - [x] Выполнить `quick_validate.py`.
 - [x] Провести fresh-agent forward-tests по lifecycle и risk modes.
-- [ ] Исправить gaps, опубликовать в `main` и синхронизировать installed skill.
+- [x] Исправить gaps, опубликовать в `main` и синхронизировать installed skill.
 
 Acceptance: один entrypoint, progressive disclosure, no broken links, clean repository, remote/local commit parity.
 
@@ -239,3 +239,7 @@ Acceptance: один entrypoint, progressive disclosure, no broken links, clean 
 Каждая доработка должна уменьшать хотя бы один вид пользовательского труда: выбор следующего шага, ручной debugging, повторный ввод, чтение лишних правил или проверку недоказанных результатов.
 
 Если правило не меняет решение, действие или evidence, его не добавлять.
+
+## 12. Результат
+
+Основная реализация опубликована в `main` коммитом `0d19079`. Структурная валидация пройдена; forward-test corpus содержит 14 cases, а реальный fresh-agent прогон покрыл 11 разных запросов, все lifecycle phases и все risk modes. Найденные gaps исправлены и повторно проверены.
