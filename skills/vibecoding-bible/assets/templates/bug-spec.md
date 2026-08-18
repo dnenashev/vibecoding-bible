@@ -26,6 +26,7 @@ Excluded/non-goals:
 Invariants:
 First Red:
 Required regressions:
+Registry admission / entry ID / rejection rationale:
 Budget/stop condition:
 Rollback:
 

@@ -123,6 +123,7 @@ Artifact вроде «создать экран» или «написать AI-�
 - current → target behavior;
 - affected components/interfaces/data;
 - first Red;
+- Regression Registry path/version и applicable entry IDs;
 - minimal implementation slice;
 - required commands/procedures.
 
@@ -239,7 +240,7 @@ Artifact вроде «создать экран» или «написать AI-�
 ### Release algorithm
 
 1. Привязать evidence к exact candidate/config/environment.
-2. Проверить required commands и evidence levels.
+2. Проверить required commands, applicable Registry entries и evidence levels.
 3. Проверить security/data/operational impact по risk mode.
 4. Проверить migrations/integrations/deploy/readback/rollback.
 5. Проверить unresolved failures, skip/todo и constraints.
@@ -273,18 +274,19 @@ Constraint обязан содержать exact scope, owner, expiry, compensat
 ### Release
 
 14. Required build/test/lint/type/security/accessibility/performance check падает либо required test skipped/todo.
-15. Mandatory integration не прошла required sandbox/live evidence.
-16. External mutation не имеет idempotency/readback/rollback/compensation.
-17. Authentication/authorization/tenant isolation не доказаны для affected path.
-18. Migration/backup/recovery не проверены на требуемом уровне.
-19. AI EvalSuite blocking slice не прошёл либо judge не откалиброван.
-20. TestingHarness опирается на self-attestation, unexecuted replay или unresolved evidence.
-21. Autonomy превышает утверждённый уровень.
-22. Token/cost caps или usage accounting отсутствуют для paid AI path.
-23. Production readiness основана только на source/unit/mock/offline result.
-24. Deploy/readback/rollback не воспроизводимы.
-25. Critical/high issue или expired constraint остаётся открытым.
-26. Release decision выдан за реальный OutcomeRecord до observation window.
+15. Применимый active blocking Registry entry не выбран, failed, skipped или не имеет fresh evidence.
+16. Mandatory integration не прошла required sandbox/live evidence.
+17. External mutation не имеет idempotency/readback/rollback/compensation.
+18. Authentication/authorization/tenant isolation не доказаны для affected path.
+19. Migration/backup/recovery не проверены на требуемом уровне.
+20. AI EvalSuite blocking slice не прошёл либо judge не откалиброван.
+21. TestingHarness опирается на self-attestation, unexecuted replay или unresolved evidence.
+22. Autonomy превышает утверждённый уровень.
+23. Token/cost caps или usage accounting отсутствуют для paid AI path.
+24. Production readiness основана только на source/unit/mock/offline result.
+25. Deploy/readback/rollback не воспроизводимы.
+26. Critical/high issue или expired constraint остаётся открытым.
+27. Release decision выдан за реальный OutcomeRecord до observation window.
 
 ## 8. Evidence levels
 
@@ -316,6 +318,7 @@ Invariants:
 Facts / assumptions / critical unknown:
 Current → target behavior:
 First Red:
+Regression Registry / selected IDs:
 Required evidence:
 Permissions / rollback:
 Implementation verdict:
@@ -347,6 +350,7 @@ Failure/migration/compatibility:
 ## Build and verify
 Change slices/write scopes:
 First Red/test strategy/evidence:
+Regression Registry path/version/selected IDs:
 Delivery harness:
 
 ## Production
@@ -377,4 +381,5 @@ Constraints/red lines:
 9. AI/eval/harness добавлены только когда нужны?
 10. EXPLORE не выдан за production?
 11. Implementation и release verdicts разделены?
-12. Пользователю понятен один следующий action?
+12. Regression Registry применён без запуска лишних tests?
+13. Пользователю понятен один следующий action?

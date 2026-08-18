@@ -1,0 +1,31 @@
+version: 1
+registry:
+  id: project-required-tests
+  owner: engineering
+  updated_at: YYYY-MM-DD
+
+tests:
+  - id: replace.with-stable-id
+    protects: Replace with the observable invariant this check protects
+    source:
+      type: requirement
+      ref: ""
+    level: unit
+    location: tests/replace-with-real-test
+    command: replace-with-real-command
+    blocking: true
+    modes: [BUILD, CRITICAL]
+    applicability:
+      paths: []
+      components: []
+      contracts: []
+      always_on: false
+    environment: test
+    data:
+      fixtures: []
+      classification: synthetic
+    owner: engineering
+    status: draft
+    quarantine: null
+    stale_when: []
+    supersedes: null

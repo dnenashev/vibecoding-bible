@@ -34,6 +34,7 @@ Cases покрывают:
 - идею без репозитория;
 - SaaS и conventional product design;
 - существующий bug и dirty worktree;
+- обязательную regression library и impact-based selection;
 - UI redesign;
 - API integration;
 - data migration;

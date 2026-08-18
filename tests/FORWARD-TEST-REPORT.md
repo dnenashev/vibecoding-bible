@@ -29,8 +29,9 @@ Reviewer: integration orchestrator
 | Medical-document release audit | SHIP / CRITICAL | Passed |
 | Duplicate submission with dirty worktree | BUILD / BUILD | Passed with honest repository blocker |
 | Desktop GUI bug through exact-candidate release | BUILD / BUILD | Passed after rerun |
+| Required Test Registry across code and AI workflows | VERIFY / BUILD | Passed after rerun |
 
-Coverage: 12 distinct requests, all lifecycle phases, and all three risk modes.
+Coverage: 13 distinct requests, all lifecycle phases, and all three risk modes.
 
 ## Gaps found and corrections
 
@@ -59,3 +60,7 @@ A fresh agent received a five-stage expensive workflow with a repaired fourth ch
 ## Bug-repair regression — 2026-08-18
 
 A fresh agent received a desktop visual defect, parallel changes in main, required user QA, and a protected system installation target. The first run preserved the exact-candidate release chain but omitted the explicit Primary Red while blocked on a missing repository. The minimal contract was tightened and rerun fresh. The rerun correctly produced repair isolation, Primary Red, affected-path verification after cumulative integration, immutable candidate identity, candidate-bound QA and ACCEPT, installation readback, and rollback. Verdict: passed.
+
+## Regression Registry — 2026-08-18
+
+A fresh agent received a repository with scattered tests, forgotten regressions, and wasteful full-suite runs. The first run correctly designed native-test references, impact selection, lifecycle states, and separate candidate evidence but omitted the aggregate entries for AI suites and workflow packs. Their universal mapping was made explicit and rerun fresh. The rerun kept executable tests in native locations, represented EvalSuite and TestingHarness packs as single entries, selected active gates by impact, preserved Primary Red admission, required exact-candidate evidence, and treated quarantine as unresolved rather than pass. Verdict: passed.

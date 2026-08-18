@@ -48,6 +48,8 @@ risk → expected behavior → cheapest trustworthy check → stronger boundary 
 
 Затем выбрать проверки, которые закрывают эти риски. Не добавлять тест, если непонятно, какое решение он защищает.
 
+Если проект имеет библиотеку обязательных проверок или нуждается в ней, полностью прочитать [`regression-registry.md`](regression-registry.md). Выбрать применимые entries по impact; не запускать весь Registry автоматически.
+
 Для каждого acceptance criterion указать:
 
 - required evidence level;
@@ -320,6 +322,8 @@ Release verdict относится только к exact source/config/schema/en
 
 Fail, unresolved skip/todo, missing credential или unverified required path нельзя выдавать за Green. Advisory limitation должна быть видимой и не скрывать red line.
 
+`Regression Registry` хранит долговечную policy и ссылки на native tests. Эта матрица хранит selection и evidence для текущего candidate. Не смешивать их и не записывать pass-флаги в Registry.
+
 ## 15. Граница с AI-проверками
 
 Для deterministic AI-adjacent behavior использовать обычные tests: schema, permission, tool args, budgets, state transitions и side effects.
@@ -337,11 +341,16 @@ Fail, unresolved skip/todo, missing credential или unverified required path �
 
 Mode: EXPLORE | BUILD | CRITICAL
 Candidate/environment:
+Registry path/version:
 
 ## Risks
 Critical journey:
 Forbidden outcomes:
 Expensive boundaries:
+
+## Registry selection
+Selected Registry IDs:
+Exclusions with rationale:
 
 ## Test matrix
 | Criterion/risk | Test level | Command/procedure | Blocking | Evidence ref |
@@ -383,4 +392,5 @@ Verdict and owner:
 12. Accessibility проверена для затронутого interface?
 13. Required fail/skip/todo/missing evidence блокирует release?
 14. AI behavior правильно направлено в EvalSuite или TestingHarness?
-15. Verdict относится к exact candidate и не устарел?
+15. Применимые blocking Registry entries выбраны и исполнены?
+16. Verdict относится к exact candidate и не устарел?

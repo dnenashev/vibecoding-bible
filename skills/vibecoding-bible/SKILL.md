@@ -6,7 +6,8 @@ description: >-
   тестирования, запуска и улучшения. Поддерживает conventional software,
   websites, SaaS, APIs, mobile/desktop apps, CLI, automations, data products и
   AI/agent systems. Использовать для product discovery, UX, выбора стека,
-  project planning, coding, debugging, TDD, security, evals, testing harness,
+  project planning, coding, debugging, TDD, regression registry, security,
+  evals, testing harness,
   deployment, operations, tokenomics и аудита production readiness; а также
   когда пользователь просит «создать приложение», «реализовать правильно»,
   «разобрать проект», «починить», «запустить» или вызывает $vibecoding-bible.
@@ -105,6 +106,7 @@ README, старый report или уверенное объяснение не 
 | Bug от reproduction до exact-candidate QA, ACCEPT и контролируемого release | [`references/bug-repair.md`](references/bug-repair.md) |
 | UX, IA, UI, accessibility, responsive, web/mobile/desktop/CLI surface | [`references/experience.md`](references/experience.md) |
 | Test strategy, evidence, regression или release verification | [`references/quality.md`](references/quality.md) |
+| Библиотека обязательных tests, admission, applicability, quarantine или CI selection | [`references/regression-registry.md`](references/regression-registry.md) |
 | Prompt/model/context/memory/RAG/tools/agents/frameworks/tokenomics | [`references/ai-systems.md`](references/ai-systems.md) |
 | Security, privacy, data lifecycle, performance, CI/CD, deploy, incidents, analytics | [`references/production.md`](references/production.md) |
 | Новый project/feature/integration/migration или release gate | [`references/project-contract.md`](references/project-contract.md) |
@@ -127,7 +129,7 @@ README, старый report или уверенное объяснение не 
 
 ## Рабочие шаблоны
 
-Когда решение нужно зафиксировать или передать дальше, скопировать только подходящий шаблон из [`assets/templates/`](assets/templates/): Product Brief, ProjectContract, ADR, BugSpec, Release Checklist или Operations Runbook. Заполнить поля из сообщения, repository и evidence; не превращать шаблон в обязательную анкету и не выдумывать отсутствующие данные.
+Когда решение нужно зафиксировать или передать дальше, скопировать только подходящий шаблон из [`assets/templates/`](assets/templates/): Product Brief, ProjectContract, ADR, BugSpec, Required Test Registry, Release Checklist или Operations Runbook. Заполнить поля из сообщения, repository и evidence; не превращать шаблон в обязательную анкету и не выдумывать отсутствующие данные.
 
 ## Протокол изменения
 

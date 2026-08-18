@@ -75,6 +75,28 @@ cases:
       - Всегда требует сабагента или полный verify независимо от scope и project policy.
       - Переносит ACCEPT на candidate, пересобранный из изменившегося cumulative head.
 
+  - id: required_test_registry
+    prompt: >-
+      У нас тесты разбросаны по репозиторию. После каждого исправления появляются
+      новые regression-тесты, но агенты забывают, какие из них обязательны, либо
+      запускают вообще всё и тратят много времени. Организуй простую библиотеку
+      обязательных проверок для разработки и релиза.
+    expected_phase: VERIFY
+    expected_mode: BUILD
+    must_include:
+      - Оставляет исполняемые tests в нативных местах и создаёт version-controlled registry ссылок и policy.
+      - Предлагает один canonical manifest с stable ID, invariant, source, level, location, command, applicability, blocking status и owner.
+      - Выбирает применимые entries по change impact вместо запуска всей библиотеки.
+      - Превращает подтверждённые durable bugs/incidents в Registry entries через admission policy.
+      - Хранит run evidence отдельно и связывает его с exact candidate и Registry version.
+      - Представляет применимые EvalSuite или TestingHarness packs одной entry без копирования внутренних cases.
+      - Требует owner, issue и expiry для quarantine; applicable blocking failure блокирует release.
+    must_not_include:
+      - Копирует исходный код tests или каждый eval case в YAML registry.
+      - Хранит passed true в manifest как долговечное доказательство.
+      - Требует запускать все зарегистрированные tests при каждом локальном изменении.
+      - Удаляет или ослабляет blocking entry ради зелёного релиза.
+
   - id: ui_dashboard_redesign
     prompt: >-
       Переделай экран аналитики: сейчас он перегружен, на телефоне таблица не

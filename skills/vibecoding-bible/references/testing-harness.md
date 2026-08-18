@@ -173,6 +173,8 @@ Recommendation: APPROVE | REJECT | CHANGE_CRITERION | ESCALATE
 
 После terminal outcome проверить exact candidate по выбранному replay scope, получить final human acceptance и превратить approvals/rejections/defects в regression cases. Не перезапускать неизменённый upstream только ради формальной «чистоты».
 
+Если regression pack становится обязательным gate проекта, зарегистрировать его одной entry по [`regression-registry.md`](regression-registry.md). Не дублировать каждый checkpoint/case в root Registry.
+
 ## 7. Классифицировать расхождение
 
 До любого patch выбрать тип или эскалировать ambiguity.
@@ -394,6 +396,7 @@ Reused upstream receipts and compatibility proof; optional clean-segment trigger
 
 ## Acceptance and autonomy
 CheckpointReview; final acceptance; regressions; autonomy promotion/rollback:
+Regression Registry entry/admission status:
 
 ## Qualification
 Seeded faults/results; known gaps; implementation/release verdicts:
@@ -420,4 +423,5 @@ Seeded faults/results; known gaps; implementation/release verdicts:
 15. Harness проверен seeded faults и false-green cases?
 16. Required live evidence не заменено offline result?
 17. Final acceptance и OutcomeRecord не перепутаны?
-18. Следующий шаг — один calibration/repair/replay slice с минимальным достаточным scope?
+18. Обязательный regression pack зарегистрирован одной entry без duplication?
+19. Следующий шаг — один calibration/repair/replay slice с минимальным достаточным scope?

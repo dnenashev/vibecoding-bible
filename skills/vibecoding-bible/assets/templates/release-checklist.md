@@ -12,6 +12,7 @@ Verdict: READY | READY_WITH_CONSTRAINTS | BLOCKED
 ## Evidence
 
 - [ ] Required static/test/build commands pass
+- [ ] Applicable blocking Registry entries have fresh evidence
 - [ ] Mandatory integrations verified
 - [ ] Critical journey passes on required environment
 - [ ] Security/performance/accessibility checks pass by risk

@@ -70,6 +70,8 @@ cold_start
 
 Frozen EvalSuite не редактировать молча. Создать новую version и связать с exact ProjectContract, code commit, model, ContextPack, Rulebook, tools и judge.
 
+Если suite является обязательным project gate, зарегистрировать её одной entry по [`regression-registry.md`](regression-registry.md). Cases остаются внутри EvalSuite; root Registry не должен их дублировать.
+
 ## 4. Контракт EvalSuite
 
 Зафиксировать:
@@ -344,6 +346,7 @@ CI/shadow/canary commands:
 
 ## Production link
 Regression admission policy:
+Regression Registry entry:
 OutcomeRecord / observation window:
 Stale/supersede conditions:
 ```
@@ -363,7 +366,8 @@ Stale/supersede conditions:
 11. Sample size и thresholds выведены из risk/baseline/variance/confidence, а не придуманы?
 12. Red-line failure блокирует release?
 13. Offline score не выдан за online outcome?
-14. Production failures пополняют новую regression version?
+14. Обязательная EvalSuite зарегистрирована одной entry без duplication?
+15. Production failures пополняют новую regression version?
 
 ## Методологическая основа
 

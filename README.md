@@ -100,6 +100,7 @@ skills/vibecoding-bible/
 │   ├── project-contract.md
 │   ├── adr.md
 │   ├── bug-spec.md
+│   ├── required-tests.yaml
 │   ├── release-checklist.md
 │   └── operations-runbook.md
 └── references/
@@ -110,6 +111,7 @@ skills/vibecoding-bible/
     ├── bug-repair.md
     ├── experience.md
     ├── quality.md
+    ├── regression-registry.md
     ├── ai-systems.md
     ├── production.md
     ├── project-contract.md
@@ -128,6 +130,7 @@ Skill включает короткие шаблоны:
 - Architecture Decision Record;
 - BugSpec;
 - exact-candidate Bug Repair protocol;
+- Required Test Registry;
 - Release Checklist;
 - Operations Runbook.
 

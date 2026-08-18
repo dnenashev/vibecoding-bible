@@ -101,6 +101,8 @@ Run ID и screenshot полезны, но не обязательны для к�
 
 Сохранить baseline candidate и Red evidence. Если defect не воспроизводится, продолжать diagnosis, а не писать speculative patch.
 
+После Green рассмотреть Primary Red для admission в [`regression-registry.md`](regression-registry.md). Добавлять entry только если test защищает долговечный invariant; иначе сохранить rationale в BugSpec.
+
 ## 6. Выбрать repair owner
 
 Сабагент не обязателен. Делегировать bounded repair, когда это сохраняет контекст оркестратора, имеет независимый write scope и отдельно проверяемый результат.
@@ -140,7 +142,8 @@ Integration owner:
 2. интегрирует изменение в чистый актуальный cumulative head;
 3. разрешает conflicts без потери invariants;
 4. повторяет Primary Red/Green и affected-path verification;
-5. замораживает точный candidate source commit.
+5. проверяет Registry delta и applicable blocking entries;
+6. замораживает точный candidate source commit.
 
 Summary repairer или Green на старом head не являются proof после integration. Изменение cumulative head делает несовместимое evidence stale.
 
@@ -259,6 +262,7 @@ Run IDs/screenshots/evidence:
 ## Repair
 Baseline/workspace/write scope:
 Primary Red:
+Registry admission / entry ID / rejection rationale:
 Repair owner/subagent contract:
 Targeted/affected/full verification policy:
 
@@ -305,4 +309,5 @@ ReleaseRecord/verdict:
 11. Release adapter доказал integrity, active version, readback и rollback?
 12. Stale evidence инвалидируется только по реальным dependencies?
 13. Platform-specific детали не стали universal requirement?
-14. Пользователю виден один следующий gate?
+14. Primary Red рассмотрен для Regression Registry без механического добавления?
+15. Пользователю виден один следующий gate?

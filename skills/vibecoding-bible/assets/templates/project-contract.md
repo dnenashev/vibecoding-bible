@@ -22,6 +22,7 @@ Unknowns + owner/probe:
 Current → target behavior:
 Architecture/data/interface impact:
 First Red:
+Regression Registry path/version/selected IDs:
 Minimal slice:
 
 ## Safety and evidence

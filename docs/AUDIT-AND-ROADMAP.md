@@ -135,6 +135,7 @@ skills/vibecoding-bible/
 │   ├── project-contract.md
 │   ├── adr.md
 │   ├── bug-spec.md
+│   ├── required-tests.yaml
 │   ├── release-checklist.md
 │   └── operations-runbook.md
 └── references/
@@ -145,6 +146,7 @@ skills/vibecoding-bible/
     ├── bug-repair.md
     ├── experience.md
     ├── quality.md
+    ├── regression-registry.md
     ├── ai-systems.md
     ├── production.md
     ├── project-contract.md
@@ -194,7 +196,7 @@ Acceptance: architecture не зависит от обязательного AI 
 
 ### Phase 5 — Practical kit
 
-- [x] Добавить шесть коротких templates.
+- [x] Добавить короткие практические templates.
 - [x] Обновить README и examples.
 - [x] Добавить repo-level forward-test corpus для разных типов проектов.
 - [x] Добавить scoring rubric и release checklist самого skill.
