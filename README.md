@@ -107,6 +107,7 @@ skills/vibecoding-bible/
     ├── product.md
     ├── architecture.md
     ├── build.md
+    ├── bug-repair.md
     ├── experience.md
     ├── quality.md
     ├── ai-systems.md
@@ -126,6 +127,7 @@ Skill включает короткие шаблоны:
 - risk-scaled ProjectContract;
 - Architecture Decision Record;
 - BugSpec;
+- exact-candidate Bug Repair protocol;
 - Release Checklist;
 - Operations Runbook.
 

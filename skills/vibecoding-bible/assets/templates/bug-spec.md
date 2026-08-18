@@ -3,6 +3,7 @@
 Status: draft | approved | verifying | closed
 Owner:
 Candidate/baseline:
+Environment/run IDs:
 
 ## Behavior
 
@@ -14,6 +15,7 @@ Impact/severity:
 
 Input/environment/steps:
 Evidence:
+Screenshots/traces:
 Probable boundary/cause:
 Alternatives checked:
 
@@ -26,6 +28,15 @@ First Red:
 Required regressions:
 Budget/stop condition:
 Rollback:
+
+## Integration and candidate
+
+Repair workspace/owner:
+Integration owner/cumulative head:
+Immutable candidate ID/source/artifact hash:
+QA policy/result/evidence:
+Exact ACCEPT/approver:
+Release adapter/readback/rollback:
 
 ## Verification
 

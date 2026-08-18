@@ -199,6 +199,7 @@ Artifact вроде «создать экран» или «написать AI-�
 - context-preservation reason;
 - task/write scopes;
 - integration owner;
+- immutable candidate, QA и exact ACCEPT policy для bug release;
 - shared gates.
 
 ### CRITICAL additions

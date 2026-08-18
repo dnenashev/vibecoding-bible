@@ -28,8 +28,9 @@ Reviewer: integration orchestrator
 | PII-sensitive AI spike | UNDERSTAND / EXPLORE | Passed after rerun |
 | Medical-document release audit | SHIP / CRITICAL | Passed |
 | Duplicate submission with dirty worktree | BUILD / BUILD | Passed with honest repository blocker |
+| Desktop GUI bug through exact-candidate release | BUILD / BUILD | Passed after rerun |
 
-Coverage: 11 distinct requests, all lifecycle phases, and all three risk modes.
+Coverage: 12 distinct requests, all lifecycle phases, and all three risk modes.
 
 ## Gaps found and corrections
 
@@ -54,3 +55,7 @@ Coverage: 11 distinct requests, all lifecycle phases, and all three risk modes.
 ## Replay-policy regression — 2026-08-04
 
 A fresh agent received a five-stage expensive workflow with a repaired fourth checkpoint. It correctly reused version-matched upstream evidence, replayed from checkpoint 3 through the terminal outcome, required readback for side effects, and reserved full clean replay only for explicit stale-state or cross-stage risk. Verdict: passed.
+
+## Bug-repair regression — 2026-08-18
+
+A fresh agent received a desktop visual defect, parallel changes in main, required user QA, and a protected system installation target. The first run preserved the exact-candidate release chain but omitted the explicit Primary Red while blocked on a missing repository. The minimal contract was tightened and rerun fresh. The rerun correctly produced repair isolation, Primary Red, affected-path verification after cumulative integration, immutable candidate identity, candidate-bound QA and ACCEPT, installation readback, and rollback. Verdict: passed.

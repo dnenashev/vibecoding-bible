@@ -102,6 +102,7 @@ README, старый report или уверенное объяснение не 
 | Идея, problem framing, product brief, requirements, scope | [`references/product.md`](references/product.md) |
 | Stack, system/data/API/integration architecture, ADR, migration design | [`references/architecture.md`](references/architecture.md) |
 | Repository work, planning, coding, debugging, git, context или delegation | [`references/build.md`](references/build.md) |
+| Bug от reproduction до exact-candidate QA, ACCEPT и контролируемого release | [`references/bug-repair.md`](references/bug-repair.md) |
 | UX, IA, UI, accessibility, responsive, web/mobile/desktop/CLI surface | [`references/experience.md`](references/experience.md) |
 | Test strategy, evidence, regression или release verification | [`references/quality.md`](references/quality.md) |
 | Prompt/model/context/memory/RAG/tools/agents/frameworks/tokenomics | [`references/ai-systems.md`](references/ai-systems.md) |

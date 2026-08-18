@@ -55,6 +55,26 @@ cases:
       - Добавляет случайный debounce как единственное доказательство исправления.
       - Заявляет причину до inspection или выдаёт непроверенный patch за завершение.
 
+  - id: gui_bug_exact_candidate_release
+    prompt: >-
+      Исправь визуальный баг в desktop-приложении и доведи исправление до установки.
+      В main параллельно интегрируются другие изменения. Я хочу сначала проверить
+      результат сам, а приложение в системной папке нельзя менять без моего точного согласия.
+    expected_phase: BUILD
+    expected_mode: BUILD
+    must_include:
+      - Создаёт BugReport и Primary Red до production patch.
+      - Изолирует repair от main и сохраняет bounded write scope.
+      - Использует targeted или affected-path verification и не выдумывает полный verify без project policy.
+      - После targeted verification интегрирует fix в clean current cumulative head.
+      - Собирает immutable candidate после integration и привязывает QA PASS к его ID или hash.
+      - Требует exact ACCEPT этого candidate до installation mutation.
+      - Проверяет artifact integrity, installed version, readback и rollback через project adapter.
+    must_not_include:
+      - Считает QA ранней feature Dev-сборки доказательством release candidate.
+      - Всегда требует сабагента или полный verify независимо от scope и project policy.
+      - Переносит ACCEPT на candidate, пересобранный из изменившегося cumulative head.
+
   - id: ui_dashboard_redesign
     prompt: >-
       Переделай экран аналитики: сейчас он перегружен, на телефоне таблица не

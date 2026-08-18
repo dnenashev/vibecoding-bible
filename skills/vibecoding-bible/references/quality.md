@@ -302,6 +302,8 @@ BugSpec должен содержать:
 
 После production defect добавить минимальный regression на правильном уровне. Не писать E2E, если unit test точнее ловит причину; не ограничиваться unit, если defect возник только на integration boundary.
 
+Если fix проходит отдельную интеграцию, candidate QA и release, применить [`bug-repair.md`](bug-repair.md). Авторитетный `QA PASS` привязывать к immutable candidate после integration; проверка другой Dev-сборки является только preview evidence.
+
 ## 14. Evidence и release matrix
 
 Создать короткую матрицу, а не длинный список команд:

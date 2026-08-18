@@ -181,6 +181,8 @@ input → domain behavior → real boundary → observable output
 
 Для bug fix сначала воспроизвести дефект. Red должен падать до исправления по причине дефекта и проходить после него.
 
+Если bug требуется довести через isolated repair, integration, human QA или controlled release, полностью прочитать [`bug-repair.md`](bug-repair.md). Не считать QA раннего Dev-preview доказательством exact release candidate.
+
 Test double разрешать только на внешней границе в test-only composition. Не использовать double как доказательство обязательной live integration.
 
 Если deterministic automated test технически невозможен, зафиксировать повторяемый probe и требуемый более сильный evidence; не объявлять TDD выполненным формально.

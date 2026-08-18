@@ -142,6 +142,7 @@ skills/vibecoding-bible/
     ├── product.md
     ├── architecture.md
     ├── build.md
+    ├── bug-repair.md
     ├── experience.md
     ├── quality.md
     ├── ai-systems.md

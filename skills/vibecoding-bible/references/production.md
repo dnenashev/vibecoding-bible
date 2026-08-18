@@ -244,6 +244,8 @@ Capacity decision связывать с SLO и подтверждённым work
 
 Pipeline должен быть воспроизводимым и выдавать evidence на exact candidate.
 
+Для bug-release с human acceptance применять [`bug-repair.md`](bug-repair.md): authoritative QA и ACCEPT должны ссылаться на immutable candidate, собранный после integration.
+
 Минимальный flow:
 
 ```text
