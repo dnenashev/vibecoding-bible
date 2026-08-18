@@ -35,6 +35,7 @@ Cases покрывают:
 - SaaS и conventional product design;
 - существующий bug и dirty worktree;
 - обязательную regression library и impact-based selection;
+- однозначную SemVer identity skill;
 - UI redesign;
 - API integration;
 - data migration;

@@ -30,8 +30,9 @@ Reviewer: integration orchestrator
 | Duplicate submission with dirty worktree | BUILD / BUILD | Passed with honest repository blocker |
 | Desktop GUI bug through exact-candidate release | BUILD / BUILD | Passed after rerun |
 | Required Test Registry across code and AI workflows | VERIFY / BUILD | Passed after rerun |
+| Canonical skill version identity | VERIFY / BUILD | Passed |
 
-Coverage: 13 distinct requests, all lifecycle phases, and all three risk modes.
+Coverage: 14 distinct requests, all lifecycle phases, and all three risk modes.
 
 ## Gaps found and corrections
 
@@ -64,3 +65,7 @@ A fresh agent received a desktop visual defect, parallel changes in main, requir
 ## Regression Registry — 2026-08-18
 
 A fresh agent received a repository with scattered tests, forgotten regressions, and wasteful full-suite runs. The first run correctly designed native-test references, impact selection, lifecycle states, and separate candidate evidence but omitted the aggregate entries for AI suites and workflow packs. Their universal mapping was made explicit and rerun fresh. The rerun kept executable tests in native locations, represented EvalSuite and TestingHarness packs as single entries, selected active gates by impact, preserved Primary Red admission, required exact-candidate evidence, and treated quarantine as unresolved rather than pass. Verdict: passed.
+
+## Version identity — 2026-08-18
+
+A fresh agent was asked to resolve the conflict between an unversioned skill and nested `version: 1` fields. It read the canonical `VERSION`, answered `1.0.0`, identified the nested value as a Registry-format version, and treated commit/tag only as supporting release identity. It also correctly reported that the candidate was not yet published before the release commit and tag. Verdict: passed.

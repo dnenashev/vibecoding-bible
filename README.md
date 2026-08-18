@@ -6,6 +6,8 @@
 
 Skill работает как senior product-and-engineering partner: определяет текущую фазу, выбирает уровень строгости, подключает только нужные правила и заканчивает одним проверяемым следующим шагом.
 
+Текущая версия: [`1.0.0`](skills/vibecoding-bible/VERSION).
+
 ## Быстрый старт
 
 Попросите Codex установить skill:
@@ -93,6 +95,7 @@ Framework и design system — conditional defaults, а не универсал�
 ```text
 skills/vibecoding-bible/
 ├── SKILL.md
+├── VERSION
 ├── agents/
 │   └── openai.yaml
 ├── assets/templates/
@@ -120,6 +123,16 @@ skills/vibecoding-bible/
 ```
 
 `SKILL.md` содержит lifecycle и routing. References загружаются лениво, поэтому запрос про обычный UI не тратит контекст на multi-agent orchestration, а AI eval не загружает deployment runbook без необходимости.
+
+## Версионирование
+
+Каноническая версия находится в [`skills/vibecoding-bible/VERSION`](skills/vibecoding-bible/VERSION). Git tag `vX.Y.Z` указывает на release commit с тем же значением:
+
+- `PATCH` — совместимое исправление или уточнение;
+- `MINOR` — новая обратно совместимая capability;
+- `MAJOR` — несовместимое изменение contract или поведения.
+
+Поля `version` внутри EvalSuite, TestingHarness или Registry относятся только к соответствующему artifact.
 
 ## Практические artifacts
 

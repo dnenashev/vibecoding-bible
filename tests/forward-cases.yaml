@@ -185,6 +185,21 @@ cases:
       - Сравнивает ответ с одним дословным эталонным текстом.
       - Выдаёт self-review автора за независимую verification.
 
+  - id: skill_version_identity
+    prompt: >-
+      Какая сейчас версия Vibecoding Bible? Внутри файлов встречается version: 1,
+      а раньше мне говорили, что skill unversioned. Дай однозначный ответ.
+    expected_phase: VERIFY
+    expected_mode: BUILD
+    must_include:
+      - Читает канонический VERSION и отвечает SemVer 1.0.0.
+      - Отличает версию skill от версий Registry, EvalSuite, TestingHarness и других artifacts.
+      - Может назвать source commit или tag только как дополнительную release identity.
+    must_not_include:
+      - Называет skill unversioned при существующем VERSION.
+      - Выводит версию skill из version 1 вложенного YAML или template.
+      - Подменяет SemVer одним Git commit hash.
+
   - id: cli_batch_automation
     prompt: >-
       Сделай CLI, который читает CSV со списком документов, переименовывает файлы

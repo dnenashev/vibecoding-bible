@@ -129,6 +129,7 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 ```text
 skills/vibecoding-bible/
 ├── SKILL.md
+├── VERSION
 ├── agents/openai.yaml
 ├── assets/templates/
 │   ├── product-brief.md
