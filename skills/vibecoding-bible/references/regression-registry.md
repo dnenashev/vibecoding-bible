@@ -98,7 +98,7 @@ Default для нового проекта:
 id: payments.no-duplicate-charge
 protects: Один заказ не создаёт два денежных списания
 source:
-  type: bug | incident | requirement | contract | threat | eval | harness
+  type: bug | incident | requirement | contract | handoff | threat | eval | harness
   ref: incident-142
 level: integration
 location: tests/payments/idempotency.test.ts
@@ -138,6 +138,7 @@ ID делать стабильным и смысловым. Не привязы�
 - permission, tenancy, privacy или security guarantee;
 - migration/recovery/rollback capability;
 - обязательный AI slice или workflow acceptance gate;
+- явно принятый feature handoff или product capability, потеря которых сделает release неполным;
 - customer/contractual release requirement.
 
 Не добавлять:
@@ -185,7 +186,9 @@ Admission утверждает integration/quality owner. Автор теста 
 ### SHIP
 
 - заново выбрать entries по final cumulative candidate impact;
+- сверить release intent с integrated/deferred/superseded handoffs;
 - убедиться, что все применимые blocking entries имеют fresh evidence;
+- подтвердить accepted capabilities behavioral проверками на exact candidate, а не только существованием файлов;
 - любой fail, unresolved skip, expired quarantine или missing required environment блокирует release.
 
 Registry определяет policy, но не доказывает исполнение. ReleaseRecord должен ссылаться на exact run evidence.
@@ -289,6 +292,8 @@ command: npm run harness:research
 - quarantine не имеет owner, issue или expiry;
 - EvalSuite/harness cases продублированы и начали расходиться;
 - selection исключает matching critical entry без rationale;
+- capability entry доказывает только наличие source-файла и не проверяет accepted behavior;
+- Registry Green используется вместо отдельной проверки полноты release intent;
 - agent запускает всё без impact analysis, создавая постоянный waste.
 
 ## 15. Минимальный рабочий slice
@@ -319,4 +324,6 @@ command: npm run harness:research
 11. Evidence связано с exact candidate и Registry version?
 12. Stale state следует dependency change, а не догадке?
 13. Release блокируется при missing applicable evidence?
-14. Registry не заставляет запускать всё всегда?
+14. Accepted capability gates проверяют behavior exact candidate, а не наличие файлов?
+15. Registry не подменяет Release Composition Gate?
+16. Registry не заставляет запускать всё всегда?

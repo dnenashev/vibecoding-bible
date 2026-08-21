@@ -4,14 +4,30 @@ Candidate/environment:
 Owner:
 Verdict: READY | READY_WITH_CONSTRAINTS | BLOCKED
 
+## Release intent
+
+Manifest/version:
+Accepted handoff IDs:
+Explicit deferred/superseded decisions:
+Composition receipt:
+
+- [ ] Every intended handoff is integrated, explicitly deferred, or superseded
+- [ ] No intended handoff remains MISSING
+- [ ] Provenance/reachability or equivalent mapping is verified
+- [ ] Accepted capabilities have behavioral evidence on the exact candidate
+- [ ] QA coverage is derived from release acceptance criteria
+
 ## Exact candidate
 
 - [ ] Source/artifact/config/schema versions frozen
+- [ ] Batch manifest and cumulative source scope frozen, if applicable
+- [ ] Candidate identity binds the release intent and composition receipt
 - [ ] Release scope and limitations explicit
 
 ## Evidence
 
 - [ ] Required static/test/build commands pass
+- [ ] Aggregate impact recalculated for the final cumulative candidate
 - [ ] Applicable blocking Registry entries have fresh evidence
 - [ ] Mandatory integrations verified
 - [ ] Critical journey passes on required environment

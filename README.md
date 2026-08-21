@@ -2,11 +2,11 @@
 
 **Одна точка входа: от идеи до работающего и управляемого цифрового продукта.**
 
-`vibecoding-bible` — открытый Codex skill для создания software с помощью AI. Он помогает сделать сайт, SaaS, API, mobile/desktop app, CLI, automation, data product или AI/agent system — и не спутать быстро написанный код с готовым продуктом.
+`vibecoding-bible` — открытая vendor-neutral методология, упакованная как Codex-compatible skill. Её правила подходят и для Claude Code, других coding agents или собственного agent harness. Она помогает сделать сайт, SaaS, API, mobile/desktop app, CLI, automation, data product или AI/agent system — и не спутать быстро написанный код с готовым продуктом.
 
 Skill работает как senior product-and-engineering partner: определяет текущую фазу, выбирает уровень строгости, подключает только нужные правила и заканчивает одним проверяемым следующим шагом.
 
-Текущая версия: [`1.0.0`](skills/vibecoding-bible/VERSION).
+Текущая версия: [`1.2.0`](skills/vibecoding-bible/VERSION).
 
 ## Быстрый старт
 
@@ -62,9 +62,11 @@ Skill не заставляет каждый запрос начинать с н
 | «Спроектируй API или архитектуру» | Определит boundaries, data ownership, contracts, failure и migration paths |
 | «Реализуй функцию правильно» | Создаст risk-scaled contract и выполнит Red → Green → Refactor |
 | «Почему всё ломается?» | Построит reproduction, локализует boundary и исправит root cause |
+| «Мелкие fixes слишком дорого релизить по одному» | Соберёт проверенные изменения в Release Train и выпустит один immutable batch |
 | «Сделай удобный интерфейс» | Проработает journey, IA, states, accessibility и подходящую design system |
 | «Как проверить AI-функцию?» | Спроектирует EvalSuite с risk-based slices и calibrated judge |
 | «Как впервые протестировать workflow?» | Совместно задаст checkpoints и автономно выполнит diagnosis/repair/replay |
+| «Как вести долгую работу агента без потери состояния?» | Подключит совместимый внешний harness или спроектирует переносимый state/evidence/approval loop |
 | «Можно выпускать?» | Проверит exact evidence, integrations, security, deploy/readback/rollback |
 | «Что улучшать после запуска?» | Свяжет usage, feedback, cost и downstream outcome |
 
@@ -79,6 +81,7 @@ Skill не заставляет каждый запрос начинать с н
 - Security, data, accessibility и operations усиливаются по риску.
 - AI calls имеют token/cost budgets и измеримый accepted outcome.
 - Implementation readiness и release readiness — разные verdicts.
+- Release Composition Gate не позволяет потерять принятый handoff в зелёном candidate.
 - Пользователь получает один следующий шаг, а не весь канон сразу.
 
 ## Opinionated defaults без lock-in
@@ -103,6 +106,7 @@ skills/vibecoding-bible/
 │   ├── project-contract.md
 │   ├── adr.md
 │   ├── bug-spec.md
+│   ├── agent-harness-contract.md
 │   ├── required-tests.yaml
 │   ├── release-checklist.md
 │   └── operations-runbook.md
@@ -116,6 +120,7 @@ skills/vibecoding-bible/
     ├── quality.md
     ├── regression-registry.md
     ├── ai-systems.md
+    ├── agent-harness.md
     ├── production.md
     ├── project-contract.md
     ├── evals.md
@@ -143,6 +148,9 @@ Skill включает короткие шаблоны:
 - Architecture Decision Record;
 - BugSpec;
 - exact-candidate Bug Repair protocol;
+- Release Train для пакетной доставки minor fixes и urgent hotfix lane;
+- Release Composition Gate: release intent, handoff provenance и capability completeness;
+- AgentHarnessContract для переносимого execution harness над proprietary agents;
 - Required Test Registry;
 - Release Checklist;
 - Operations Runbook.
@@ -162,6 +170,8 @@ Skill включает короткие шаблоны:
 - быстро меняющийся API проверяется по installed version и official docs.
 
 Пользователю достаточно обратиться к `$vibecoding-bible`: skill сам применит доступные специализированные skills, connectors и официальные источники, если они нужны задаче.
+
+Если среда уже предоставляет совместимый execution harness, он ведёт durable stages, evidence и human approvals, а Библия остаётся policy layer. Codex Harness — один из возможных adapters, не обязательная зависимость канона.
 
 ## Установка через системный installer
 

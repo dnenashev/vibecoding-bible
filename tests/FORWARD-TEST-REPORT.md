@@ -69,3 +69,20 @@ A fresh agent received a repository with scattered tests, forgotten regressions,
 ## Version identity — 2026-08-18
 
 A fresh agent was asked to resolve the conflict between an unversioned skill and nested `version: 1` fields. It read the canonical `VERSION`, answered `1.0.0`, identified the nested value as a Registry-format version, and treated commit/tag only as supporting release identity. It also correctly reported that the candidate was not yet published before the release commit and tag. Verdict: passed.
+
+## Release Train regression — 2026-08-19
+
+A fresh agent received the candidate skill and a user request about repeated hour-long release cycles for minor bugs; it did not receive tests, expected properties, development history, or reviewer conclusions. It separated per-fix Red/targeted verification/preview from release-grade candidate evidence, accumulated compatible fixes as `READY_FOR_BATCH` on a clean cumulative head, required a project-owned trigger and maximum wait, froze one batch manifest and immutable candidate, selected blocking plus `always_on` Registry checks by aggregate impact, and performed one candidate QA/ACCEPT/deploy/readback/rollback cycle. It preserved an urgent hotfix lane without weakening exact-candidate gates. Verdict: passed.
+
+## Release Composition Gate regression — 2026-08-20
+
+A fresh agent received candidate `1.2.0` and a release regression where an accepted Workflow Hub handoff remained on a sibling history while the selected release head, shallow file gate, QA sample, and installation controller all passed. It did not receive tests, expected properties, prior conclusions, memories, or Git history. The agent correctly separated head correctness from release-intent completeness, introduced a versioned accepted-handoff manifest with blocking `MISSING`, required ancestry or explicit equivalent mapping, behavioral capability proof on the exact candidate, manifest-derived QA coverage, and candidate binding to the composition receipt. It preserved impact-based Registry selection and correctly left the installation controller unchanged. Verdict: passed.
+
+## Portable Agent Execution Harness — 2026-08-21
+
+Two fresh agents received candidate `1.2.0`, one natural prompt each, and no tests, expected properties, development history or prior conclusions.
+
+- `design_portable_proprietary_agent_harness` passed: the response separated a deterministic core, data-defined WorkflowPacks, HostAdapter, ProjectAdapter, evidence store and authenticated approval channel; kept durable state outside chat; defined stage/revision/subject semantics; and covered wrong-stage, stale-revision, self-approval, missing-receipt, subject-drift and duplicate-mutation faults.
+- `use_existing_agent_execution_harness` initially needed a targeted repair: the response correctly kept the existing harness authoritative, bound work/evidence to the current stage and exact subject, separated reports/receipts/approvals and avoided a parallel chat state machine, but did not explicitly state the bounded manual fallback for a short low-risk task when the harness is unavailable. The entrypoint was tightened at the minimal general layer and rerun fresh. The rerun explicitly separated a bounded manual process for short reversible low-risk work from mandatory stop-and-restore behavior for durable or consequential work, while preserving TDD, evidence, security, release-composition and rollback policy above the harness.
+
+Verdict: passed after targeted repair and fresh rerun.

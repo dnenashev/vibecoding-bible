@@ -75,6 +75,54 @@ cases:
       - Всегда требует сабагента или полный verify независимо от scope и project policy.
       - Переносит ACCEPT на candidate, пересобранный из изменившегося cumulative head.
 
+  - id: minor_bug_release_train
+    prompt: >-
+      Я регулярно нахожу небольшие баги. Каждый из них быстро исправляется, но затем
+      почти час уходит на полную сборку, QA и релиз. Хочу проверять fixes в
+      изолированных preview, накапливать готовые изменения и выпускать их одной
+      пачкой, не ослабляя качество. Организуй практичный процесс.
+    expected_phase: SHIP
+    expected_mode: BUILD
+    must_include:
+      - Разделяет repair каждого бага и дорогой production release вместо связи один fix — один release.
+      - Для каждого бага сохраняет BugReport, Primary Red, targeted или affected verification и при необходимости PREVIEW PASS.
+      - Интегрирует готовые совместимые fixes в clean cumulative head со статусом READY_FOR_BATCH.
+      - Задаёт project-owned release trigger и maximum wait без универсального числа fixes или дней.
+      - Один раз замораживает batch manifest и собирает immutable candidate из exact cumulative head.
+      - Пересчитывает aggregate impact и один раз запускает все применимые blocking и always-on Registry entries для итогового candidate.
+      - Проводит candidate-bound QA, exact ACCEPT, deploy, readback и rollback один раз для batch.
+      - Оставляет urgent hotfix lane для security, data, money, permissions, outage или другого срочного impact.
+    must_not_include:
+      - Запускает полный release pipeline после каждого несрочного minor fix.
+      - Выдаёт PREVIEW PASS отдельной Dev-сборки за QA PASS или ACCEPT итогового candidate.
+      - Механически запускает весь Registry без aggregate impact selection.
+      - Оставляет срочный consequential defect ждать обычный release train.
+
+  - id: accepted_handoff_missing_from_candidate
+    prompt: >-
+      На последнем релизе пропала ранее принятая переработка Workflow Hub. Feature
+      handoff с новой IA был готов в отдельной ветке, но release head пошёл от
+      соседней линии истории. release:prepare и тесты выбранного head были Green,
+      capability gate проверял только наличие workflow-файлов, а ручной QA посмотрел
+      две соседние функции. Controller установил ровно принятый artifact. Как изменить
+      release process, чтобы принятые handoffs больше не терялись?
+    expected_phase: LEARN
+    expected_mode: BUILD
+    must_include:
+      - Отличает корректность выбранного Green head от полноты release intent и не обвиняет корректно сработавший controller.
+      - Вводит versioned release intent manifest только для handoffs, явно принятых в конкретный batch.
+      - Требует для каждого intended handoff статус INTEGRATED, DEFERRED, SUPERSEDED или блокирующий MISSING.
+      - Проверяет native ancestry или явное equivalent mapping после squash, rebase или reimplementation.
+      - Требует behavioral capability evidence на exact candidate; наличие файлов не считается достаточным.
+      - Формирует QA coverage matrix из acceptance criteria batch и проверяет полный затронутый user journey.
+      - Блокирует release:prepare до устранения MISSING или явного owner decision.
+      - Сохраняет impact-based Registry selection и не заменяет composition gate полным запуском всех tests.
+    must_not_include:
+      - Предлагает проверять и включать все исторические feature branches без release intent.
+      - Считает clean head, Green verify или artifact hash доказательством полноты состава.
+      - Усиливает только installation controller, хотя omission возник до candidate build.
+      - Оставляет capability gate на уровне проверки существования файлов.
+
   - id: required_test_registry
     prompt: >-
       У нас тесты разбросаны по репозиторию. После каждого исправления появляются
@@ -185,6 +233,47 @@ cases:
       - Сравнивает ответ с одним дословным эталонным текстом.
       - Выдаёт self-review автора за независимую verification.
 
+  - id: use_existing_agent_execution_harness
+    prompt: >-
+      В моей среде уже есть внешний harness, который хранит стадии, evidence и
+      approvals для coding-агента. Я прошу исправить баг. Как Vibecoding Bible
+      должна работать с этим harness, не дублируя его процесс внутри чата?
+    expected_phase: BUILD
+    expected_mode: BUILD
+    must_include:
+      - Сначала обнаруживает и читает authoritative workflow/session state существующего harness вместо создания параллельного процесса.
+      - Сохраняет за Библией product policy, risk mode, TDD, Registry и production guardrails, а исполнение стадий оставляет harness.
+      - Работает только в разрешённой текущей стадии и связывает evidence с exact subject и revision.
+      - Отделяет agent report, trusted receipt и authenticated human approval.
+      - При смене чата или агента использует безопасный bind или resume без переноса старой authority.
+      - Имеет честный manual fallback, если harness недоступен или не поддерживает нужный контракт.
+    must_not_include:
+      - Пересоздаёт stage machine Библии параллельно существующему authoritative harness.
+      - Считает сообщение агента или текстовый passed true достаточным evidence.
+      - Привязывает универсальную методологию к названиям tools одного vendor.
+
+  - id: design_portable_proprietary_agent_harness
+    prompt: >-
+      Хочу построить внешний harness над Claude Code, но позже подключать другие
+      проприетарные coding-агенты и добавлять новые процессы без переписывания ядра.
+      Спроектируй минимальный production-ready фундамент.
+    expected_phase: DESIGN
+    expected_mode: BUILD
+    must_include:
+      - Разделяет deterministic harness core, декларативные WorkflowDefinition или packs и сменный HostAdapter.
+      - Хранит SessionState, current stage, revision, subject fingerprint, receipts и decisions вне контекста агента.
+      - Определяет StageContract с allowed actions, required evidence, transition, approval, budget и stop conditions.
+      - Позволяет добавлять произвольные workflows данными или конфигурацией без новой ветки в core engine.
+      - Разделяет HostAdapter, ProjectAdapter, evidence store и human approval channel.
+      - Проектирует stale-state, rebind/resume, idempotency, replay, recovery и audit semantics.
+      - Предлагает conformance/fault tests для wrong stage, stale revision, self-approval, missing receipt, subject drift и duplicate mutation.
+      - Отличает Agent Execution Harness от TestingHarness, который проверяет качество конкретного subject.
+    must_not_include:
+      - Встраивает бизнес-процессы в prompt или conversation history.
+      - Хардкодит фиксированный список workflows либо Claude Code API в core.
+      - Позволяет агенту самостоятельно подтверждать consequential stage или approval.
+      - Предлагает custom framework сложнее минимального вертикального slice без доказанной необходимости.
+
   - id: skill_version_identity
     prompt: >-
       Какая сейчас версия Vibecoding Bible? Внутри файлов встречается version: 1,
@@ -192,7 +281,7 @@ cases:
     expected_phase: VERIFY
     expected_mode: BUILD
     must_include:
-      - Читает канонический VERSION и отвечает SemVer 1.0.0.
+      - Читает канонический VERSION и отвечает SemVer 1.2.0.
       - Отличает версию skill от версий Registry, EvalSuite, TestingHarness и других artifacts.
       - Может назвать source commit или tag только как дополнительную release identity.
     must_not_include:

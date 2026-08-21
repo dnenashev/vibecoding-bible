@@ -29,5 +29,8 @@ Minimal slice:
 
 Permissions/privacy:
 Required checks/evidence:
+Release intent / accepted handoff IDs:
+Composition receipt / provenance / capability evidence:
+QA coverage matrix:
 Deploy/readback/rollback:
 Constraints/red lines:

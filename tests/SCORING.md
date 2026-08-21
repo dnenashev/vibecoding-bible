@@ -34,6 +34,8 @@ Cases покрывают:
 - идею без репозитория;
 - SaaS и conventional product design;
 - существующий bug и dirty worktree;
+- пакетную доставку minor fixes через Release Train и urgent hotfix lane;
+- полноту release intent, accepted handoff reconciliation и capability composition gate;
 - обязательную regression library и impact-based selection;
 - однозначную SemVer identity skill;
 - UI redesign;
@@ -41,6 +43,8 @@ Cases покрывают:
 - data migration;
 - AI workflow;
 - skill/agent behavior;
+- использование существующего vendor-neutral Agent Execution Harness;
+- проектирование переносимого harness с отдельными host/project adapters;
 - CLI automation;
 - mobile/desktop system;
 - production incident;

@@ -233,6 +233,8 @@ Durable process engine и AI runtime могут быть разными слоя
 
 Если AI framework не доказывает required durability, использовать отдельный process engine либо application state machine. Не имитировать recovery дополнительными prompts.
 
+Для длительной, возобновляемой или consequential работы над proprietary coding-agent использовать vendor-neutral [`Agent Execution Harness`](agent-harness.md): authoritative state/evidence/approvals живут вне conversation context, workflows задаются versioned definitions, а конкретный agent и project подключаются разными adapters. Если совместимый harness уже есть, не строить параллельную state machine.
+
 ## 11. Evals и TestingHarness
 
 Для consequential probabilistic behavior создать versioned EvalSuite с cases, slices, provenance, calibrated judge, risk-based gates и fallback. Не использовать LLM judge для deterministic assertions.
@@ -306,6 +308,7 @@ Offline eval/replay не доказывает production outcome. Связать
 - retrieval/memory ownership;
 - tool permissions/mutations;
 - workflow/agent/multi-agent topology;
+- Agent Execution Harness / workflow / host/project adapter refs;
 - framework/durability decision;
 - EvalSuite/TestingHarness refs;
 - token/cost policy;
@@ -337,7 +340,8 @@ Offline eval/replay не доказывает production outcome. Связать
 8. Workflow/agent/multi-agent выбран по необходимости?
 9. Framework decision и durability доказуемы?
 10. EvalSuite/TestingHarness применены по типу риска?
-11. Token/cost reservation и settlement работают?
-12. Failures ведут к explicit fallback, а не fabricated success?
-13. Decision и Outcome разделены?
-14. Upgrade/rollback path существует?
+11. Долгая consequential agent-work имеет durable external control plane либо честный fallback?
+12. Token/cost reservation и settlement работают?
+13. Failures ведут к explicit fallback, а не fabricated success?
+14. Decision и Outcome разделены?
+15. Upgrade/rollback path существует?

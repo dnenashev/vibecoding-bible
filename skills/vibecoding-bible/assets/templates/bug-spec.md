@@ -34,6 +34,11 @@ Rollback:
 
 Repair workspace/owner:
 Integration owner/cumulative head:
+PREVIEW PASS/evidence:
+Delivery lane: READY_FOR_BATCH | URGENT_HOTFIX
+Batch ID/manifest/trigger/maximum wait:
+Release intent / accepted handoff IDs / composition receipt:
+Aggregate impact/Registry selection:
 Immutable candidate ID/source/artifact hash:
 QA policy/result/evidence:
 Exact ACCEPT/approver:

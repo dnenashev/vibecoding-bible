@@ -7,7 +7,7 @@ description: >-
   websites, SaaS, APIs, mobile/desktop apps, CLI, automations, data products и
   AI/agent systems. Использовать для product discovery, UX, выбора стека,
   project planning, coding, debugging, TDD, regression registry, security,
-  evals, testing harness,
+  evals, testing harness, vendor-neutral agent execution harness,
   deployment, operations, tokenomics и аудита production readiness; а также
   когда пользователь просит «создать приложение», «реализовать правильно»,
   «разобрать проект», «починить», «запустить» или вызывает $vibecoding-bible.
@@ -70,7 +70,7 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 
 ### SHIP
 
-Проверить config, secrets, migrations, CI/CD, deploy, readback, observability и rollback. Implementation readiness не равна release readiness.
+Проверить полноту release intent, config, secrets, migrations, CI/CD, deploy, readback, observability и rollback. Green exact candidate не доказывает, что в него вошли все принятые handoffs. Implementation readiness не равна release readiness.
 
 ### LEARN
 
@@ -109,17 +109,27 @@ README, старый report или уверенное объяснение не 
 | Идея, problem framing, product brief, requirements, scope | [`references/product.md`](references/product.md) |
 | Stack, system/data/API/integration architecture, ADR, migration design | [`references/architecture.md`](references/architecture.md) |
 | Repository work, planning, coding, debugging, git, context или delegation | [`references/build.md`](references/build.md) |
-| Bug от reproduction до exact-candidate QA, ACCEPT и контролируемого release | [`references/bug-repair.md`](references/bug-repair.md) |
+| Bug от reproduction до preview, release batch/composition gate, exact-candidate QA и controlled release | [`references/bug-repair.md`](references/bug-repair.md) |
 | UX, IA, UI, accessibility, responsive, web/mobile/desktop/CLI surface | [`references/experience.md`](references/experience.md) |
 | Test strategy, evidence, regression или release verification | [`references/quality.md`](references/quality.md) |
 | Библиотека обязательных tests, admission, applicability, quarantine или CI selection | [`references/regression-registry.md`](references/regression-registry.md) |
 | Prompt/model/context/memory/RAG/tools/agents/frameworks/tokenomics | [`references/ai-systems.md`](references/ai-systems.md) |
+| Долгая/возобновляемая работа над proprietary agents, внешний state/evidence/approvals, portable workflow definitions или host adapters | [`references/agent-harness.md`](references/agent-harness.md) |
 | Security, privacy, data lifecycle, performance, CI/CD, deploy, incidents, analytics | [`references/production.md`](references/production.md) |
 | Новый project/feature/integration/migration или release gate | [`references/project-contract.md`](references/project-contract.md) |
 | Probabilistic AI behavior, judge или AI quality gate | [`references/evals.md`](references/evals.md) |
 | Первый/изменённый workflow, TestCase, checkpoints, autonomous repair/replay | [`references/testing-harness.md`](references/testing-harness.md) |
 
 Если web project содержит `components.json`, применить доступный `shadcn` skill и получить actual project context. Если нужен Mastra, применить `mastra` skill и проверить exact version. Это conditional defaults, не универсальные зависимости.
+
+Если среда уже предоставляет подходящий Agent Execution Harness, использовать его как authoritative owner стадий, state, receipts и approvals; Библия остаётся policy/guardrail layer. Не дублировать state machine в чате. При отсутствии harness использовать только честный risk-scaled manual fallback либо помочь построить переносимый minimal slice по [`references/agent-harness.md`](references/agent-harness.md).
+
+В ответе про внешний harness всегда явно назвать обе fallback-границы, даже если harness сейчас доступен:
+
+- короткая обратимая low-risk задача — bounded manual process с явными stage, evidence и human approval;
+- длительная, возобновляемая или consequential работа — остановить mutations, сохранить contract/evidence и восстановить совместимый harness.
+
+Не выдавать первый вариант за durable control plane и не применять его ко второму.
 
 ## ProjectContract
 
@@ -135,7 +145,7 @@ README, старый report или уверенное объяснение не 
 
 ## Рабочие шаблоны
 
-Когда решение нужно зафиксировать или передать дальше, скопировать только подходящий шаблон из [`assets/templates/`](assets/templates/): Product Brief, ProjectContract, ADR, BugSpec, Required Test Registry, Release Checklist или Operations Runbook. Заполнить поля из сообщения, repository и evidence; не превращать шаблон в обязательную анкету и не выдумывать отсутствующие данные.
+Когда решение нужно зафиксировать или передать дальше, скопировать только подходящий шаблон из [`assets/templates/`](assets/templates/): Product Brief, ProjectContract, ADR, BugSpec, AgentHarnessContract, Required Test Registry, Release Checklist или Operations Runbook. Заполнить поля из сообщения, repository и evidence; не превращать шаблон в обязательную анкету и не выдумывать отсутствующие данные.
 
 ## Протокол изменения
 

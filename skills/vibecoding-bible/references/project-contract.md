@@ -194,12 +194,27 @@ Artifact вроде «создать экран» или «написать AI-�
 - replay scope, affected downstream path и правила переиспользования trusted upstream evidence;
 - qualification/promotion policy.
 
+### Agent Execution Harness
+
+Для длительной, возобновляемой или consequential работы над coding-agent:
+
+- `existing | build | manual_fallback` decision и rationale;
+- WorkflowDefinition/StageContract versions;
+- session/revision/subject identity и host/project bindings;
+- HostAdapter/ProjectAdapter capabilities и least privilege;
+- evidence/approval trust boundaries;
+- budgets, stale/rebind/recovery/replay policy;
+- conformance/fault qualification.
+
 ### Delivery harness
 
 - `KEEP_LOCAL | DELEGATE | PARALLELIZE | DECOMPOSE_FIRST`;
 - context-preservation reason;
 - task/write scopes;
 - integration owner;
+- delivery lane: `READY_FOR_BATCH | URGENT_HOTFIX`, release trigger и maximum wait;
+- release intent manifest, accepted handoffs/capabilities и composition owner;
+- provenance, capability evidence и QA coverage policy;
 - immutable candidate, QA и exact ACCEPT policy для bug release;
 - shared gates.
 
@@ -240,11 +255,15 @@ Artifact вроде «создать экран» или «написать AI-�
 ### Release algorithm
 
 1. Привязать evidence к exact candidate/config/environment.
-2. Проверить required commands, applicable Registry entries и evidence levels.
-3. Проверить security/data/operational impact по risk mode.
-4. Проверить migrations/integrations/deploy/readback/rollback.
-5. Проверить unresolved failures, skip/todo и constraints.
-6. Выдать отдельный release verdict.
+2. Freeze release intent и классифицировать каждый handoff как `INTEGRATED | DEFERRED | SUPERSEDED | MISSING`.
+3. Блокировать `MISSING`; проверить provenance и behavioral capability exact candidate.
+4. Для batch freeze manifests и пересчитать aggregate impact финального cumulative candidate.
+5. Построить QA coverage matrix из acceptance criteria release intent.
+6. Проверить required commands, applicable Registry entries и evidence levels.
+7. Проверить security/data/operational impact по risk mode.
+8. Проверить migrations/integrations/deploy/readback/rollback.
+9. Проверить unresolved failures, skip/todo и constraints.
+10. Выдать отдельный release verdict.
 
 Constraint обязан содержать exact scope, owner, expiry, compensating control, validation и closure criterion. Иначе это blocker.
 
@@ -270,23 +289,27 @@ Constraint обязан содержать exact scope, owner, expiry, compensat
 11. Consequential AI behavior не имеет model/context/tool/budget/fallback/eval policy.
 12. Первый сложный workflow не имеет TestCase/checkpoint/replay plan.
 13. Не определены write scope и delivery owner.
+14. Выбранный Agent Execution Harness хранит state только в chat, позволяет self-approval или не имеет stale/rebind policy.
 
 ### Release
 
-14. Required build/test/lint/type/security/accessibility/performance check падает либо required test skipped/todo.
-15. Применимый active blocking Registry entry не выбран, failed, skipped или не имеет fresh evidence.
-16. Mandatory integration не прошла required sandbox/live evidence.
-17. External mutation не имеет idempotency/readback/rollback/compensation.
-18. Authentication/authorization/tenant isolation не доказаны для affected path.
-19. Migration/backup/recovery не проверены на требуемом уровне.
-20. AI EvalSuite blocking slice не прошёл либо judge не откалиброван.
-21. TestingHarness опирается на self-attestation, unexecuted replay или unresolved evidence.
-22. Autonomy превышает утверждённый уровень.
-23. Token/cost caps или usage accounting отсутствуют для paid AI path.
-24. Production readiness основана только на source/unit/mock/offline result.
-25. Deploy/readback/rollback не воспроизводимы.
-26. Critical/high issue или expired constraint остаётся открытым.
-27. Release decision выдан за реальный OutcomeRecord до observation window.
+15. Required build/test/lint/type/security/accessibility/performance check падает либо required test skipped/todo.
+16. Применимый active blocking Registry entry не выбран, failed, skipped или не имеет fresh evidence.
+17. Mandatory integration не прошла required sandbox/live evidence.
+18. External mutation не имеет idempotency/readback/rollback/compensation.
+19. Authentication/authorization/tenant isolation не доказаны для affected path.
+20. Migration/backup/recovery не проверены на требуемом уровне.
+21. AI EvalSuite blocking slice не прошёл либо judge не откалиброван.
+22. TestingHarness опирается на self-attestation, unexecuted replay или unresolved evidence.
+23. Autonomy превышает утверждённый уровень.
+24. Token/cost caps или usage accounting отсутствуют для paid AI path.
+25. Production readiness основана только на source/unit/mock/offline result.
+26. Deploy/readback/rollback не воспроизводимы.
+27. Critical/high issue или expired constraint остаётся открытым.
+28. Release decision выдан за реальный OutcomeRecord до observation window.
+29. Принятый handoff отсутствует в cumulative candidate и не имеет explicit defer/supersede decision.
+30. Candidate provenance или behavioral capability coverage не доказаны для release intent.
+31. QA coverage выбрана произвольно и не покрывает user-visible acceptance criteria batch.
 
 ## 8. Evidence levels
 
@@ -320,6 +343,7 @@ Current → target behavior:
 First Red:
 Regression Registry / selected IDs:
 Required evidence:
+Release intent/composition/QA coverage:
 Permissions / rollback:
 Implementation verdict:
 Release status/verdict:
@@ -352,6 +376,7 @@ Change slices/write scopes:
 First Red/test strategy/evidence:
 Regression Registry path/version/selected IDs:
 Delivery harness:
+Release intent/composition receipt/QA coverage:
 
 ## Production
 Security/privacy/data:
@@ -361,6 +386,7 @@ CI-CD/deploy/readback/rollback/recovery:
 ## AI / TestingHarness
 AI policy/evals/tokenomics:
 TestCase/checkpoints/replay:
+Agent Execution Harness/workflow/adapters/state:
 
 ## Gates
 Implementation verdict:
@@ -382,4 +408,7 @@ Constraints/red lines:
 10. EXPLORE не выдан за production?
 11. Implementation и release verdicts разделены?
 12. Regression Registry применён без запуска лишних tests?
-13. Пользователю понятен один следующий action?
+13. Delivery lane, batch trigger и urgent hotfix criteria определены по применимости?
+14. Release intent reconciled с provenance, capability evidence и QA coverage?
+15. Agent Execution Harness применён только по необходимости и остаётся portable?
+16. Пользователю понятен один следующий action?

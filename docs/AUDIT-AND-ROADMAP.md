@@ -136,6 +136,7 @@ skills/vibecoding-bible/
 │   ├── project-contract.md
 │   ├── adr.md
 │   ├── bug-spec.md
+│   ├── agent-harness-contract.md
 │   ├── required-tests.yaml
 │   ├── release-checklist.md
 │   └── operations-runbook.md
@@ -149,6 +150,7 @@ skills/vibecoding-bible/
     ├── quality.md
     ├── regression-registry.md
     ├── ai-systems.md
+    ├── agent-harness.md
     ├── production.md
     ├── project-contract.md
     ├── evals.md
@@ -214,6 +216,17 @@ Acceptance: skill создаёт консистентные artifacts и про�
 
 Acceptance: один entrypoint, progressive disclosure, no broken links, clean repository, remote/local commit parity.
 
+### Phase 7 — Portable Agent Execution Harness
+
+- [x] Отделить универсальный execution-control protocol от конкретного coding-agent и фиксированного набора workflows.
+- [x] Определить data-driven WorkflowDefinition, StageContract, durable SessionState, evidence, approvals и stale/rebind semantics.
+- [x] Разделить replaceable HostAdapter и ProjectAdapter.
+- [x] Добавить manual fallback, минимальный implementation slice и conformance/fault tests.
+- [x] Связать Agent Execution Harness с ProjectContract, AI systems и TestingHarness без смешения их ролей.
+- [x] Добавить AgentHarnessContract и два forward cases.
+
+Acceptance: пользователь может безопасно применить существующий совместимый harness или построить минимальный переносимый harness поверх любого proprietary coding-agent; workflows описываются versioned data, а не ветками конкретного engine.
+
 ## 9. Definition of Done
 
 Цель завершена, когда:
@@ -246,4 +259,4 @@ Acceptance: один entrypoint, progressive disclosure, no broken links, clean 
 
 ## 12. Результат
 
-Основная реализация опубликована в `main` коммитом `0d19079`. Структурная валидация пройдена; forward-test corpus содержит 14 cases, а реальный fresh-agent прогон покрыл 11 разных запросов, все lifecycle phases и все risk modes. Найденные gaps исправлены и повторно проверены.
+Основная реализация опубликована в `main` коммитом `0d19079`. Текущий candidate добавляет portable Agent Execution Harness; forward-test corpus содержит 21 case, включая два новых сценария harness. Их Green-проверка и публикация выполняются в release-процессе candidate.

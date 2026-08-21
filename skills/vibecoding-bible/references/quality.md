@@ -306,6 +306,8 @@ BugSpec должен содержать:
 
 Если fix проходит отдельную интеграцию, candidate QA и release, применить [`bug-repair.md`](bug-repair.md). Авторитетный `QA PASS` привязывать к immutable candidate после integration; проверка другой Dev-сборки является только preview evidence.
 
+Для серии несрочных minor fixes отделять repair verification от release verification: каждый fix получает собственный Red, targeted/affected evidence и при необходимости `PREVIEW PASS`, затем входит в `READY_FOR_BATCH`. После freeze общего cumulative head один раз пересчитать aggregate impact, выбрать применимые Registry gates и получить candidate-bound evidence для всего batch. Не запускать полный release pipeline после каждого небольшого fix и не переносить preview approval на итоговый candidate.
+
 ## 14. Evidence и release matrix
 
 Создать короткую матрицу, а не длинный список команд:
@@ -319,6 +321,10 @@ BugSpec должен содержать:
 | accessibility | automated + manual | ... | ... | ... | by policy |
 
 Release verdict относится только к exact source/config/schema/environment evidence. После значимого изменения затронутые результаты становятся stale.
+
+Для release batch матрица перечисляет batch manifest и cumulative diff. Совместимое engineering evidence отдельных fixes можно переиспользовать; проверки, зависящие от artifact, environment или совокупного взаимодействия изменений, должны быть fresh для итогового immutable candidate.
+
+Отдельно проверить completeness: release intent manifest должен сопоставлять каждый принятый handoff и capability с provenance, automated evidence и применимым human QA scenario. Green выбранного head, существование workflow-файлов или smoke нескольких соседних функций не доказывают, что весь принятый product scope вошёл в candidate.
 
 Fail, unresolved skip/todo, missing credential или unverified required path нельзя выдавать за Green. Advisory limitation должна быть видимой и не скрывать red line.
 
@@ -351,6 +357,11 @@ Expensive boundaries:
 ## Registry selection
 Selected Registry IDs:
 Exclusions with rationale:
+
+## Release composition
+Release intent / accepted handoff IDs:
+Composition receipt / provenance:
+Capability and QA coverage:
 
 ## Test matrix
 | Criterion/risk | Test level | Command/procedure | Blocking | Evidence ref |
@@ -393,4 +404,6 @@ Verdict and owner:
 13. Required fail/skip/todo/missing evidence блокирует release?
 14. AI behavior правильно направлено в EvalSuite или TestingHarness?
 15. Применимые blocking Registry entries выбраны и исполнены?
-16. Verdict относится к exact candidate и не устарел?
+16. Release intent reconciled с фактическим candidate без `MISSING` handoffs?
+17. Capability и QA coverage проверяют принятый behavior, а не наличие файлов?
+18. Verdict относится к exact candidate и не устарел?

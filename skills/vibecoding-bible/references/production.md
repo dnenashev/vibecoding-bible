@@ -242,9 +242,13 @@ Capacity decision связывать с SLO и подтверждённым work
 
 ## 12. CI/CD и release strategy
 
-Pipeline должен быть воспроизводимым и выдавать evidence на exact candidate.
+Pipeline должен быть воспроизводимым и выдавать evidence на exact candidate, связанный с release intent и composition receipt.
 
 Для bug-release с human acceptance применять [`bug-repair.md`](bug-repair.md): authoritative QA и ACCEPT должны ссылаться на immutable candidate, собранный после integration.
+
+Для несрочных небольших fixes по умолчанию использовать `Release Train`: независимо исправлять и проверять каждый defect, накапливать `READY_FOR_BATCH` changes в чистом cumulative head, затем один раз freeze batch, build candidate, выполнить aggregate risk-based verification, QA/ACCEPT и controlled release. Release trigger и maximum wait задаёт project policy; не придумывать универсальный размер batch.
+
+Перед build выполнить `Release Composition Gate`: versioned release intent перечисляет handoffs/capabilities, явно принятые в batch; каждый должен быть `INTEGRATED`, явно `DEFERRED` или `SUPERSEDED`. Проверить provenance в frozen cumulative head и behavioral capability на exact candidate. Чистый Green head или наличие файлов не доказывают полноту release scope.
 
 Минимальный flow:
 
@@ -267,6 +271,8 @@ source candidate
 - blue/green для быстрого environment rollback;
 - shadow для behavior comparison без consequential output;
 - manual checkpoint для irreversible/high-risk action.
+
+Отдельная urgent hotfix lane нужна для активной security-проблемы, потери/повреждения данных, денег/permissions, существенной недоступности или другого явно срочного impact. Она не ждёт обычный train, но сохраняет applicable evidence, immutable candidate, approval, readback и rollback/compensation.
 
 Approval не заменяет automated evidence. Автоматизация не отменяет human decision там, где policy его требует.
 
@@ -402,16 +408,19 @@ OutcomeRecord содержит:
 
 ## 19. Release protocol
 
-1. Freeze exact candidate и release scope.
-2. Проверить red lines ProjectContract и QualityPlan.
-3. Подтвердить artifact/config/schema/integration evidence.
-4. Проверить security/privacy/data и operational ownership.
-5. Выполнить migration preflight и recovery readiness.
-6. Deploy с выбранным blast-radius control.
-7. Выполнить readback critical journey и observability.
-8. Наблюдать decision window, определённое risk/SLO policy.
-9. Promote, constrain или rollback по заранее известным signals.
-10. Открыть OutcomeRecord с будущим observation window.
+1. Выбрать обычный release, `Release Train` batch или urgent hotfix по impact/urgency.
+2. Freeze release intent: accepted handoffs, capabilities, acceptance criteria и explicit defer/supersede decisions.
+3. Выполнить Release Composition Gate: provenance + capability proof + QA coverage matrix.
+4. Freeze exact cumulative head, batch manifest, candidate и release scope.
+5. Пересчитать aggregate impact и проверить red lines ProjectContract/QualityPlan.
+6. Подтвердить fresh applicable artifact/config/schema/integration evidence.
+7. Проверить security/privacy/data и operational ownership.
+8. Выполнить migration preflight и recovery readiness.
+9. Deploy с выбранным blast-radius control.
+10. Выполнить readback critical journey и observability.
+11. Наблюдать decision window, определённое risk/SLO policy.
+12. Promote, constrain или rollback по заранее известным signals.
+13. Открыть OutcomeRecord с будущим observation window.
 
 Release `READY` запрещён, если mandatory evidence отсутствует, rollback/compensation неработоспособны, monitoring слеп или owner не определён.
 
@@ -440,6 +449,9 @@ Timeout/retry/fallback:
 Recovery/DR:
 
 ## Delivery
+Release intent/accepted handoffs:
+Composition receipt/provenance/capability evidence:
+QA coverage matrix:
 CI artifact/evidence:
 Feature flag/canary strategy:
 Deploy/readback:
@@ -473,11 +485,13 @@ READY | READY_WITH_CONSTRAINTS | BLOCKED
 10. Dependency failures имеют timeout, bounded retry и честный fallback?
 11. Environment/config drift видим?
 12. CI выдаёт immutable artifact и evidence на exact candidate?
-13. Release ограничивает blast radius по риску?
-14. Deploy подтверждён readback critical journey?
-15. Rollback/compensation исполнены или проверены безопасным drill?
-16. Observability показывает user outcome и critical boundaries?
-17. Alerts имеют owner/action, runbooks применимы?
-18. Incident и disaster recovery процедуры проверены по риску?
-19. Analytics/feedback/support ведут к решению, а не к сбору шума?
-20. OutcomeRecord отделён от release verdict и имеет observation window?
+13. Release intent полностью reconciled с integrated/deferred/superseded handoffs?
+14. Capability evidence и QA matrix подтверждают принятый scope exact candidate?
+15. Release ограничивает blast radius по риску?
+16. Deploy подтверждён readback critical journey?
+17. Rollback/compensation исполнены или проверены безопасным drill?
+18. Observability показывает user outcome и critical boundaries?
+19. Alerts имеют owner/action, runbooks применимы?
+20. Incident и disaster recovery процедуры проверены по риску?
+21. Analytics/feedback/support ведут к решению, а не к сбору шума?
+22. OutcomeRecord отделён от release verdict и имеет observation window?

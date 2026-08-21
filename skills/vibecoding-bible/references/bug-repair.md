@@ -10,15 +10,16 @@
 6. Выбрать repair owner
 7. Проверить исправление
 8. Интегрировать в cumulative head
-9. Собрать immutable candidate
-10. Провести QA и получить ACCEPT
-11. Выполнить release adapter
-12. Управлять evidence и stale state
-13. Масштабировать строгость
-14. Red lines
-15. Универсальный BugRepairContract
-16. Пример Schema adapter
-17. Self-check
+9. Выбрать delivery lane и сформировать release batch
+10. Собрать immutable candidate
+11. Провести QA и получить ACCEPT
+12. Выполнить release adapter
+13. Управлять evidence и stale state
+14. Масштабировать строгость
+15. Red lines
+16. Универсальный BugRepairContract
+17. Пример Schema adapter
+18. Self-check
 
 ## 1. Назначение
 
@@ -42,6 +43,9 @@ BugReport
   → bounded repair
   → targeted + risk-based verification
   → integration into clean cumulative head
+  → READY_FOR_BATCH | urgent hotfix
+  → release intent reconciliation
+  → composition receipt + batch freeze
   → immutable candidate
   → candidate QA
   → exact ACCEPT
@@ -132,7 +136,7 @@ Run ID и screenshot полезны, но не обязательны для к�
 
 Tests не ослаблять, required checks не отключать, retry не выдавать за исправление flakiness. Зафиксировать exact commit/config/environment каждого результата.
 
-Опциональный Dev-preview до интеграции полезен для ранней обратной связи, но не создаёт release-grade `QA PASS`.
+Опциональный Dev-preview до интеграции полезен для ранней обратной связи. Пользователь может дать `PREVIEW PASS`, подтверждающий исправление конкретного scenario на конкретной preview-сборке. Это не release-grade `QA PASS` и не `ACCEPT`.
 
 ## 8. Интегрировать в cumulative head
 
@@ -149,12 +153,71 @@ Summary repairer или Green на старом head не являются proof
 
 Не интегрировать unrelated dirty changes и не переписывать main history.
 
-## 9. Собрать immutable candidate
+## 9. Выбрать delivery lane и сформировать release batch
+
+Не связывать каждый небольшой fix с отдельным дорогим релизом. После integration выбрать одну из двух дорожек.
+
+### Release Train — default для несрочных исправлений
+
+Поместить проверенный fix в очередь со статусом `READY_FOR_BATCH`. Для каждой записи сохранить:
+
+- defect/change ID, risk и user-visible scope;
+- handoff ID, acceptance criteria и статус в release intent;
+- repair и cumulative commits;
+- Primary Red, targeted/affected evidence и Registry delta;
+- `PREVIEW PASS`, если требовался human preview;
+- dependencies, rollout/rollback и owner;
+- причину включения в выбранный release batch.
+
+Release trigger задаётся policy проекта: расписанием, допустимым временем ожидания, готовностью связанной группы изменений или явным решением owner. Не придумывать универсальное число fixes или дней. Не держать очередь без owner и максимального срока ожидания.
+
+### Release Composition Gate
+
+Green выбранного head доказывает его внутреннюю корректность, но не полноту относительно принятого release intent. До freeze создать короткий versioned release intent manifest со всеми handoffs, явно принятыми в этот batch.
+
+Для каждого handoff сохранить:
+
+- stable ID, source/base identity и acceptance reference;
+- user-visible capabilities и acceptance criteria;
+- статус `INTEGRATED | DEFERRED | SUPERSEDED | MISSING`;
+- cumulative integration identity либо explicit defer/supersede decision с owner;
+- provenance proof и candidate-level capability evidence.
+
+Release Composition Gate проходит, только если каждый handoff из release intent:
+
+1. интегрирован в frozen cumulative head либо явно отложен/заменён владельцем;
+2. имеет доказательство происхождения: native ancestry/reachability или явное mapping после squash/rebase/reimplementation;
+3. имеет behavioral capability proof на exact candidate; наличие файлов или Green другого branch недостаточно;
+4. присутствует в QA coverage matrix, если acceptance требует human/product verification.
+
+Не включать автоматически все исторические feature branches. Gate сверяет только явно утверждённый release intent, но не позволяет молча потерять элемент этого intent.
+
+Перед candidate build integration owner:
+
+1. выбирает только готовые совместимые изменения;
+2. сверяет release intent со всеми принятыми handoffs и закрывает `MISSING`;
+3. удаляет, откатывает или изолирует change с unresolved blocker, не удерживая без причины весь train;
+4. замораживает exact cumulative head, batch/release intent manifests и composition receipt;
+5. заново рассчитывает совокупный impact;
+6. выбирает все применимые blocking и `always_on` Registry entries для cumulative diff;
+7. строит QA matrix из acceptance criteria принятых capabilities;
+8. переиспользует совместимое engineering evidence, но получает fresh candidate-bound evidence там, где этого требует risk или environment.
+
+Затем один immutable candidate, один release QA/ACCEPT и один deploy/readback/rollback покрывают весь batch. Финальная QA проверяет применимые изменённые scenarios и critical journeys, а не механически повторяет каждую ручную preview-проверку.
+
+### Urgent hotfix
+
+Не ждать train при активной уязвимости, потере/повреждении данных, ошибке денег или permissions, существенной недоступности либо другом явно срочном impact. Hotfix ускоряет очередь и ограничивает scope, но не отменяет Primary Red, required evidence, exact candidate, applicable approval, readback и rollback/compensation.
+
+`PREVIEW PASS` никогда не становится `ACCEPT` автоматически. Если frozen batch изменился, создать новый candidate и инвалидировать только evidence, реально зависящее от изменившегося subject.
+
+## 10. Собрать immutable candidate
 
 Из clean cumulative head один раз собрать immutable candidate:
 
 - candidate ID и artifact hash;
 - exact source commit;
+- release intent/batch manifest и composition receipt identities;
 - config/schema/dependency versions;
 - build logs и required evidence refs;
 - supported scope и known constraints;
@@ -164,7 +227,7 @@ Summary repairer или Green на старом head не являются proof
 
 Не модифицировать artifact после hash/signing. Не собирать release повторно из другого workspace после QA.
 
-## 10. Провести QA и получить ACCEPT
+## 11. Провести QA и получить ACCEPT
 
 Авторитетный human QA проводить на isolated runtime именно immutable candidate после integration.
 
@@ -183,11 +246,12 @@ Human QA обязательна, если acceptance зависит от UX, в�
 
 До required ACCEPT не выполнять installation/deploy/external mutation.
 
-## 11. Выполнить release adapter
+## 12. Выполнить release adapter
 
 Universal release controller принимает только accepted immutable candidate и выполняет platform-specific шаги:
 
 - проверить artifact integrity/signature/provenance;
+- проверить привязку candidate к release intent и прошедшему composition receipt;
 - проверить exact target и authority;
 - сохранить previous known-good;
 - установить/deploy с ограниченным blast radius;
@@ -198,29 +262,32 @@ Universal release controller принимает только accepted immutable 
 
 Названия команд, codesign, package manager, app location, Launchpad, container registry или cloud rollout принадлежат project adapter, а не универсальному канону.
 
-## 12. Управлять evidence и stale state
+## 13. Управлять evidence и stale state
 
 Evidence graph связывает:
 
 ```text
 BugReport → Primary Red → repair commit → cumulative head
-→ candidate hash → QA PASS → ACCEPT → ReleaseRecord
+→ READY_FOR_BATCH/hotfix → release intent → composition receipt
+→ batch manifest → candidate hash
+→ QA PASS → ACCEPT → ReleaseRecord
 ```
 
 Считать downstream evidence stale, если меняется его dependency:
 
 - patch после tests → повторить affected verification;
 - cumulative head после integration → пересобрать candidate;
+- release intent или handoff decision после composition → создать новую candidate identity и повторить affected composition/QA/approval;
 - candidate hash после QA → QA PASS и ACCEPT недействительны;
 - target/config после ACCEPT → повторить release preflight или запросить новое approval по risk policy.
 
 Не повторять неизменённые дорогие этапы без причины. Переиспользовать trusted evidence только при совпадающих versions/hashes и доказанной совместимости.
 
-## 13. Масштабировать строгость
+## 14. Масштабировать строгость
 
 ### `BUILD/lite`
 
-Primary Red, bounded fix, targeted verification и обычный repository integration flow. Human QA и отдельный release controller — только по применимости.
+Primary Red, bounded fix, targeted verification и обычный repository integration flow. Для несрочного minor fix предпочитать `READY_FOR_BATCH`, а не отдельный release. Human QA и отдельный release controller — только по применимости.
 
 ### `BUILD/standard`
 
@@ -232,7 +299,7 @@ Primary Red, bounded fix, targeted verification и обычный repository int
 
 Не применять desktop-release церемонию к documentation-only или low-risk server fix. Не сокращать exact-candidate chain для денег, PII или необратимых mutations.
 
-## 14. Red lines
+## 15. Red lines
 
 Блокировать соответствующий gate, если:
 
@@ -242,14 +309,23 @@ Primary Red, bounded fix, targeted verification и обычный repository int
 - repair вышел за утверждённый scope;
 - integration выполнена в dirty/unknown head;
 - candidate не immutable или не связан с source commit;
+- candidate identity не связана с release intent и composition receipt;
 - authoritative QA выполнялась на другом build;
 - QA/ACCEPT не содержит exact candidate identity;
 - artifact изменён после signing/hash/QA;
 - required ACCEPT отсутствует до external mutation;
+- `PREVIEW PASS` выдан за release QA или ACCEPT;
+- несрочный minor fix без причины запускает полный отдельный release pipeline;
+- срочный consequential defect оставлен ждать обычный batch;
+- batch frozen без manifest, aggregate impact selection или owner;
+- release intent содержит `MISSING` либо принятый handoff исчез без explicit defer/supersede decision;
+- provenance проверяет только чистоту выбранного head, но не включение handoffs;
+- capability gate проверяет наличие файлов вместо принятого behavior;
+- QA matrix не покрывает user-visible acceptance criteria release intent;
 - release adapter не подтверждает active version/readback/rollback;
 - platform-specific procedure выдана за универсальную без project evidence.
 
-## 15. Универсальный BugRepairContract
+## 16. Универсальный BugRepairContract
 
 ```markdown
 # BugRepairContract: <defect> v<version>
@@ -270,6 +346,14 @@ Targeted/affected/full verification policy:
 Integration owner/cumulative head:
 Post-integration evidence:
 
+## Delivery lane
+PREVIEW PASS/evidence:
+READY_FOR_BATCH | URGENT_HOTFIX:
+Batch ID/manifest/trigger/maximum wait:
+Release intent manifest / accepted handoff IDs:
+Composition receipt / missing-deferred-superseded decisions:
+Aggregate impact/Registry selection:
+
 ## Candidate and QA
 Candidate ID/source/artifact hash:
 QA policy/result/evidence:
@@ -283,18 +367,18 @@ ReleaseRecord/verdict:
 
 Заполнять только применимые поля. Отсутствующий screenshot не заменять выдуманным; отсутствующий required approval считать blocker.
 
-## 16. Пример Schema adapter
+## 17. Пример Schema adapter
 
 Для desktop-приложения Schema универсальные роли могут отображаться так:
 
-- `release:prepare` собирает immutable candidate из clean cumulative head и выдаёт subject/evidence;
+- `release:prepare` сначала сверяет release intent, accepted handoffs, provenance и capability evidence, затем собирает immutable candidate из clean cumulative head и выдаёт subject/evidence;
 - пользователь запускает isolated candidate и даёт `QA PASS`, связанный с candidate hash;
 - точный `ACCEPT` разрешает изменение `/Applications/Schema.app`;
 - `schema-release-controller` проверяет codesign, устанавливает candidate, выполняет readback/rollback и подтверждает единственный экземпляр Schema в Launchpad.
 
 Это пример adapter contract. Другой проект подставляет собственные commands, artifact target и platform checks.
 
-## 17. Self-check
+## 18. Self-check
 
 1. BugReport описывает expected/observed и воспроизводимый scenario?
 2. Isolation соразмерна риску и сохраняет main/dirty worktree?
@@ -310,4 +394,10 @@ ReleaseRecord/verdict:
 12. Stale evidence инвалидируется только по реальным dependencies?
 13. Platform-specific детали не стали universal requirement?
 14. Primary Red рассмотрен для Regression Registry без механического добавления?
-15. Пользователю виден один следующий gate?
+15. Несрочный fix отделён от release и поставлен в управляемый batch?
+16. Batch имеет trigger, owner, maximum wait, manifest и aggregate impact selection?
+17. Каждый handoff release intent интегрирован либо явно deferred/superseded?
+18. Provenance и behavioral capability доказаны на exact candidate?
+19. QA matrix выведена из acceptance criteria batch, а не случайного smoke-набора?
+20. Срочный consequential bug не задержан обычным train?
+21. Пользователю виден один следующий gate?

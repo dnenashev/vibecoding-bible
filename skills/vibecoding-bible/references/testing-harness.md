@@ -36,6 +36,7 @@ Harness нужен, когда ещё неизвестно, проходит л�
 
 - `EvalSuite` измеряет вероятностное AI-поведение на наборе cases;
 - `TestingHarness` проверяет execution path, checkpoints, repair и replay конкретного subject.
+- [`Agent Execution Harness`](agent-harness.md) управляет durable стадиями, evidence и approvals работы coding-agent; TestingHarness может быть одним из его WorkflowPacks.
 
 Semantic evaluator может использовать EvalSuite, но его verdict не доказывает state, handoff, side effect или recovery. Общие AI rules брать из [`ai-systems.md`](ai-systems.md), release и operational controls — из [`production.md`](production.md).
 
