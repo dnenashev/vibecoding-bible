@@ -1,3 +1,5 @@
+# Host-specific: интерфейс для Codex. Другие хосты этот файл не читают.
+# Канонические сведения о skill — SKILL.md и VERSION.
 interface:
   display_name: "Вайбкодинг Библия"
   short_description: "От идеи до production с помощью AI"

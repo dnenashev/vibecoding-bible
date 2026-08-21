@@ -135,6 +135,7 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 |---|---|
 | Любая содержательная работа | [`references/core-principles.md`](references/core-principles.md) |
 | Значение любого статуса, режима, вердикта или уровня evidence | [`references/vocabulary.md`](references/vocabulary.md) |
+| Делегирование, планирование, hooks, review или иные возможности конкретной среды | [`references/host-adapters.md`](references/host-adapters.md) |
 | Идея, problem framing, product brief, requirements, scope | [`references/product.md`](references/product.md) |
 | Stack, system/data/API/integration architecture, ADR, migration design | [`references/architecture.md`](references/architecture.md) |
 | Repository work, planning, coding, debugging, git, context или delegation | [`references/build.md`](references/build.md) |
@@ -149,7 +150,7 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 | Probabilistic AI behavior, judge или AI quality gate | [`references/evals.md`](references/evals.md) |
 | Первый/изменённый workflow, TestCase, checkpoints, autonomous repair/replay | [`references/testing-harness.md`](references/testing-harness.md) |
 
-Если web project содержит `components.json`, применить доступный `shadcn` skill и получить actual project context. Если нужен Mastra, применить `mastra` skill и проверить exact version. Это conditional defaults, не универсальные зависимости.
+Если web project содержит `components.json`, применить доступный `shadcn` skill и получить actual project context. Если нужен Mastra, применить `mastra` skill и проверить exact version. Это conditional defaults, не универсальные зависимости; перед ссылкой на них проверить фактическую доступность skill в текущей среде — см. [`references/host-adapters.md`](references/host-adapters.md).
 
 Если среда уже предоставляет подходящий Agent Execution Harness, использовать его как authoritative owner стадий, state, receipts и approvals; Библия остаётся policy/guardrail layer. Не дублировать state machine в чате. При отсутствии harness использовать только честный risk-scaled manual fallback либо помочь построить переносимый minimal slice по [`references/agent-harness.md`](references/agent-harness.md).
 
