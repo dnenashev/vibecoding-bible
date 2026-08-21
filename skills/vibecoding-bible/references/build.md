@@ -36,11 +36,11 @@ reality → contract → Red → minimal Green → refactor → evidence → nex
 
 ## 2. Выбрать режим и границу изменения
 
-Выбрать режим:
+Выбрать delivery mode и risk отдельно:
 
-- `EXPLORE` — time-boxed spike, изолированный от production path;
-- `BUILD` — production-ready slice по умолчанию;
-- `CRITICAL` — усиленные approvals и evidence для высокого риска.
+- mode `EXPLORE` — time-boxed spike, изолированный от production path;
+- mode `BUILD` — production-ready slice по умолчанию;
+- risk `LOW | STANDARD | CRITICAL` — определяет силу approvals, evidence и изоляции.
 
 До изменения сформулировать:
 
@@ -344,7 +344,8 @@ Green unit test не равен release readiness. Перед `SHIP` выпол�
 
 ```markdown
 ## Build Brief
-Mode: EXPLORE | BUILD | CRITICAL
+Delivery mode: EXPLORE | BUILD
+Risk: LOW | STANDARD | CRITICAL
 Outcome:
 Included / excluded:
 Invariants:

@@ -1,6 +1,8 @@
 # Project Contract: <name> v<version>
 
-Mode/depth: EXPLORE | BUILD/lite | BUILD/standard | BUILD/full | CRITICAL
+Delivery mode: EXPLORE | BUILD
+Risk: LOW | STANDARD | CRITICAL
+Contract depth: lite | standard | full | critical
 Parent/baseline:
 Implementation verdict:
 Release status/verdict:

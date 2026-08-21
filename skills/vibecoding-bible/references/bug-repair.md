@@ -289,15 +289,15 @@ BugReport → Primary Red → repair commit → cumulative head
 
 ## 14. Масштабировать строгость
 
-### `BUILD/lite`
+### `BUILD` при risk `LOW`
 
 Primary Red, bounded fix, targeted verification и обычный repository integration flow. Для несрочного minor fix предпочитать `READY_FOR_BATCH`, а не отдельный release. Human QA и отдельный release controller — только по применимости.
 
-### `BUILD/standard`
+### `BUILD` при risk `STANDARD`
 
 Изолированный repair предпочтителен; affected-path verification, clean cumulative integration, immutable candidate и explicit release evidence обязательны для пользовательского релиза.
 
-### `CRITICAL`
+### Risk `CRITICAL`
 
 Требовать separation of duties, independent verifier, authenticated QA/ACCEPT, signed/traceable artifact, canary/blast-radius control, readback и проверенный rollback/compensation.
 

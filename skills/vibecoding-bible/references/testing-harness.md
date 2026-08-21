@@ -24,7 +24,7 @@
 
 Использовать `TestingHarness` для первого контролируемого испытания нового или существенно изменённого workflow, multi-agent system, agent role или skill.
 
-Первый прогон не означает режим `EXPLORE`. Наследовать `EXPLORE`, `BUILD` или `CRITICAL` от предназначения и риска subject; production-bound workflow по умолчанию остаётся `BUILD`.
+Первый прогон не означает mode `EXPLORE`. Наследовать delivery mode от предназначения subject, а risk — от цены его ошибки; production-bound workflow по умолчанию остаётся `BUILD`.
 
 Harness нужен, когда ещё неизвестно, проходит ли subject весь путь, сохраняет ли качество в критических точках и соответствует ли ожиданию пользователя.
 

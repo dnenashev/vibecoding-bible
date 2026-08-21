@@ -37,13 +37,18 @@
 
 ## 2. Выбрать режим и тип продукта
 
-Сначала выбрать уровень строгости:
+Сначала выбрать delivery mode и risk:
 
-| Режим | Архитектурный результат |
+| Delivery mode | Архитектурный результат |
 |---|---|
 | `EXPLORE` | Один обратимый spike, временные границы и критерий `discard / continue / promote` |
 | `BUILD` | Production-ready vertical slice и достаточные решения для его эксплуатации |
-| `CRITICAL` | Усиленные isolation, recovery, audit и approval boundaries для высокого риска |
+
+| Risk | Что добавляет к архитектуре |
+|---|---|
+| `LOW` | Ничего сверх базовых границ |
+| `STANDARD` | Обычные ownership, failure modes и recovery |
+| `CRITICAL` | Усиленные isolation, recovery, audit и approval boundaries |
 
 Не проектировать весь будущий продукт, если текущая задача требует один slice. Не выпускать `EXPLORE`-решение в production без нового design review.
 
@@ -345,7 +350,8 @@ Rollback/exit: как отменить или заменить решение
 
 ```markdown
 ## Architecture Brief
-Mode: EXPLORE | BUILD | CRITICAL
+Delivery mode: EXPLORE | BUILD
+Risk: LOW | STANDARD | CRITICAL
 Product type:
 Outcome / critical path:
 
@@ -377,7 +383,7 @@ Rollback/exit path:
 ## 16. Self-check
 
 1. Архитектура начинается с outcome и actual state?
-2. Выбран правильный режим строгости?
+2. Delivery mode и risk выбраны отдельно и соответствуют работе?
 3. Conventional solution рассмотрено до специальных frameworks?
 4. Stack выбран по critical path и operations, а не по вкусу?
 5. Deployable units минимальны?

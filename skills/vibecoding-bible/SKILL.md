@@ -17,7 +17,7 @@ description: >-
 
 Быть единой точкой входа для создания цифрового продукта с помощью AI. Вести пользователя по минимальному пути к реальному outcome, сохраняя качество, безопасность и управляемость.
 
-Не превращать Библию в энциклопедию или анкету. Самостоятельно определять текущую фазу, уровень риска и минимальный набор references. Пользователь не обязан знать внутреннюю методологию или вручную вызывать другие skills.
+Не превращать Библию в энциклопедию или анкету. Самостоятельно определять текущую фазу, delivery mode, risk и минимальный набор references. Пользователь не обязан знать внутреннюю методологию или вручную вызывать другие skills.
 
 ## Версия
 
@@ -36,7 +36,7 @@ Source commit/tag можно сообщить дополнительно, но �
 1. Извлечь цель и текущее состояние.
 2. Разделить `fact`, `assumption` и `unknown`.
 3. Найти unknown с максимальным риском для outcome.
-4. Определить фазу и режим строгости.
+4. Определить фазу, delivery mode и risk.
 5. Задать максимум один blocking question; если можно безопасно продолжить — не спрашивать.
 6. Дать один обратимый следующий шаг.
 
@@ -76,17 +76,31 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 
 Связать usage, feedback, cost, incidents и downstream outcome. Превращать реальные failures в regressions и выбирать следующий минимальный improvement.
 
-## Режим строгости
+## Режим и риск
 
-Выбирать режим по риску и предназначению, а не по размеру задачи.
+Это две независимые оси. Предназначение работы задаёт delivery mode, цена ошибки задаёт risk. Не смешивать их в одном значении: обратимый spike на платёжных данных является одновременно `EXPLORE` и `CRITICAL`.
 
-| Режим | Когда | Минимум |
+| Delivery mode | Когда | Минимум |
 |---|---|---|
-| `EXPLORE` | Reversible spike или проверка неизвестного без production claim | Outcome, time/cost box, safety boundary, explicit non-production label, discard/promote decision |
-| `BUILD` | Реальный продукт или функция; default | Маленький production-ready slice, delta/full contract, TDD, required evidence, deploy/rollback |
-| `CRITICAL` | Payments, PII, regulated data, high autonomy, irreversible action или большой blast radius | Усиленные threat model, approvals, isolation, live evidence, canary и recovery |
+| `EXPLORE` | Обратимая проверка неизвестного без production claim | Outcome, time/cost box, safety boundary, explicit non-production label, discard/promote decision |
+| `BUILD` | Реальный продукт или функция; default | Маленький production-ready slice, contract, TDD, required evidence, deploy/rollback |
 
-Не выпускать `EXPLORE` в production без promotion в `BUILD`. Не применять `CRITICAL`-процесс к тривиальному reversible изменению.
+| Risk | Когда | Что усиливается |
+|---|---|---|
+| `LOW` | Обратимое изменение с малым blast radius, без чувствительных данных | Ничего сверх базового; не разворачивать тяжёлый контур |
+| `STANDARD` | Default для реального продукта | Обычные evidence, permissions, readback и rollback |
+| `CRITICAL` | Payments, PII, regulated data, high autonomy, необратимое действие или большой blast radius | Threat model, approvals, isolation, live evidence, canary, recovery |
+
+Рабочие сочетания:
+
+- `EXPLORE + LOW` — дешёвый spike; не выпускать в production без promotion в `BUILD`;
+- `EXPLORE + CRITICAL` — исследование на чувствительных данных: time box и discard-решение от режима, изоляция, синтетические данные и запрет production-записи от риска;
+- `BUILD + STANDARD` — default;
+- `BUILD + CRITICAL` — усиленный контур для дорогой ошибки.
+
+Глубину контракта выводить из риска и размера scope: `LOW` → `lite`, `STANDARD` → `standard` или `full`, `CRITICAL` → `critical`. Явный override допустим с указанием причины.
+
+Не применять `CRITICAL`-контур к тривиальному обратимому изменению и не понижать risk ради скорости.
 
 ## Authority и evidence
 
@@ -150,10 +164,10 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 
 Перед существенным изменением создать risk-scaled `VibecodingProjectContract`:
 
-- `lite` для bounded low-risk BUILD change;
-- `standard` для новой feature/product/integration;
+- `lite` для bounded change при risk `LOW`;
+- `standard` для новой feature/product/integration при risk `STANDARD`;
 - `full` для новой системы, migration или широкого cross-cutting change;
-- `critical` для CRITICAL scope.
+- `critical` для risk `CRITICAL`.
 
 Контракт извлекать из сообщения и repository; не заставлять пользователя заполнять форму. Зафиксировать outcome, scope, invariants, facts/unknowns, architecture impact, evidence и rollback.
 
@@ -217,11 +231,11 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 
 ## Self-check
 
-1. Определены текущая фаза и режим строгости?
+1. Определены текущая фаза, delivery mode и risk?
 2. Outcome важнее artifact/technology?
 3. Загружены только нужные references?
 4. Facts подтверждены source/runtime evidence?
-5. Scope минимален и честно помечен EXPLORE/BUILD/CRITICAL?
+5. Scope минимален, delivery mode и risk названы явно и не смешаны?
 6. Архитектура проще необходимого, а не сложнее?
 7. UX, data, security и operations учтены по риску?
 8. Первый Red и required evidence определены?

@@ -14,29 +14,44 @@
 Фаза описывает, где находится работа. Она не является уровнем строгости и не
 определяет глубину контракта сама по себе.
 
-## Режим строгости
+## Delivery mode
 
-`EXPLORE | BUILD | CRITICAL`
+`EXPLORE | BUILD`
 
 - `EXPLORE` — обратимый эксперимент без production claim;
-- `BUILD` — default: маленький production-ready slice;
-- `CRITICAL` — усиленный контур для payments, PII, regulated data, high autonomy,
-  необратимых действий и большого blast radius.
+- `BUILD` — default: маленький production-ready slice.
 
-Режим `BUILD` и фаза `BUILD` — разные вещи с совпадающим именем. Различать по контексту:
-фаза отвечает на вопрос «где мы», режим — «насколько строго».
+Режим `BUILD` и фаза `BUILD` — разные вещи с совпадающим именем. Фаза отвечает на вопрос
+«где мы», delivery mode — «что мы выпускаем».
+
+## Risk
+
+`LOW | STANDARD | CRITICAL`
+
+- `LOW` — обратимое изменение с малым blast radius и без чувствительных данных;
+- `STANDARD` — default для реального продукта;
+- `CRITICAL` — payments, PII, regulated data, high autonomy, необратимое действие или
+  большой blast radius.
+
+Delivery mode и risk независимы. Допустимы все четыре сочетания, включая
+`EXPLORE + CRITICAL` — исследование на чувствительных данных.
+
+До версии 2.0.0 существовал один enum `EXPLORE | BUILD | CRITICAL`. Соответствие при
+переносе старых артефактов: `EXPLORE` → `EXPLORE + LOW` (или `+ CRITICAL`, если данные
+чувствительные), `BUILD` → `BUILD + STANDARD`, `CRITICAL` → `BUILD + CRITICAL`.
 
 ## Глубина контракта
 
 `lite | standard | full | critical`
 
-- `lite` — bounded low-risk change в существующей системе;
+- `lite` — bounded change при risk `LOW`;
 - `standard` — новый product, feature или integration, заметное изменение behavior;
 - `full` — новая система, migration или широкий cross-cutting change;
-- `critical` — любой scope в режиме `CRITICAL`, с усиленными threat, evidence,
+- `critical` — любой scope при risk `CRITICAL`, с усиленными threat, evidence,
   approval и recovery полями.
 
-Глубина выводится из режима и размера scope; явный override допускается с указанием причины.
+Глубина выводится из risk и размера scope: `LOW` → `lite`, `STANDARD` → `standard` или
+`full`, `CRITICAL` → `critical`. Явный override допускается с указанием причины.
 
 ## Вердикты
 

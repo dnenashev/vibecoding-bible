@@ -47,17 +47,19 @@ LEARN: outcomes → feedback/incidents → regressions/decisions → next slice
 
 ## 2. Масштабирование строгости
 
-### `EXPLORE`
+Строгость задаётся парой delivery mode и risk. Ниже — вклад каждой оси.
+
+### Mode `EXPLORE`
 
 Не выпускать spike как production feature. Изолировать environment/data, ограничить стоимость и срок жизни, запретить реальные consequential mutations. В конце удалить либо формально повысить в `BUILD`.
 
-### `BUILD`
+### Mode `BUILD`
 
 По умолчанию требовать реальную configuration, security, migrations, observability, release/readback/rollback и owner эксплуатации для принятого vertical slice.
 
-### `CRITICAL`
+### Risk `CRITICAL`
 
-Для payments, PII, regulated data, irreversible actions, high autonomy или большого blast radius усилить separation of duties, independent review, canary, audit, recovery exercises и production observation.
+Применимо и к `EXPLORE`, и к `BUILD`. Для payments, PII, regulated data, irreversible actions, high autonomy или большого blast radius усилить separation of duties, independent review, canary, audit, recovery exercises и production observation.
 
 Не использовать один фиксированный checklist для всех систем. Усиливать controls там, где failure дорог, трудно обнаружим или необратим.
 
@@ -429,7 +431,8 @@ Release `READY` запрещён, если mandatory evidence отсутству
 ```markdown
 # ProductionPlan: <scope>
 
-Mode: EXPLORE | BUILD | CRITICAL
+Delivery mode: EXPLORE | BUILD
+Risk: LOW | STANDARD | CRITICAL
 Owners: product / service / security / incident
 Candidate/environments:
 
@@ -474,7 +477,7 @@ READY | READY_WITH_CONSTRAINTS | BLOCKED
 ## 21. Self-check
 
 1. Production owner и supported journey определены?
-2. Строгость соответствует `EXPLORE`, `BUILD` или `CRITICAL`?
+2. Delivery mode и risk названы отдельно и соответствуют работе?
 3. Threat model покрывает самые дорогие assets/boundaries?
 4. Identity trusted, authorization server-side, tenants изолированы?
 5. Secrets/PII защищены на storage, transit, logs и providers?

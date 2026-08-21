@@ -104,7 +104,7 @@ level: integration
 location: tests/payments/idempotency.test.ts
 command: npm test -- idempotency
 blocking: true
-modes: [BUILD, CRITICAL]
+risk: [STANDARD, CRITICAL]
 applicability:
   paths: [src/payments/**]
   components: [payments]
@@ -150,7 +150,7 @@ ID делать стабильным и смысловым. Не привязы�
 - test, который проходит только на hardcoded fixture и не ловит заявленный риск;
 - entry без owner или executable verification path для `active` status.
 
-Admission утверждает integration/quality owner. Автор теста может предложить запись, но не должен единолично объявлять собственный слабый check release gate для `CRITICAL` scope.
+Admission утверждает integration/quality owner. Автор теста может предложить запись, но не должен единолично объявлять собственный слабый check release gate при risk `CRITICAL`.
 
 ## 7. Выбор применимых проверок
 
@@ -159,7 +159,7 @@ Admission утверждает integration/quality owner. Автор теста 
 1. получить reality snapshot и change scope;
 2. определить затронутые paths, components, contracts, data, permissions и integrations;
 3. выбрать все `active` entries, чья applicability пересекается с impact;
-4. добавить `always_on` entries для соответствующего mode/gate;
+4. добавить `always_on` entries для соответствующего risk/gate;
 5. создать Primary Red, даже если нового defect ещё нет в Registry;
 6. записать selected IDs и причины исключения пограничных entries в QualityPlan/ProjectContract.
 

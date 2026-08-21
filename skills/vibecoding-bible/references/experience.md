@@ -277,7 +277,7 @@ Design system обязан помогать:
 
 Не устанавливать универсальное число participants или threshold. Выбирать силу evidence по риску, вариативности аудитории и цене ошибки.
 
-Для EXPLORE разрешать prototype evidence с explicit limitations. Для BUILD проверять implemented representative journey. Для CRITICAL добавлять независимую проверку high-impact paths и assistive use cases по риску.
+Для mode `EXPLORE` разрешать prototype evidence с explicit limitations. Для mode `BUILD` проверять implemented representative journey. При risk `CRITICAL` добавлять независимую проверку high-impact paths и assistive use cases.
 
 ## 13. Handoff в build и verify
 

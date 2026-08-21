@@ -149,7 +149,7 @@
 - минимальный vertical slice;
 - exclusions/non-goals;
 - validation и analytics hypothesis;
-- mode `EXPLORE | BUILD | CRITICAL`;
+- delivery mode `EXPLORE | BUILD` и risk `LOW | STANDARD | CRITICAL`;
 - open decisions и owners.
 
 Freeze Brief перед build-ready design. При изменении outcome или scope создать новую version и пометить зависимые decisions stale.
@@ -246,19 +246,21 @@ Acceptance: <проверяемые примеры success/failure>.
 
 Не считать page views, clicks или AI score автоматически продуктовой ценностью. Не собирать PII «на будущее». Проверить implementability событий в architecture и production modules.
 
-## 12. Режимы строгости
+## 12. Режим и риск
 
-### EXPLORE
+Delivery mode задаёт, что выпускается; risk — насколько силён контур. Оси независимы.
+
+### Mode EXPLORE
 
 Проверять один критический unknown. Использовать disposable prototype или bounded spike, explicit non-production label и решение о продолжении.
 
-### BUILD
+### Mode BUILD
 
 Подтвердить Product Brief, основной journey, requirements, acceptance и analytics hypothesis для production-ready slice. Использовать как default.
 
-### CRITICAL
+### Risk CRITICAL
 
-Добавить независимых reviewers/owners по применимости, misuse/abuse journeys, compliance constraints, failure/recovery requirements и более сильное evidence. Не превращать criticality в длинную общую анкету.
+Применимо и к `EXPLORE`, и к `BUILD`. Добавить независимых reviewers/owners по применимости, misuse/abuse journeys, compliance constraints, failure/recovery requirements и более сильное evidence. Не превращать criticality в длинную общую анкету.
 
 ## 13. Антипаттерны
 

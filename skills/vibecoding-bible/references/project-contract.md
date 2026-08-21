@@ -29,11 +29,11 @@
 
 Ожидаемый failing Red совместим с implementation readiness, но блокирует release, пока не станет Green.
 
-## 2. Режим и глубина контракта
+## 2. Режим, риск и глубина контракта
 
-Сначала выбрать operating mode.
+Сначала выбрать delivery mode и risk — это независимые оси. Затем вывести глубину контракта.
 
-### `EXPLORE`
+### Mode `EXPLORE`
 
 Для reversible spike без production claim. Использовать короткий experiment contract:
 
@@ -45,17 +45,17 @@
 
 Exploration artifact нельзя подключать к production path без нового `BUILD` contract.
 
-### `BUILD`
+### Mode `BUILD`
 
-Default для реального продукта или функции. Выбрать глубину:
+Default для реального продукта или функции. Выбрать глубину по risk и размеру scope:
 
-- `lite` — bounded low-risk change в существующей системе;
-- `standard` — новый product/feature/integration или заметное изменение behavior;
+- `lite` — bounded change при risk `LOW`;
+- `standard` — новый product/feature/integration или заметное изменение behavior при risk `STANDARD`;
 - `full` — новая система, migration или широкий cross-cutting change.
 
-### `CRITICAL`
+### Risk `CRITICAL`
 
-Для payments, PII, regulated data, high autonomy, irreversible mutation или большого blast radius. Использовать `critical` contract с усиленными threat/evidence/approval/recovery полями.
+Для payments, PII, regulated data, high autonomy, irreversible mutation или большого blast radius. Использовать `critical` contract с усиленными threat/evidence/approval/recovery полями — независимо от того, `EXPLORE` это или `BUILD`. Для `EXPLORE + CRITICAL` контракт остаётся коротким, но обязан содержать изоляцию, запрет production-записи и правило удаления данных.
 
 ### Когда контракт не нужен
 
@@ -218,7 +218,7 @@ Artifact вроде «создать экран» или «написать AI-�
 - immutable candidate, QA и exact ACCEPT policy для bug release;
 - shared gates.
 
-### CRITICAL additions
+### Risk CRITICAL additions
 
 - abuse/misuse cases;
 - data classification and legal/compliance owner;

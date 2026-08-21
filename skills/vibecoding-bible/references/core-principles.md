@@ -38,11 +38,15 @@ AI помогает проектировать и реализовывать. О
 
 Выбирать самую простую архитектуру, которая честно выдерживает requirements и risk. Не выбирать самый короткий код ценой потери данных, безопасности или поддержки.
 
-### Режимы
+### Режим и риск
 
-- `EXPLORE` — reversible experiment без production claim;
-- `BUILD` — default: маленький production-ready vertical slice;
-- `CRITICAL` — усиленный контур для high-impact риска.
+Две независимые оси, определения — в [`vocabulary.md`](vocabulary.md):
+
+- delivery mode `EXPLORE` — reversible experiment без production claim;
+- delivery mode `BUILD` — default: маленький production-ready vertical slice;
+- risk `LOW | STANDARD | CRITICAL` — цена ошибки, определяет силу контура.
+
+`EXPLORE` на чувствительных данных остаётся `CRITICAL` по риску: time box не отменяет изоляцию.
 
 Scope уменьшать удалением функциональности, а не качества внутри принятой границы.
 

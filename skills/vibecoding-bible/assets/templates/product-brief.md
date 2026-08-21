@@ -1,6 +1,7 @@
 # Product Brief: <name>
 
-Mode: EXPLORE | BUILD | CRITICAL
+Delivery mode: EXPLORE | BUILD
+Risk: LOW | STANDARD | CRITICAL
 Owner:
 Status: draft | validated | stale
 

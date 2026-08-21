@@ -59,9 +59,9 @@ risk → expected behavior → cheapest trustworthy check → stronger boundary 
 - ожидаемый observable result;
 - owner исправления при fail.
 
-## 3. Минимальная стратегия по режимам
+## 3. Минимальная стратегия по режиму и риску
 
-### `EXPLORE`
+### Mode `EXPLORE`
 
 Проверять только гипотезу и самые опасные ограничения:
 
@@ -73,7 +73,7 @@ risk → expected behavior → cheapest trustworthy check → stronger boundary 
 
 Не строить полную regression suite для идеи, которую можно выбросить. Перед promotion в `BUILD` создать нормальный QualityPlan.
 
-### `BUILD`
+### Mode `BUILD`
 
 Это режим по умолчанию. Требовать:
 
@@ -84,9 +84,9 @@ risk → expected behavior → cheapest trustworthy check → stronger boundary 
 - проверки ошибок, permissions и recovery;
 - release evidence на exact candidate.
 
-### `CRITICAL`
+### Risk `CRITICAL`
 
-Для денег, PII, regulated data, высокого autonomy или большого blast radius усилить:
+Применимо и к `EXPLORE`, и к `BUILD`. Для денег, PII, regulated data, высокого autonomy или большого blast radius усилить:
 
 - threat-driven negative tests;
 - tenant/permission isolation;
@@ -345,7 +345,8 @@ Fail, unresolved skip/todo, missing credential или unverified required path �
 ```markdown
 # QualityPlan: <scope>
 
-Mode: EXPLORE | BUILD | CRITICAL
+Delivery mode: EXPLORE | BUILD
+Risk: LOW | STANDARD | CRITICAL
 Candidate/environment:
 Registry path/version:
 

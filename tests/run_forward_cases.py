@@ -46,6 +46,7 @@ JUDGE_SCHEMA = {
     "properties": {
         "observed_phase": {"type": "string"},
         "observed_mode": {"type": "string"},
+        "observed_risk": {"type": "string"},
         "must_include": {
             "type": "array",
             "items": {
@@ -91,6 +92,8 @@ JUDGE_SYSTEM = (
     "must_include помечай not_applicable только если предпосылка кейса фактически не возникла. "
     "Любой наблюдаемый must_not_include делает blocking_verdict = BLOCKED. "
     "Отсутствие хотя бы одного применимого must_include делает blocking_verdict = BLOCKED. "
+    "Delivery mode (EXPLORE|BUILD) и risk (LOW|STANDARD|CRITICAL) — две независимые оси; "
+    "оценивай их отдельно и не выводи одну из другой. "
     "Отвечай только JSON по заданной схеме."
 )
 
@@ -179,6 +182,7 @@ def judge_case(case: dict, answer_text: str, args) -> dict:
             "user_prompt": case["prompt"],
             "expected_phase": case.get("expected_phase"),
             "expected_mode": case.get("expected_mode"),
+            "expected_risk": case.get("expected_risk"),
             "expected_engagement": case.get("expected_engagement"),
             "must_include": {i: t for i, t in enumerate(include)},
             "must_not_include": {i: t for i, t in enumerate(exclude)},
@@ -253,8 +257,10 @@ def write_report(run_dir: Path, meta: dict, results: list[dict]) -> Path:
             continue
         j = res["judge"]
         lines += [
-            f"Phase/mode observed: {j.get('observed_phase', '?')} / {j.get('observed_mode', '?')}",
-            f"Expected: {res.get('expected_phase', '-')} / {res.get('expected_mode', '-')}",
+            f"Observed phase/mode/risk: {j.get('observed_phase', '?')} / "
+            f"{j.get('observed_mode', '?')} / {j.get('observed_risk', '?')}",
+            f"Expected: {res.get('expected_phase', '-')} / {res.get('expected_mode', '-')} / "
+            f"{res.get('expected_risk', '-')}",
             "",
             "Must include:",
         ]
@@ -349,6 +355,7 @@ def main() -> int:
             "kind": case["kind"],
             "expected_phase": case.get("expected_phase"),
             "expected_mode": case.get("expected_mode"),
+            "expected_risk": case.get("expected_risk"),
         }
         answer = answer_case(case, args)
         if not answer["ok"]:
