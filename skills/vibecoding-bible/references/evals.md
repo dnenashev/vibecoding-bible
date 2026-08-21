@@ -176,6 +176,10 @@ ambiguityPolicy: answer | clarify | abstain | human_review
 
 Не хранить hidden chain-of-thought как expected output. Проверять observable answer, decision, tool call, state transition или отказ.
 
+Для вероятностного поведения Red принимает форму воспроизводимого probe: eval case с
+заранее объявленным критерием, а не assert над одним прогоном. Правило то же —
+критерий объявляется до прогона и не переписывается под полученный результат.
+
 ## 7. Неоднозначность и abstention
 
 Case с несколькими защитимыми содержательными ответами не использовать для проверки одного exact answer. Выбрать одно:

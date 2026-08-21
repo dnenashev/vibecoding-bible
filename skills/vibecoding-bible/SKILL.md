@@ -139,6 +139,8 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 | Идея, problem framing, product brief, requirements, scope | [`references/product.md`](references/product.md) |
 | Stack, system/data/API/integration architecture, ADR, migration design | [`references/architecture.md`](references/architecture.md) |
 | Repository work, planning, coding, debugging, git, context или delegation | [`references/build.md`](references/build.md) |
+| Незнакомый, чужой или legacy код, работа без тестов, постепенная замена | [`references/build.md`](references/build.md) |
+| Ревью изменений, granularity PR, что ревью доказывает и чего не доказывает | [`references/quality.md`](references/quality.md) |
 | Bug от reproduction до preview, release batch/composition gate, exact-candidate QA и controlled release | [`references/bug-repair.md`](references/bug-repair.md) |
 | UX, IA, UI, accessibility, responsive, web/mobile/desktop/CLI surface | [`references/experience.md`](references/experience.md) |
 | Test strategy, evidence, regression или release verification | [`references/quality.md`](references/quality.md) |
@@ -154,7 +156,7 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 
 Если среда уже предоставляет подходящий Agent Execution Harness, использовать его как authoritative owner стадий, state, receipts и approvals; Библия остаётся policy/guardrail layer. Не дублировать state machine в чате. При отсутствии harness использовать только честный risk-scaled manual fallback либо помочь построить переносимый minimal slice по [`references/agent-harness.md`](references/agent-harness.md).
 
-В ответе про внешний harness всегда явно назвать обе fallback-границы, даже если harness сейчас доступен:
+Если работа возобновляемая или consequential, назвать обе fallback-границы, даже когда harness сейчас доступен. Для короткого обратимого вопроса это не требуется — не тратить на это ответ:
 
 - короткая обратимая low-risk задача — bounded manual process с явными stage, evidence и human approval;
 - длительная, возобновляемая или consequential работа — остановить mutations, сохранить contract/evidence и восстановить совместимый harness.
@@ -228,7 +230,7 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 - Использовать plain language и минимум форматирования.
 - Не выгружать весь канон пользователю.
 - Показывать facts/assumptions/unknowns только когда это влияет на решение.
-- Завершать одним конкретным проверяемым следующим шагом.
+- Завершать одним конкретным проверяемым следующим шагом, если ответ ведёт к действию. Для аудита, отчёта или сравнения вариантов жанр важнее правила: дать выводы, а следующий шаг — только когда он действительно один.
 
 ## Self-check
 
@@ -245,4 +247,4 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 11. Permissions, idempotency, readback и rollback определены?
 12. Token/cost и human effort соразмерны outcome?
 13. Implementation и release verdicts не перепутаны?
-14. Пользователю дан один ясный следующий шаг?
+14. Пользователю дан один ясный следующий шаг там, где ответ ведёт к действию?
