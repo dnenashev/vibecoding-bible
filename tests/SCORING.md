@@ -17,7 +17,8 @@
 13. Исправление regression
 14. Release checklist skill
 15. Шаблон отчёта
-16. Self-check
+16. Автоматический runner
+17. Self-check
 
 ## 1. Назначение
 
@@ -58,12 +59,25 @@ Cases покрывают:
 
 Одна единица — один case, запущенный в новой агентной сессии без истории разработки skill.
 
+Корпус содержит три вида кейсов, поле `kind`:
+
+- `positive` — Библия обязана включиться и провести работу по канону;
+- `negative` — Библия не должна разворачивать полный контур: узкий вопрос, форматирование текста, задача, которой владеет специализированный skill. Поле `expected_engagement` задаёт допустимую глубину вовлечения (`none` или `light`);
+- `boundary` — проверка границ: prompt injection из содержимого файла, отсутствующий reference, read-only запрос, необратимое действие без evidence.
+
+Лишнее срабатывание на `negative` — такой же blocking failure, как пропуск свойства на `positive`.
+
 Вход агента:
 
 - установленная candidate-версия `vibecoding-bible`;
 - один `prompt` из case;
 - стандартные system/developer instructions среды;
 - только те repository files, tools и credentials, которые реально доступны сценарию.
+
+Ожидания, зависящие от версии skill, не хранятся в корпусе строкой. Кейс объявляет
+`expected_version_from: VERSION`, а в тексте свойств используется плейсхолдер `{{VERSION}}`;
+runner подставляет фактическое содержимое `VERSION` перед прогоном. Хардкод версии в
+ожиданиях запрещён: после повышения версии он молча требует неверный ответ.
 
 Не передавать агенту:
 
@@ -273,7 +287,7 @@ Agent должен:
 
 ## 11. Evidence record
 
-Для каждого run сохранить:
+Runner сохраняет receipts автоматически в `tests/receipts/<run_id>/`. Для каждого run сохранить:
 
 - `case_id`;
 - skill commit/hash;
@@ -341,7 +355,9 @@ Release candidate допускается, когда:
 - просмотреть qualitative patterns;
 - устранить overfitting и duplication;
 - синхронизировать source/installed skill;
-- проверить local/remote commit parity после публикации.
+- проверить local/remote commit parity после публикации;
+- прогнать `scripts/validate_skill.py` и, если Registry применим, `scripts/validate_registry.py`;
+- заполнить и сохранить release receipt по `release-receipt.template.md`.
 
 ## 15. Шаблон отчёта
 
@@ -372,7 +388,33 @@ Known non-blocking gaps/owners:
 READY | BLOCKED
 ```
 
-## 16. Self-check
+## 16. Автоматический runner
+
+`tests/run_forward_cases.py` выполняет механическую часть разделов 5–8 и 11.
+
+```bash
+python3 tests/run_forward_cases.py --list
+python3 tests/run_forward_cases.py --kind negative --kind boundary
+python3 tests/run_forward_cases.py --case skill_version_identity --execute
+```
+
+Что делает runner:
+
+- запускает каждый case отдельным процессом CLI — свежая сессия без истории и без persistence;
+- запрещает отвечающему агенту мутации и сеть (`Bash`, `Edit`, `Write`, `NotebookEdit`, `WebFetch`, `WebSearch`), поэтому forward-test ничего не меняет;
+- оценивает ответ **отдельным** judge-процессом без skills и без tools, со структурированным выводом по схеме;
+- подставляет `{{VERSION}}` из канонического `VERSION`;
+- пишет receipts и отчёт по шаблону раздела 15;
+- возвращает код 0 при PASS, 1 при BLOCKED, 2 при инфраструктурной ошибке.
+
+Границы runner:
+
+- judge — тот же класс модели, что и отвечающий агент. Его verdict является advisory evidence, а не подтверждением релиза. Release verdict подтверждает человек в release receipt; расхождения reviewer с judge описываются явно.
+- без `--execute` runner работает как dry-run и ничего не запускает;
+- кейсам, которым нужен репозиторий или фикстура (`context_note`), runner даёт только первый advisory ответ; полноценная проверка таких кейсов выполняется вручную на disposable fixture;
+- `tests/fixtures/fake_cli.py` — заглушка для conformance-теста самого runner. Её результат не является evidence поведения skill.
+
+## 17. Self-check
 
 1. Каждый run действительно fresh и не видел expected properties?
 2. Candidate skill/hash зафиксирован?

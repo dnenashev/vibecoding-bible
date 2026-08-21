@@ -1,1 +1,4 @@
 .DS_Store
+
+# Сырые прогоны forward-корпуса
+tests/receipts/*/
