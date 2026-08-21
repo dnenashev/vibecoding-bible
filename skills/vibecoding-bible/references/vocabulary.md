@@ -88,6 +88,21 @@ Implementation readiness не является release readiness. Зелёный
 
 `MISSING` блокирует релиз.
 
+## Delivery lane и человеческие подтверждения
+
+Дорожки доставки исправления, определения — в [`bug-repair.md`](bug-repair.md):
+
+- `READY_FOR_BATCH` — проверенный fix ждёт ближайший release batch; default для несрочного;
+- urgent hotfix — отдельная дорожка для срочного исправления с тем же exact-candidate контуром.
+
+Человеческие подтверждения различаются по силе и не заменяют друг друга:
+
+- `PREVIEW PASS` — пользователь подтвердил конкретный сценарий на preview-сборке;
+- `QA PASS` — пройдена QA на immutable candidate;
+- `ACCEPT` — точное разрешение на релиз, привязанное к identity кандидата.
+
+`PREVIEW PASS` никогда не становится `ACCEPT` автоматически.
+
 ## Уровни evidence
 
 `source | static | unit | component | contract | integration | e2e | live_observation`
@@ -95,6 +110,26 @@ Implementation readiness не является release readiness. Зелёный
 Порядок — от слабого к сильному. Слабый уровень не заменяет требуемый сильный.
 Полная таблица «что доказывает / что не доказывает» — в
 [`project-contract.md`](project-contract.md), раздел «Evidence levels».
+
+## Verdict проверки и решения человека на checkpoint
+
+Результат проверки (TestingHarness, EvalSuite, Registry run):
+
+`PASS | FAIL | INSUFFICIENT_EVIDENCE`
+
+`INSUFFICIENT_EVIDENCE` — отдельное значение, а не разновидность `PASS`. Недоступное
+trusted evidence даёт его или `BLOCKED`, но никогда `PASS`.
+
+Решение человека на checkpoint:
+
+`APPROVE | REJECT | CHANGE_CRITERION | ESCALATE`
+
+- `APPROVE` — качество и evidence устраивают, checkpoint замораживается;
+- `REJECT` — результат не соответствует ожиданию; обязателен reason;
+- `CHANGE_CRITERION` — критерий был неполон или ошибочен; правится критерий, а не результат;
+- `ESCALATE` — нужно продуктовое, risk или permission решение.
+
+Определения и порядок применения — в [`testing-harness.md`](testing-harness.md).
 
 ## Статусы записи Regression Registry
 

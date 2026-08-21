@@ -1,0 +1,26 @@
+entries:
+  - id: payments.no-duplicate-charge
+    protects: Один заказ не создаёт два денежных списания
+    source: {type: incident, ref: incident-142}
+    level: integration
+    location: tests/payments/idempotency.test.ts
+    command: npm test -- idempotency
+    status: active
+  - id: payments.no-duplicate-charge
+    protects: Дубль id, отсутствует owner при active
+    source: {type: bug}
+    level: unit
+    location: tests/payments/missing-file.test.ts
+    command: TOKEN=ghp_abcdefghijklmnopqrstuvwxyz npm test
+    status: active
+  - id: payments.quarantined-expired
+    protects: Просроченный quarantine и битая ссылка supersedes
+    source: {type: bug}
+    level: e2e
+    location: tests/payments/idempotency.test.ts
+    status: quarantined
+    quarantine:
+      reason: нестабилен в CI
+      owner: payments
+      expiry: "2026-01-01"
+    supersedes: payments.does-not-exist

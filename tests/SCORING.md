@@ -356,7 +356,7 @@ Release candidate допускается, когда:
 - устранить overfitting и duplication;
 - синхронизировать source/installed skill;
 - проверить local/remote commit parity после публикации;
-- прогнать `scripts/validate_skill.py` и, если Registry применим, `scripts/validate_registry.py`;
+- прогнать `scripts/validate_skill.py` и, если Registry применим, `skills/vibecoding-bible/scripts/validate_registry.py`;
 - заполнить и сохранить release receipt по `release-receipt.template.md`.
 
 ## 15. Шаблон отчёта

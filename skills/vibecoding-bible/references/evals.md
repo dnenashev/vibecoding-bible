@@ -152,6 +152,9 @@ Frozen EvalSuite не редактировать молча. Создать но
 
 ## 6. Схема eval case
 
+Машинная схема — [`assets/schemas/eval-case.schema.json`](../assets/schemas/eval-case.schema.json).
+Поля ниже описывают её содержательно.
+
 Минимальная запись:
 
 ```yaml

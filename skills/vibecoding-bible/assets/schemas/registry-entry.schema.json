@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibecoding-bible/schemas/registry-entry.schema.json",
+  "title": "Regression Registry entry",
+  "type": "object",
+  "required": ["id", "protects", "source", "level", "location", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+([._-][a-z0-9]+)*$",
+      "description": "Стабильный смысловой id. Не привязывать к номеру строки или имени ветки."
+    },
+    "protects": {"type": "string", "minLength": 8},
+    "source": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {"enum": ["bug", "incident", "requirement", "contract", "handoff", "threat", "eval", "harness"]},
+        "ref": {"type": "string"}
+      }
+    },
+    "level": {"enum": ["static", "unit", "component", "contract", "integration", "e2e", "security", "performance", "accessibility", "eval", "harness", "manual"]},
+    "location": {"type": "string", "minLength": 1},
+    "command": {"type": "string"},
+    "procedure": {"type": "string"},
+    "blocking": {"type": "boolean"},
+    "risk": {"type": "array", "items": {"enum": ["LOW", "STANDARD", "CRITICAL"]}, "minItems": 1},
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "paths": {"type": "array", "items": {"type": "string"}},
+        "components": {"type": "array", "items": {"type": "string"}},
+        "contracts": {"type": "array", "items": {"type": "string"}},
+        "always_on": {"type": "boolean"}
+      }
+    },
+    "environment": {"type": "string"},
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fixtures": {"type": "array", "items": {"type": "string"}},
+        "classification": {"enum": ["synthetic", "anonymized", "production"]}
+      }
+    },
+    "owner": {"type": "string"},
+    "status": {"enum": ["draft", "active", "quarantined", "superseded", "deprecated"]},
+    "quarantine": {
+      "type": ["object", "null"],
+      "required": ["reason", "owner", "expiry"],
+      "additionalProperties": false,
+      "properties": {
+        "reason": {"type": "string"},
+        "issue": {"type": "string"},
+        "owner": {"type": "string"},
+        "expiry": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+        "scope": {"type": "string"},
+        "compensating_control": {"type": "string"}
+      }
+    },
+    "stale_when": {"type": "array", "items": {"type": "string"}},
+    "supersedes": {"type": ["string", "null"]}
+  }
+}

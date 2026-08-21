@@ -10,7 +10,7 @@ runner и фактический результат прогона. Judge verdic
 - release commit / tag:
 - corpus version (`tests/forward-cases.yaml`):
 - runner (`tests/run_forward_cases.py`) commit:
-- validator (`scripts/validate_skill.py`) commit:
+- validators (`scripts/validate_skill.py`, `skills/vibecoding-bible/scripts/validate_registry.py`) commit:
 
 ## Прогон
 
@@ -31,7 +31,7 @@ runner и фактический результат прогона. Judge verdic
 ## Валидация
 
 - `scripts/validate_skill.py`: PASS | FAIL
-- `scripts/validate_registry.py` (если применимо): PASS | FAIL
+- `skills/vibecoding-bible/scripts/validate_registry.py` (если применимо): PASS | FAIL
 - установленная копия идентична релизному дереву: да | нет
 
 ## Verdict

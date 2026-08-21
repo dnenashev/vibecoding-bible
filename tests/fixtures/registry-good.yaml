@@ -1,0 +1,24 @@
+entries:
+  - id: payments.no-duplicate-charge
+    protects: Один заказ не создаёт два денежных списания
+    source:
+      type: incident
+      ref: incident-142
+    level: integration
+    location: tests/payments/idempotency.test.ts
+    command: npm test -- idempotency
+    blocking: true
+    risk: [STANDARD, CRITICAL]
+    applicability:
+      paths: [src/payments/**]
+      always_on: false
+    environment: test
+    data:
+      fixtures: [payment-timeout]
+      classification: synthetic
+    owner: payments
+    status: active
+    quarantine: null
+    stale_when:
+      - payment state machine changes
+    supersedes: null

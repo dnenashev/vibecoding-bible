@@ -279,6 +279,19 @@ command: npm run harness:research
 
 Не строить отдельный framework, если CI проекта может прочитать manifest небольшим script. Сначала достаточно versioned YAML, schema validation и явного selection report.
 
+Skill поставляет готовую реализацию этих проверок:
+
+```bash
+python3 scripts/validate_registry.py path/to/registry.yaml --root .
+```
+
+Схема записи — [`assets/schemas/registry-entry.schema.json`](../assets/schemas/registry-entry.schema.json);
+схема eval case — [`assets/schemas/eval-case.schema.json`](../assets/schemas/eval-case.schema.json).
+Валидатор проверяет schema, уникальность id, существование `location`, наличие `command`
+или `procedure` для исполняемых levels, owner у `active`, срок и полноту quarantine,
+целостность `supersedes` и отсутствие secrets. Ненулевой код возврата блокирует gate.
+Валидатор не заменяет прогон самих проверок: он подтверждает целостность манифеста, а не поведение системы.
+
 ## 14. Red lines
 
 Блокировать соответствующий gate, если:
