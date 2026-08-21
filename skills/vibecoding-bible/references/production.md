@@ -1,29 +1,5 @@
 # Production: безопасность, выпуск, эксплуатация и обучение
 
-## Содержание
-
-1. Назначение
-2. Масштабирование строгости
-3. Production baseline
-4. Threat model
-5. Identity, authorization и tenancy
-6. Secrets, privacy и abuse
-7. Supply chain
-8. Data lifecycle
-9. Performance и capacity
-10. Resilience и recovery
-11. Environments и configuration
-12. CI/CD и release strategy
-13. Deploy, readback и rollback
-14. Observability и SLO
-15. Incidents, runbooks и disaster recovery
-16. Analytics, feedback и support
-17. Deprecation и maintenance
-18. LEARN и OutcomeRecord
-19. Release protocol
-20. Шаблон ProductionPlan
-21. Self-check
-
 ## 1. Назначение
 
 Этот модуль переводит «работает у разработчика» в «безопасно работает для реального пользователя и управляемо меняется после запуска».
@@ -476,25 +452,11 @@ READY | READY_WITH_CONSTRAINTS | BLOCKED
 
 ## 21. Self-check
 
-1. Production owner и supported journey определены?
-2. Delivery mode и risk названы отдельно и соответствуют работе?
-3. Threat model покрывает самые дорогие assets/boundaries?
-4. Identity trusted, authorization server-side, tenants изолированы?
-5. Secrets/PII защищены на storage, transit, logs и providers?
-6. Supply-chain изменения прослеживаемы?
-7. Schemas/migrations/backfills versioned, resumable и проверяемы?
-8. Retention/deletion/backups/restore реально работают?
-9. Capacity и performance основаны на workload/SLO?
-10. Dependency failures имеют timeout, bounded retry и честный fallback?
-11. Environment/config drift видим?
-12. CI выдаёт immutable artifact и evidence на exact candidate?
-13. Release intent полностью reconciled с integrated/deferred/superseded handoffs?
-14. Capability evidence и QA matrix подтверждают принятый scope exact candidate?
-15. Release ограничивает blast radius по риску?
-16. Deploy подтверждён readback critical journey?
-17. Rollback/compensation исполнены или проверены безопасным drill?
-18. Observability показывает user outcome и critical boundaries?
-19. Alerts имеют owner/action, runbooks применимы?
-20. Incident и disaster recovery процедуры проверены по риску?
-21. Analytics/feedback/support ведут к решению, а не к сбору шума?
-22. OutcomeRecord отделён от release verdict и имеет observation window?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Identity trusted, authorization server-side, tenants изолированы?
+2. Secrets/PII защищены на storage, transit, logs и providers?
+3. Release intent полностью reconciled с integrated/deferred/superseded handoffs?
+4. Deploy подтверждён readback critical journey?
+5. Rollback/compensation исполнены или проверены безопасным drill?
+

@@ -1,26 +1,5 @@
 # Bug repair: от воспроизведения до точного релиза
 
-## Содержание
-
-1. Назначение
-2. Базовый протокол
-3. Зафиксировать BugReport
-4. Изолировать repair
-5. Создать Primary Red
-6. Выбрать repair owner
-7. Проверить исправление
-8. Интегрировать в cumulative head
-9. Выбрать delivery lane и сформировать release batch
-10. Собрать immutable candidate
-11. Провести QA и получить ACCEPT
-12. Выполнить release adapter
-13. Управлять evidence и stale state
-14. Масштабировать строгость
-15. Red lines
-16. Универсальный BugRepairContract
-17. Пример Schema adapter
-18. Self-check
-
 ## 1. Назначение
 
 Использовать этот протокол для бага, который требуется не только исправить в коде, но и безопасно довести до пользовательской проверки и релиза.
@@ -371,37 +350,19 @@ ReleaseRecord/verdict:
 
 Заполнять только применимые поля. Отсутствующий screenshot не заменять выдуманным; отсутствующий required approval считать blocker.
 
-## 17. Пример Schema adapter
+## 17. Adapter конкретного проекта
 
-Для desktop-приложения Schema универсальные роли могут отображаться так:
+Release adapter проекта обязан определить: команды сборки immutable candidate, точный artifact target, платформенные проверки целостности и подписи, способ readback и способ rollback. Роли канона остаются теми же, меняются только их реализации.
 
-- `release:prepare` сначала сверяет release intent, accepted handoffs, provenance и capability evidence, затем собирает immutable candidate из clean cumulative head и выдаёт subject/evidence;
-- пользователь запускает isolated candidate и даёт `QA PASS`, связанный с candidate hash;
-- точный `ACCEPT` разрешает изменение `/Applications/Schema.app`;
-- `schema-release-controller` проверяет codesign, устанавливает candidate, выполняет readback/rollback и подтверждает единственный экземпляр Schema в Launchpad.
-
-Это пример adapter contract. Другой проект подставляет собственные commands, artifact target и platform checks.
+Развёрнутый пример для desktop-приложения — [`assets/examples/release-adapter-desktop.md`](../assets/examples/release-adapter-desktop.md).
 
 ## 18. Self-check
 
-1. BugReport описывает expected/observed и воспроизводимый scenario?
-2. Isolation соразмерна риску и сохраняет main/dirty worktree?
-3. Primary Red падает на baseline по правильной причине?
-4. Repair owner имеет bounded scope и не принимает собственный fix?
-5. Verification выбрана по impact, а не по привычной команде?
-6. Integration выполнена в clean current cumulative head?
-7. Immutable candidate однозначно связан с source/config?
-8. Авторитетный QA проверяет именно этот candidate?
-9. ACCEPT содержит candidate identity, scope и approver?
-10. До required ACCEPT не было install/deploy mutation?
-11. Release adapter доказал integrity, active version, readback и rollback?
-12. Stale evidence инвалидируется только по реальным dependencies?
-13. Platform-specific детали не стали universal requirement?
-14. Primary Red рассмотрен для Regression Registry без механического добавления?
-15. Несрочный fix отделён от release и поставлен в управляемый batch?
-16. Batch имеет trigger, owner, maximum wait, manifest и aggregate impact selection?
-17. Каждый handoff release intent интегрирован либо явно deferred/superseded?
-18. Provenance и behavioral capability доказаны на exact candidate?
-19. QA matrix выведена из acceptance criteria batch, а не случайного smoke-набора?
-20. Срочный consequential bug не задержан обычным train?
-21. Пользователю виден один следующий gate?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Primary Red падает на baseline по правильной причине?
+2. Immutable candidate однозначно связан с source/config?
+3. ACCEPT содержит candidate identity, scope и approver?
+4. Каждый handoff release intent интегрирован либо явно deferred/superseded?
+5. QA matrix выведена из acceptance criteria batch, а не случайного smoke-набора?
+

@@ -1,23 +1,5 @@
 # EvalSuite: от cold start до production outcomes
 
-## Содержание
-
-1. Назначение
-2. Когда EvalSuite обязателен
-3. Жизненный цикл
-4. Контракт EvalSuite
-5. Cold-start протокол
-6. Схема eval case
-7. Неоднозначность и abstention
-8. Judge и калибровка
-9. Прогон и чтение результата
-10. Guardrail и product decision
-11. Production enrichment
-12. Red lines
-13. Стартовые ориентиры
-14. Human-readable template
-15. Self-check
-
 ## 1. Назначение
 
 `EvalSuite` — versioned executable specification вероятностного поведения AI-функции. Он переводит словесное требование в воспроизводимые cases с ожидаемым поведением, срезами, критериями и release policy.
@@ -360,21 +342,13 @@ Stale/supersede conditions:
 
 ## 15. Self-check
 
-1. Проверяется одна ясная capability?
-2. Eval дополняет, а не заменяет ProjectContract и business outcome?
-3. Owner, provenance, versions и data policy зафиксированы?
-4. Есть floor, ceiling и meaningful dimensions?
-5. Synthetic cases утверждены expert и очищены от duplicates/leakage?
-6. Неоднозначность проверяется через clarify/abstain/fallback?
-7. Deterministic checks выполняются до LLM-judge?
-8. Judge откалиброван по false pass и false fail?
-9. Thresholds заданы по slices и risk, а не одним средним score?
-10. Run config, repetitions, variance, tokens и cost воспроизводимы?
-11. Sample size и thresholds выведены из risk/baseline/variance/confidence, а не придуманы?
-12. Red-line failure блокирует release?
-13. Offline score не выдан за online outcome?
-14. Обязательная EvalSuite зарегистрирована одной entry без duplication?
-15. Production failures пополняют новую regression version?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Есть floor, ceiling и meaningful dimensions?
+2. Deterministic checks выполняются до LLM-judge?
+3. Judge откалиброван по false pass и false fail?
+4. Thresholds заданы по slices и risk, а не одним средним score?
+5. Sample size и thresholds выведены из risk/baseline/variance/confidence, а не придуманы?
 
 ## Методологическая основа
 

@@ -1,25 +1,5 @@
 # Практический workflow реализации
 
-## Содержание
-
-1. Назначение
-2. Выбрать режим и границу изменения
-3. Ориентироваться в репозитории
-4. Прочитать project instructions
-5. Сформировать Context Capsule
-6. Разбить задачу на slices
-7. Выполнить implementation loop
-8. Применить TDD без ритуала
-9. Диагностировать системно
-10. Управлять dependencies и generated code
-11. Сохранить dirty worktree
-12. Соблюдать change и git hygiene
-13. Решить, нужен ли сабагент
-14. Синхронизировать документацию
-15. Остановиться при правильном условии
-16. Короткий Build Brief
-17. Self-check
-
 ## 1. Назначение
 
 Использовать этот модуль на фазе `BUILD` для нового проекта, feature, bug fix, integration, migration или refactor с изменением поведения.
@@ -411,18 +391,11 @@ Docs/contracts to update:
 
 ## 17. Self-check
 
-1. Outcome и граница изменения ясны?
-2. Выбран правильный risk mode?
-3. Project instructions и actual repository state прочитаны?
-4. Dirty user changes сохранены?
-5. Прослежен реальный behavior/data path?
-6. Slice мал, вертикален и проверяем?
-7. Первый Red падает по ожидаемой причине?
-8. Green достигнут минимальным production change?
-9. Debugging шёл от reproduction и hypothesis, а не случайных patches?
-10. Dependencies и generated code изменены осознанно?
-11. Tests соответствуют требуемому evidence level?
-12. Diff свободен от scope creep, secrets, placeholders и debug output?
-13. Делегирование действительно сохраняет контекст и имеет bounded contract?
-14. Public behavior, decisions и operations docs синхронизированы?
-15. Implementation completion не выдана за release readiness?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Dirty user changes сохранены?
+2. Прослежен реальный behavior/data path?
+3. Slice мал, вертикален и проверяем?
+4. Debugging шёл от reproduction и hypothesis, а не случайных patches?
+5. Diff свободен от scope creep, secrets, placeholders и debug output?
+

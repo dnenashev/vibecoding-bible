@@ -1,24 +1,5 @@
 # Regression Registry: библиотека обязательных проверок
 
-## Содержание
-
-1. Назначение
-2. Что хранит Registry
-3. Где хранить
-4. Когда создавать и обновлять
-5. Схема записи
-6. Admission policy
-7. Выбор применимых проверок
-8. Выполнение и release gate
-9. Жизненный цикл записи
-10. Evidence и stale state
-11. Связь с Bug Repair
-12. Связь с EvalSuite и TestingHarness
-13. CI и validation
-14. Red lines
-15. Минимальный рабочий slice
-16. Self-check
-
 ## 1. Назначение
 
 `Regression Registry` — version-controlled индекс проверок, которые защищают долговечные product/system invariants и могут блокировать выпуск.
@@ -324,19 +305,11 @@ python3 scripts/validate_registry.py path/to/registry.yaml --root .
 
 ## 16. Self-check
 
-1. Registry — индекс, а не копия tests или run history?
-2. Canonical path и owner определены?
-3. IDs стабильны и unique?
-4. Каждая active entry защищает observable invariant?
-5. Native location и executable command/procedure существуют?
-6. Applicability позволяет выбрать минимальный достаточный набор?
-7. Blocking policy соответствует risk mode?
-8. Primary Red рассмотрен для admission?
-9. EvalSuite/TestCase pack указаны одной entry без duplication?
-10. Quarantine имеет reason, owner, expiry и control?
-11. Evidence связано с exact candidate и Registry version?
-12. Stale state следует dependency change, а не догадке?
-13. Release блокируется при missing applicable evidence?
-14. Accepted capability gates проверяют behavior exact candidate, а не наличие файлов?
-15. Registry не подменяет Release Composition Gate?
-16. Registry не заставляет запускать всё всегда?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. IDs стабильны и unique?
+2. Каждая active entry защищает observable invariant?
+3. Native location и executable command/procedure существуют?
+4. Applicability позволяет выбрать минимальный достаточный набор?
+5. Quarantine имеет reason, owner, expiry и control?
+

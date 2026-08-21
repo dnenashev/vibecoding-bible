@@ -1,25 +1,5 @@
 # AI systems: models, context, tools и agents
 
-## Содержание
-
-1. Когда использовать AI
-2. AI decision boundary
-3. Model и provider policy
-4. Prompt и structured output
-5. ContextPack и Rulebook
-6. Retrieval и memory
-7. Tools и permissions
-8. Workflow, agent и multi-agent
-9. Framework decision
-10. Durability и state
-11. Evals и TestingHarness
-12. Tokenomics
-13. Observability и records
-14. Fallback и failure semantics
-15. ProjectContract fields
-16. Антипаттерны
-17. Self-check
-
 ## 1. Когда использовать AI
 
 Сначала проверить, даёт ли AI измеримую пользу. Не использовать model call для поведения, которое проще, дешевле и надёжнее выразить deterministic code, query, rules или обычным UI.
@@ -330,18 +310,11 @@ Offline eval/replay не доказывает production outcome. Связать
 
 ## 17. Self-check
 
-1. AI действительно нужен?
-2. Decision boundary мала и наблюдаема?
-3. Deterministic rules/validation находятся вне prompt?
-4. Model/provider/version/fallback проверены?
-5. Context/rules/retrieval имеют provenance/freshness/permissions?
-6. Memory stores разделены по responsibility?
-7. Tools typed и least privilege?
-8. Workflow/agent/multi-agent выбран по необходимости?
-9. Framework decision и durability доказуемы?
-10. EvalSuite/TestingHarness применены по типу риска?
-11. Долгая consequential agent-work имеет durable external control plane либо честный fallback?
-12. Token/cost reservation и settlement работают?
-13. Failures ведут к explicit fallback, а не fabricated success?
-14. Decision и Outcome разделены?
-15. Upgrade/rollback path существует?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Decision boundary мала и наблюдаема?
+2. Context/rules/retrieval имеют provenance/freshness/permissions?
+3. Tools typed и least privilege?
+4. Token/cost reservation и settlement работают?
+5. Failures ведут к explicit fallback, а не fabricated success?
+

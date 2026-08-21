@@ -1,25 +1,5 @@
 # Quality: практичная стратегия проверки продукта
 
-## Содержание
-
-1. Назначение
-2. Сначала риск, потом тесты
-3. Минимальная стратегия по режимам
-4. Пирамида проверок
-5. Static, types и lint
-6. Unit и component
-7. Contract и integration
-8. End-to-end
-9. Property, fuzz и concurrency
-10. Security, performance и accessibility
-11. Test data и изоляция
-12. Flakiness
-13. Debugging feedback loop
-14. Evidence и release matrix
-15. Граница с AI-проверками
-16. Шаблон QualityPlan
-17. Self-check
-
 ## 1. Назначение
 
 Этот модуль отвечает на простой вопрос: **каким минимальным набором проверок доказать, что выбранный scope работает и безопасен для выпуска**.
@@ -424,21 +404,11 @@ Verdict and owner:
 
 ## 17. Self-check
 
-1. Проверки выведены из рисков, а не из привычного checklist?
-2. Первый Red воспроизводит observable behavior или defect?
-3. Выбран самый дешёвый достаточный уровень теста?
-4. Реальные boundaries проверены integration evidence?
-5. Есть один полный critical journey?
-6. Negative, permission и recovery paths покрыты по риску?
-7. Test doubles остаются test-only и не выданы за live evidence?
-8. Test data разрешена, изолирована и очищается безопасно?
-9. Flaky check не превращён в pass retries?
-10. Security tests следуют threat model?
-11. Performance criteria следуют SLO/workload, а не выдуманному числу?
-12. Accessibility проверена для затронутого interface?
-13. Required fail/skip/todo/missing evidence блокирует release?
-14. AI behavior правильно направлено в EvalSuite или TestingHarness?
-15. Применимые blocking Registry entries выбраны и исполнены?
-16. Release intent reconciled с фактическим candidate без `MISSING` handoffs?
-17. Capability и QA coverage проверяют принятый behavior, а не наличие файлов?
-18. Verdict относится к exact candidate и не устарел?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Первый Red воспроизводит observable behavior или defect?
+2. Выбран самый дешёвый достаточный уровень теста?
+3. Реальные boundaries проверены integration evidence?
+4. Test doubles остаются test-only и не выданы за live evidence?
+5. Required fail/skip/todo/missing evidence блокирует release?
+

@@ -1,25 +1,5 @@
 # TestingHarness v2.1: калибровка и экономный replay
 
-## Содержание
-
-1. Назначение
-2. Базовый протокол
-3. Роли и доверие
-4. Совместно сформировать TestCase
-5. Выбрать checkpoints и критерии
-6. Провести первый прогон
-7. Классифицировать расхождение
-8. Выполнить автономный repair
-9. Выполнить replay
-10. Повышать автономность постепенно
-11. Специализировать проверки
-12. Проверить сам harness
-13. Ограничить автономный цикл
-14. Минимальный рабочий slice
-15. Red lines
-16. Шаблон TestingHarnessContract
-17. Self-check
-
 ## 1. Назначение
 
 Использовать `TestingHarness` для первого контролируемого испытания нового или существенно изменённого workflow, multi-agent system, agent role или skill.
@@ -407,22 +387,11 @@ Seeded faults/results; known gaps; implementation/release verdicts:
 
 ## 17. Self-check
 
-1. TestCase совместно определяет input, outcome и quality?
-2. Subject и criteria заморожены по version/hash?
-3. Checkpoints минимальны и стоят на critical boundaries?
-4. Пользователь получает CheckpointReview, а не ручной debugging?
-5. Hard evidence собрано независимо, roles/approvals аутентифицированы?
-6. `FAIL`/`REJECT` сначала классифицируется?
-7. Patch разрешён только для `workflow_defect`?
-8. Repair имеет bounded BugSpec, Red/Green и independent verifier?
-9. Targeted replay подтверждает исправленную точку?
-10. Затронутый downstream-путь и terminal invariants проверены на exact candidate?
-11. Переиспользованный upstream evidence привязан к неизменным versions/hashes и совместимому snapshot?
-12. Full clean не запускается без конкретного risk trigger и оценки стоимости?
-13. Autonomy повышается по checkpoint/risk slice после calibration?
-14. Loop останавливается при ambiguity, budget или scope expansion?
-15. Harness проверен seeded faults и false-green cases?
-16. Required live evidence не заменено offline result?
-17. Final acceptance и OutcomeRecord не перепутаны?
-18. Обязательный regression pack зарегистрирован одной entry без duplication?
-19. Следующий шаг — один calibration/repair/replay slice с минимальным достаточным scope?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Hard evidence собрано независимо, roles/approvals аутентифицированы?
+2. `FAIL`/`REJECT` сначала классифицируется?
+3. Patch разрешён только для `workflow_defect`?
+4. Затронутый downstream-путь и terminal invariants проверены на exact candidate?
+5. Harness проверен seeded faults и false-green cases?
+

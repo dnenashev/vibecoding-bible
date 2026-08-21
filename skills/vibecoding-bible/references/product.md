@@ -1,23 +1,5 @@
 # Product: от идеи до проверяемого scope
 
-## Содержание
-
-1. Назначение
-2. Рабочий протокол
-3. Пользователь, проблема и current way
-4. Outcome и продуктовая гипотеза
-5. Facts, assumptions и unknowns
-6. Дешёвая проверка идеи
-7. Product Brief
-8. User journeys
-9. Requirements и acceptance
-10. Scope и приоритеты
-11. Analytics hypothesis
-12. Режимы строгости
-13. Антипаттерны
-14. Короткие шаблоны
-15. Self-check
-
 ## 1. Назначение
 
 Применять в фазе `UNDERSTAND` и на продуктовой части `DESIGN`.
@@ -329,15 +311,11 @@ Discard / continue / promote rule:
 
 ## 15. Self-check
 
-1. Названы реальный пользователь, consumer и trigger?
-2. Проблема описана через current behavior, а не отсутствие функции?
-3. Outcome отделён от output и дальнего impact?
-4. Facts, assumptions и unknowns разделены?
-5. Первым проверяется неизвестное, способное изменить решение?
-6. Validation использует реальное evidence и заранее заданный decision rule?
-7. Основной journey заканчивается downstream outcome?
-8. Requirements наблюдаемы и не зашивают преждевременно implementation?
-9. Scope образует маленький, но честный vertical slice?
-10. Non-functional requirements и thresholds основаны на риске/constraints?
-11. Analytics отвечает на решение и содержит counter-signal?
-12. Пользователю понятен один следующий шаг?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Проблема описана через current behavior, а не отсутствие функции?
+2. Outcome отделён от output и дальнего impact?
+3. Первым проверяется неизвестное, способное изменить решение?
+4. Основной journey заканчивается downstream outcome?
+5. Analytics отвечает на решение и содержит counter-signal?
+

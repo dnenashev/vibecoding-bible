@@ -1,24 +1,5 @@
 # Experience: понятный и доступный продукт
 
-## Содержание
-
-1. Назначение
-2. Рабочий протокол
-3. UX до визуального polish
-4. Information architecture
-5. Interaction design
-6. Состояния и ошибки
-7. Content design
-8. Accessibility
-9. Responsive и adaptive behavior
-10. Правила для разных surfaces
-11. Design system и shadcn
-12. Usability validation
-13. Handoff в build и verify
-14. Антипаттерны
-15. Короткие шаблоны
-16. Self-check
-
 ## 1. Назначение
 
 Применять в фазе `DESIGN`, а затем при `BUILD` и `VERIFY` для любого пользовательского или операторского interface.
@@ -361,17 +342,11 @@ Diagnostic evidence without sensitive data:
 
 ## 16. Self-check
 
-1. Experience начинается с user goal и journey, а не компонентов?
-2. Vocabulary и IA понятны без знания внутренней системы?
-3. Основной путь минимален, но не скрывает риск и последствия?
-4. Loading, empty, partial, error, permission и recovery states определены?
-5. Async accepted и completed states не перепутаны?
-6. Content называет действие и реальный эффект?
-7. Accessibility встроена в behavior и acceptance?
-8. Responsive описан правилами, а не только несколькими картинками?
-9. Surface-specific conventions соблюдены?
-10. Existing design system проверен по source?
-11. shadcn применён только к подходящему web context?
-12. Usability проверена representative task без подсказки?
-13. Handoff содержит states, behavior и evidence, а не только mockup?
-14. Пользователю понятен один следующий шаг?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Vocabulary и IA понятны без знания внутренней системы?
+2. Loading, empty, partial, error, permission и recovery states определены?
+3. Async accepted и completed states не перепутаны?
+4. Accessibility встроена в behavior и acceptance?
+5. Surface-specific conventions соблюдены?
+

@@ -6,7 +6,7 @@
 
 Skill работает как senior product-and-engineering partner: определяет текущую фазу, выбирает уровень строгости, подключает только нужные правила и заканчивает одним проверяемым следующим шагом.
 
-Текущая версия: [`1.2.0`](skills/vibecoding-bible/VERSION).
+Текущая версия: [`2.0.0`](skills/vibecoding-bible/VERSION).
 
 ## Быстрый старт
 
@@ -129,6 +129,8 @@ skills/vibecoding-bible/
     ├── architecture.md
     ├── build.md
     ├── bug-repair.md
+    ├── vocabulary.md
+    ├── host-adapters.md
     ├── experience.md
     ├── quality.md
     ├── regression-registry.md
@@ -139,6 +141,8 @@ skills/vibecoding-bible/
     ├── evals.md
     └── testing-harness.md
 ```
+
+`vocabulary.md` — единственный источник публичных enum: фазы, delivery mode, risk, глубина контракта, вердикты, уровни evidence. `host-adapters.md` сопоставляет роли канона с примитивами конкретной среды.
 
 `SKILL.md` содержит lifecycle и routing. References загружаются лениво, поэтому запрос про обычный UI не тратит контекст на multi-agent orchestration, а AI eval не загружает deployment runbook без необходимости.
 

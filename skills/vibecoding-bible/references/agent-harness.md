@@ -1,24 +1,5 @@
 # Agent Execution Harness: переносимый control plane над AI-агентами
 
-## Содержание
-
-1. Назначение и граница
-2. Когда harness оправдан
-3. Непереговорные принципы
-4. Переносимая архитектура
-5. WorkflowDefinition и WorkflowPack
-6. StageContract
-7. SessionState и subject identity
-8. Evidence и approvals
-9. HostAdapter и ProjectAdapter
-10. Runtime loop
-11. Rebind, recovery и replay
-12. Использование существующего harness
-13. Минимальная собственная реализация
-14. Conformance и fault tests
-15. Red lines
-16. Self-check
-
 ## 1. Назначение и граница
 
 `Agent Execution Harness` — внешний deterministic control plane над проприетарным или открытым AI-агентом. Он хранит процесс, состояние, evidence и human decisions вне conversation context, поэтому работа переживает compaction, restart и смену host-agent.
@@ -342,17 +323,12 @@ TestingHarness/fault injection проверяет сам harness как subject:
 
 ## 16. Self-check
 
-1. Harness оправдан сложностью/риском задачи?
-2. Core не зависит от vendor и названий workflow?
-3. Новый process добавляется WorkflowPack без core change?
-4. StageContract ограничивает actions/evidence/transitions/budgets?
-5. State, revision и subject identity durable?
-6. Reports, receipts и approvals разделены?
-7. HostAdapter и ProjectAdapter имеют разные responsibilities?
-8. Rebind/recovery/replay fail closed?
-9. Manual fallback честно ограничен?
-10. Conformance ловит stale state, self-approval и duplicate mutation?
-11. Agent Execution Harness не перепутан с TestingHarness?
-12. Реализован минимальный vertical slice без лишнего framework?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Core не зависит от vendor и названий workflow?
+2. StageContract ограничивает actions/evidence/transitions/budgets?
+3. HostAdapter и ProjectAdapter имеют разные responsibilities?
+4. Rebind/recovery/replay fail closed?
+5. Conformance ловит stale state, self-approval и duplicate mutation?
 
 Использовать шаблон [`agent-harness-contract.md`](../assets/templates/agent-harness-contract.md) только когда harness действительно нужен.

@@ -11,6 +11,7 @@ description: >-
   deployment, operations, tokenomics и аудита production readiness; а также
   когда пользователь просит «создать приложение», «реализовать правильно»,
   «разобрать проект», «починить», «запустить» или вызывает $vibecoding-bible.
+license: MIT
 ---
 
 # Вайбкодинг Библия

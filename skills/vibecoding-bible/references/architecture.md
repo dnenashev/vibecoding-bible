@@ -1,24 +1,5 @@
 # Архитектура программного продукта
 
-## Содержание
-
-1. Назначение
-2. Выбрать режим и тип продукта
-3. Зафиксировать reality snapshot
-4. Выбрать стек
-5. Выбрать форму системы
-6. Провести границы и ownership
-7. Спроектировать domain и data
-8. Зафиксировать API и integration contracts
-9. Определить state, concurrency и caching
-10. Спланировать migrations и compatibility
-11. Задать non-functional requirements и failure modes
-12. Учесть особенности платформы
-13. Зафиксировать решение в ADR
-14. Избегать антипаттернов
-15. Короткий Architecture Brief
-16. Self-check
-
 ## 1. Назначение
 
 Использовать этот модуль на фазе `DESIGN`, когда нужно спроектировать новый продукт, функцию, integration или существенное изменение существующей системы.
@@ -382,17 +363,11 @@ Rollback/exit path:
 
 ## 16. Self-check
 
-1. Архитектура начинается с outcome и actual state?
-2. Delivery mode и risk выбраны отдельно и соответствуют работе?
-3. Conventional solution рассмотрено до специальных frameworks?
-4. Stack выбран по critical path и operations, а не по вкусу?
-5. Deployable units минимальны?
-6. Boundaries имеют ownership, contracts и dependency direction?
-7. Для каждого факта определён source of truth?
-8. State transitions, concurrency и partial failures определены?
-9. Integrations имеют timeout, idempotency и fallback semantics?
-10. Migration сохраняет нужную compatibility?
-11. NFR измеримы и действительно влияют на design?
-12. Platform-specific behavior учтено?
-13. Дорогие решения зафиксированы в коротких ADR?
-14. Есть проверяемый validation step и exit path?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Boundaries имеют ownership, contracts и dependency direction?
+2. Для каждого факта определён source of truth?
+3. State transitions, concurrency и partial failures определены?
+4. Integrations имеют timeout, idempotency и fallback semantics?
+5. Migration сохраняет нужную compatibility?
+

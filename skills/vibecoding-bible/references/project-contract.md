@@ -1,18 +1,5 @@
 # VibecodingProjectContract
 
-## Содержание
-
-1. Назначение
-2. Режим и глубина контракта
-3. Как заполнять
-4. Обязательное ядро
-5. Расширения standard и critical
-6. Implementation и release gates
-7. Red lines
-8. Evidence levels
-9. Templates
-10. Self-check
-
 ## 1. Назначение
 
 `VibecodingProjectContract` связывает намерение пользователя, изменения в системе и доказательство результата. Он нужен не для отчётности, а чтобы до кода ответить:
@@ -399,19 +386,11 @@ Constraints/red lines:
 
 ## 10. Self-check
 
-1. Mode/depth соответствует риску?
-2. Контракт помогает принять решение, а не добавляет форму?
-3. Outcome наблюдаем и связан с consumer?
-4. Scope мал, но полон внутри границы?
-5. Facts/assumptions/unknowns разделены?
-6. First Red и required evidence названы?
-7. Architecture/data/API changes совместимы?
-8. Security/production поля заполнены только по применимости, но red lines не пропущены?
-9. AI/eval/harness добавлены только когда нужны?
-10. EXPLORE не выдан за production?
-11. Implementation и release verdicts разделены?
-12. Regression Registry применён без запуска лишних tests?
-13. Delivery lane, batch trigger и urgent hotfix criteria определены по применимости?
-14. Release intent reconciled с provenance, capability evidence и QA coverage?
-15. Agent Execution Harness применён только по необходимости и остаётся portable?
-16. Пользователю понятен один следующий action?
+Общий self-check — в [`../SKILL.md`](../SKILL.md). Здесь только то, что проверяется именно этим файлом.
+
+1. Outcome наблюдаем и связан с consumer?
+2. Facts/assumptions/unknowns разделены?
+3. First Red и required evidence названы?
+4. Implementation и release verdicts разделены?
+5. Release intent reconciled с provenance, capability evidence и QA coverage?
+
