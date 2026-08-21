@@ -88,6 +88,8 @@ Skill не заставляет каждый запрос начинать с н
 - Маленький scope, но production-ready внутри принятой границы.
 - Никаких production mocks, hardcoded success и fabricated evidence.
 - Изменение behavior начинается с подтверждённого Red.
+- Перед consequential действием фиксируется проверяемое ожидание; запись задним числом не является evidence.
+- Дорогое действие выполняется после того, как исчерпан вывод из уже собранных артефактов.
 - Самая простая архитектура, достаточная для реальных constraints.
 - Deterministic rules остаются в коде; AI получает bounded decisions.
 - Permissions, idempotency, readback и rollback для внешних mutations.
@@ -119,6 +121,7 @@ skills/vibecoding-bible/
 │   ├── project-contract.md
 │   ├── adr.md
 │   ├── bug-spec.md
+│   ├── belief-notes.md
 │   ├── agent-harness-contract.md
 │   ├── required-tests.yaml
 │   ├── release-checklist.md
@@ -164,6 +167,7 @@ Skill включает короткие шаблоны:
 - risk-scaled ProjectContract;
 - Architecture Decision Record;
 - BugSpec;
+- BeliefNotes — durable-форма Context Capsule с разделом `Refuted` и лимитом в одну страницу;
 - exact-candidate Bug Repair protocol;
 - Release Train для пакетной доставки minor fixes и urgent hotfix lane;
 - Release Composition Gate: release intent, handoff provenance и capability completeness;

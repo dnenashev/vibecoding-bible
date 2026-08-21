@@ -38,6 +38,7 @@ Stale and invalidation rules:
 ## Evidence and decisions
 
 Receipt types/producers/trust:
+Expectation policy per stage / committed-before-action proof:
 Artifact/log storage and redaction:
 Human identity/decision binding:
 Self-attestation policy:

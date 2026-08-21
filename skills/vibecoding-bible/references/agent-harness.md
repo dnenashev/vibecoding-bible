@@ -110,6 +110,7 @@ terminal_states: [complete, blocked, cancelled]
 - allowed read/write/actions;
 - forbidden mutations;
 - required evidence types и minimum trust;
+- `expectation_policy`: `none | per_consequential_action | per_action`;
 - legal outcomes/transitions;
 - human approval policy;
 - attempts, deadline, token/cost budgets;
@@ -125,6 +126,7 @@ allowed_actions: [read_source, run_selected_tests, record_evidence]
 required_evidence:
   - type: test
     minimum_trust: independent
+expectation_policy: per_consequential_action
 transitions:
   pass: accept_candidate
   fail: repair
@@ -134,6 +136,10 @@ budget:
   attempts: 2
 stop_conditions: [subject_drift, permission_gap, budget_exhausted]
 ```
+
+`expectation_policy` выводится из risk: `LOW` → `none`, `STANDARD` →
+`per_consequential_action`, `CRITICAL` → `per_action`. Действие, требующее ожидания, не
+отправляется без него; отказ бесплатен и не расходует attempt budget.
 
 Stage completion — atomic compare-and-set по expected revision. Late или duplicate transition не должен менять state повторно.
 
@@ -165,7 +171,16 @@ Receipt содержит:
 - subject/config fingerprints;
 - environment и observed timestamp;
 - payload hash или resolvable artifact reference;
-- короткий observable summary.
+- короткий observable summary;
+- `expectation`, когда stage требует его политикой.
+
+Ожидание фиксируется **до** действия: наблюдаемое утверждение, его `committed_hash`,
+`verdict` (`HELD` | `MISSED`) и точка расхождения. Хеш отличает ожидание от объяснения
+задним числом; без него запись является self-report, а не evidence. Схема —
+[`evidence-receipt.schema.json`](../assets/schemas/evidence-receipt.schema.json).
+
+`MISSED` не блокирует стадию, а датирует расхождение модели с реальностью и служит входом
+для классификации по [`testing-harness.md`](testing-harness.md), раздел 7.
 
 Agent self-report хранить как `reported`, а не trusted proof. Command/test/artifact/readback evidence получать через независимый runner, hook, system of record или content-addressed resolver.
 
@@ -313,6 +328,7 @@ TestingHarness/fault injection проверяет сам harness как subject:
 - core hardcodes vendor API или фиксированный список workflows;
 - agent выбирает stage, повышает privileges или принимает собственный результат;
 - mutation выполнена вне allowed StageContract;
+- ожидание записано после действия или его `committed_hash` отсутствует;
 - transition не защищён revision/idempotency;
 - evidence/approval не связано с exact subject;
 - host switch переносит старую authority без rebind;
@@ -330,5 +346,6 @@ TestingHarness/fault injection проверяет сам harness как subject:
 3. HostAdapter и ProjectAdapter имеют разные responsibilities?
 4. Rebind/recovery/replay fail closed?
 5. Conformance ловит stale state, self-approval и duplicate mutation?
+6. `expectation_policy` соответствует risk, а ожидания зафиксированы до действий?
 
 Использовать шаблон [`agent-harness-contract.md`](../assets/templates/agent-harness-contract.md) только когда harness действительно нужен.

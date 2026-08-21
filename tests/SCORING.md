@@ -44,6 +44,9 @@ Cases покрывают:
 - data migration;
 - AI workflow;
 - skill/agent behavior;
+- ожидание, зафиксированное до необратимого действия, и последовательность с остановкой на первом расхождении;
+- соразмерность контура: обратимая правка risk `LOW` не разворачивает ожидания, контракт и receipts;
+- отказ принять объяснение задним числом как evidence;
 - использование существующего vendor-neutral Agent Execution Harness;
 - проектирование переносимого harness с отдельными host/project adapters;
 - CLI automation;
@@ -314,7 +317,8 @@ Runner сохраняет receipts автоматически в `tests/receipts
 - слабая Practicality → reference слишком абстрактен или ответ перегружен;
 - слабые Evidence/Risk → red lines недостаточно заметны;
 - слабая Simplicity → skill загружает слишком много канона;
-- слабый Next step → стиль не приводит к решению.
+- слабый Next step → стиль не приводит к решению;
+- срабатывание тяжёлого контура на `negative`-кейсах → правило не отмасштабировано по risk.
 
 Не считать все cases равновесными статистическими samples. Corpus — scenario coverage и regression evidence, а не оценка рыночной надёжности.
 

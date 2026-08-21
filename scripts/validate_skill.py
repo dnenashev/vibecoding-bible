@@ -33,6 +33,7 @@ CASES = REPO / "tests" / "forward-cases.yaml"
 INSTALLS = [
     Path.home() / ".codex" / "skills" / "vibecoding-bible",
     Path.home() / ".claude" / "skills" / "vibecoding-bible",
+    Path.home() / ".agents" / "skills" / "vibecoding-bible",
 ]
 
 PHASES = {"UNDERSTAND", "DESIGN", "BUILD", "VERIFY", "SHIP", "LEARN"}

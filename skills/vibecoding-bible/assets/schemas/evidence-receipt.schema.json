@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibecoding-bible/schemas/evidence-receipt.schema.json",
+  "title": "EvidenceReceipt",
+  "type": "object",
+  "required": ["id", "type", "producer", "trust", "binding", "observed_at", "payload"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9]+([._-][a-z0-9]+)*$"},
+    "type": {"enum": ["test", "command", "artifact", "readback", "reconciliation", "approval", "reported"]},
+    "producer": {
+      "type": "object",
+      "required": ["principal", "authenticated"],
+      "additionalProperties": false,
+      "properties": {
+        "principal": {"type": "string", "minLength": 1},
+        "authenticated": {"type": "boolean"}
+      }
+    },
+    "trust": {"enum": ["reported", "independent", "system_of_record"]},
+    "binding": {
+      "type": "object",
+      "required": ["session", "stage", "revision", "subject_fingerprint"],
+      "additionalProperties": false,
+      "properties": {
+        "workflow": {"type": "string"},
+        "session": {"type": "string"},
+        "stage": {"type": "string"},
+        "revision": {"type": "integer", "minimum": 0},
+        "subject_fingerprint": {"type": "string", "minLength": 1},
+        "config_fingerprint": {"type": "string"},
+        "environment": {"type": "string"}
+      }
+    },
+    "observed_at": {"type": "string", "format": "date-time"},
+    "payload": {
+      "type": "object",
+      "required": ["hash"],
+      "additionalProperties": false,
+      "properties": {
+        "hash": {"type": "string", "minLength": 1},
+        "artifact_ref": {"type": "string"},
+        "summary": {"type": "string", "maxLength": 500}
+      }
+    },
+    "expectation": {
+      "type": "object",
+      "description": "Заполняется до действия. committed_at строго раньше observed_at.",
+      "required": ["claim", "committed_hash", "committed_at", "verdict"],
+      "additionalProperties": false,
+      "properties": {
+        "claim": {"type": "string", "minLength": 1, "maxLength": 500},
+        "committed_hash": {"type": "string", "minLength": 1},
+        "committed_at": {"type": "string", "format": "date-time"},
+        "verdict": {"enum": ["HELD", "MISSED"]},
+        "diverged_at": {"type": "string", "maxLength": 500},
+        "because": {"type": "string", "maxLength": 500}
+      }
+    }
+  }
+}

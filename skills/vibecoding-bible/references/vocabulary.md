@@ -111,6 +111,18 @@ Implementation readiness не является release readiness. Зелёный
 Полная таблица «что доказывает / что не доказывает» — в
 [`project-contract.md`](project-contract.md), раздел «Evidence levels».
 
+## Вердикт ожидания
+
+`HELD | MISSED`
+
+Ожидание фиксируется до действия и сверяется с наблюдаемым результатом:
+
+- `HELD` — наблюдаемый результат совпал с заявленным ожиданием;
+- `MISSED` — результат разошёлся с ожиданием и называет неверное убеждение.
+
+`MISSED` не равен `FAIL`: действие могло выполниться успешно при неверной модели системы.
+Правила — в [`agent-harness.md`](agent-harness.md), раздел «EvidenceReceipt».
+
 ## Verdict проверки и решения человека на checkpoint
 
 Результат проверки (TestingHarness, EvalSuite, Registry run):

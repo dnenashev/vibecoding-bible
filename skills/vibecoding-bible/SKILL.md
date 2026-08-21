@@ -140,6 +140,7 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 | Идея, problem framing, product brief, requirements, scope | [`references/product.md`](references/product.md) |
 | Stack, system/data/API/integration architecture, ADR, migration design | [`references/architecture.md`](references/architecture.md) |
 | Repository work, planning, coding, debugging, git, context или delegation | [`references/build.md`](references/build.md) |
+| Ожидание перед действием, проверка по одному шагу против плана, потеря контекста | [`references/build.md`](references/build.md) |
 | Незнакомый, чужой или legacy код, работа без тестов, постепенная замена | [`references/build.md`](references/build.md) |
 | Ревью изменений, granularity PR, что ревью доказывает и чего не доказывает | [`references/quality.md`](references/quality.md) |
 | Bug от reproduction до preview, release batch/composition gate, exact-candidate QA и controlled release | [`references/bug-repair.md`](references/bug-repair.md) |
@@ -179,7 +180,7 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 
 ## Рабочие шаблоны
 
-Когда решение нужно зафиксировать или передать дальше, скопировать только подходящий шаблон из [`assets/templates/`](assets/templates/): Product Brief, ProjectContract, ADR, BugSpec, AgentHarnessContract, Required Test Registry, Release Checklist или Operations Runbook. Заполнить поля из сообщения, repository и evidence; не превращать шаблон в обязательную анкету и не выдумывать отсутствующие данные.
+Когда решение нужно зафиксировать или передать дальше, скопировать только подходящий шаблон из [`assets/templates/`](assets/templates/): Product Brief, ProjectContract, ADR, BugSpec, BeliefNotes, AgentHarnessContract, Required Test Registry, Release Checklist или Operations Runbook. Заполнить поля из сообщения, repository и evidence; не превращать шаблон в обязательную анкету и не выдумывать отсутствующие данные.
 
 ## Протокол изменения
 
@@ -201,6 +202,8 @@ UNDERSTAND → DESIGN → BUILD → VERIFY → SHIP → LEARN
 - Строить маленький scope, но production-ready внутри выбранной границы.
 - Не использовать mock/fake/stub/hardcoded success в production path. Test doubles не являются live evidence.
 - Начинать изменение behavior с подтверждённого Red; не ослаблять assertion ради Green.
+- Перед consequential или необратимым действием фиксировать проверяемое ожидание результата и сверять его после. Ожидание, записанное после действия, не является evidence.
+- Исчерпать вывод из уже собранных артефактов до дорогого действия.
 - Не придумывать факты, API, credentials, test results, sample size или thresholds.
 - Если данных для численного sample/threshold недостаточно, использовать time/cost box и adaptive stop rule; не подменять их произвольным числом примеров.
 - Предпочитать простую архитектуру; добавлять abstraction/framework/agent только при измеримой необходимости.
