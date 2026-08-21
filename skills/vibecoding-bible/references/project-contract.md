@@ -239,7 +239,10 @@ Artifact вроде «создать экран» или «написать AI-�
 | `READY_WITH_CONSTRAINTS` | Разрешён только exact safe scope с owner, expiry и control |
 | `BLOCKED` | Нельзя начинать или выпускать затронутый scope |
 
-До реализации release status всегда `PENDING`.
+Эта таблица описывает `implementation_verdict`. Release ведётся отдельным словарём
+`release_state`: `PENDING | CANDIDATE | ACCEPTED | RELEASED | BLOCKED`. До появления
+evidence кандидата release_state равен `PENDING`. Канонические определения обоих
+словарей — в [`vocabulary.md`](vocabulary.md); здесь их не переопределять.
 
 ### Implementation algorithm
 
@@ -263,7 +266,7 @@ Artifact вроде «создать экран» или «написать AI-�
 7. Проверить security/data/operational impact по risk mode.
 8. Проверить migrations/integrations/deploy/readback/rollback.
 9. Проверить unresolved failures, skip/todo и constraints.
-10. Выдать отдельный release verdict.
+10. Выдать `release_state` и, если он не `RELEASED`, назвать blocker или недостающее evidence.
 
 Constraint обязан содержать exact scope, owner, expiry, compensating control, validation и closure criterion. Иначе это blocker.
 

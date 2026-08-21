@@ -246,6 +246,10 @@ Human QA обязательна, если acceptance зависит от UX, в�
 
 До required ACCEPT не выполнять installation/deploy/external mutation.
 
+Состояние доставки вести словарём `release_state` из [`vocabulary.md`](vocabulary.md):
+immutable candidate — `CANDIDATE`, точный ACCEPT — `ACCEPTED`, выполненные deploy и
+readback — `RELEASED`. Не объявлять `RELEASED` по факту сборки кандидата.
+
 ## 12. Выполнить release adapter
 
 Universal release controller принимает только accepted immutable candidate и выполняет platform-specific шаги:
