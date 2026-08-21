@@ -170,19 +170,50 @@ def check_corpus(report: Report) -> None:
 
 
 def check_installs(report: Report) -> None:
-    release_tree = SKILL.resolve()
+    """Установленная копия должна совпадать с релизным тегом, а не с рабочим деревом."""
+    version = (SKILL / "VERSION").read_text(encoding="utf-8").strip()
+    tag = f"v{version}"
+    listing = subprocess.run(
+        ["git", "-C", str(REPO), "ls-tree", "-r", tag, "--", "skills/vibecoding-bible"],
+        capture_output=True, text=True)
+    if listing.returncode != 0:
+        report.warn("installs", f"тега {tag} нет — сверить установленные копии не с чем")
+        return
+
+    released: dict[str, str] = {}
+    for line in listing.stdout.splitlines():
+        meta, path = line.split("\t", 1)
+        _mode, kind, blob = meta.split()
+        if kind == "blob":
+            released[path.removeprefix("skills/vibecoding-bible/")] = blob
+
     for install in INSTALLS:
+        where = str(install)
         if not install.exists():
-            report.warn(str(install), "skill не установлен в этой среде")
+            report.warn(where, "skill не установлен в этой среде")
             continue
-        if install.is_symlink():
-            if install.resolve() != release_tree:
-                report.error(str(install), f"симлинк ведёт не в релизное дерево: {install.resolve()}")
-            continue
-        diff = subprocess.run(["diff", "-rq", str(release_tree), str(install)],
-                              capture_output=True, text=True)
-        if diff.returncode != 0:
-            report.error(str(install), "установленная копия расходится с релизным деревом")
+        root = install.resolve()
+        installed = {
+            f.relative_to(root).as_posix()
+            for f in root.rglob("*") if f.is_file() and ".git" not in f.parts
+        }
+        missing = sorted(set(released) - installed)
+        extra = sorted(installed - set(released))
+        if missing:
+            report.error(where, f"нет файлов релиза {tag}: {', '.join(missing[:5])}")
+        if extra:
+            report.error(where, f"лишние файлы вне релиза: {', '.join(extra[:5])}")
+        changed = []
+        for rel, blob in released.items():
+            target = root / rel
+            if not target.exists():
+                continue
+            actual = subprocess.run(["git", "hash-object", str(target)],
+                                    capture_output=True, text=True).stdout.strip()
+            if actual != blob:
+                changed.append(rel)
+        if changed:
+            report.error(where, f"содержимое расходится с {tag}: {', '.join(changed[:5])}")
 
 
 def main() -> int:
