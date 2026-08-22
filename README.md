@@ -6,7 +6,7 @@
 
 Skill работает как senior product-and-engineering partner: определяет текущую фазу, выбирает уровень строгости, подключает только нужные правила и заканчивает одним проверяемым следующим шагом.
 
-Текущая версия: [`2.0.0`](skills/vibecoding-bible/VERSION).
+Текущая версия: [`2.2.0`](skills/vibecoding-bible/VERSION).
 
 ## Быстрый старт
 

@@ -8,7 +8,8 @@
 3. ссылки: все внутренние markdown-ссылки резолвятся;
 4. словарь: enum-токены употребляются согласованно, старая модель не возвращается;
 5. корпус forward-cases: id, kind, ожидания, отсутствие захардкоженной версии;
-6. установленные копии совпадают с релизным деревом.
+6. README объявляет ту же версию, что и файл VERSION;
+7. установленные копии совпадают с релизным деревом.
 
 Использование: python3 scripts/validate_skill.py [--strict]
 Коды возврата: 0 — ошибок нет, 1 — есть ERROR.
@@ -30,6 +31,10 @@ except ImportError:
 REPO = Path(__file__).resolve().parent.parent
 SKILL = REPO / "skills" / "vibecoding-bible"
 CASES = REPO / "tests" / "forward-cases.yaml"
+README = REPO / "README.md"
+# Объявление версии на витрине репозитория. Историческе упоминания («до версии X»)
+# намеренно не попадают под шаблон.
+README_VERSION = re.compile(r"Текущая версия:\s*\[`(\d+\.\d+\.\d+)`\]")
 INSTALLS = [
     Path.home() / ".codex" / "skills" / "vibecoding-bible",
     Path.home() / ".claude" / "skills" / "vibecoding-bible",
@@ -170,6 +175,21 @@ def check_corpus(report: Report) -> None:
                     report.error(where, f"{field}: захардкожена версия; нужен плейсхолдер {{{{VERSION}}}}")
 
 
+def check_readme_version(report: Report) -> None:
+    """README рендерится на странице репозитория и уже расходился с VERSION."""
+    if not README.exists():
+        report.warn("README.md", "нет README — версию на витрине сверить не с чем")
+        return
+    version = (SKILL / "VERSION").read_text(encoding="utf-8").strip()
+    found = README_VERSION.findall(README.read_text(encoding="utf-8"))
+    if not found:
+        report.error("README.md", "нет объявления «Текущая версия: [`X.Y.Z`](...)»")
+        return
+    for declared in found:
+        if declared != version:
+            report.error("README.md", f"объявлена версия {declared}, а VERSION={version}")
+
+
 def check_installs(report: Report) -> None:
     """Установленная копия должна совпадать с релизным тегом, а не с рабочим деревом."""
     version = (SKILL / "VERSION").read_text(encoding="utf-8").strip()
@@ -228,6 +248,7 @@ def main() -> int:
     check_links(report)
     check_vocabulary(report)
     check_corpus(report)
+    check_readme_version(report)
     check_installs(report)
 
     for line in report.errors + report.warnings:
